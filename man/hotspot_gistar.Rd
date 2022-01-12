@@ -65,7 +65,7 @@ parameters set automatically will be suppressed. The default is
 ignored if \code{kde = FALSE}.}
 }
 \value{
-An \code{\link[sf]{sf}} tibble of regular grid cells and
+An \code{\link[sf]{sf}} tibble of regular grid cells with
 corresponding point counts,
 \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}} or
 \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}
@@ -97,6 +97,19 @@ function to adjust the corresponding \eqn{p}-values for multiple comparison.
 The function also returns counts of points ineach cell and (by default but
 optionally) kernel density estimates using the \code{\link[SpatialKDE]{kde}}
 function.
+\subsection{Coverage of the output data}{
+
+The grid produced by this function covers the convex hull of the input data
+layer. This means the result may include
+\ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}} or
+\ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}}
+values for cells that are outside the area for which data were provided,
+which could be misleading. To handle this, consider cropping the output layer
+to the area for which data are available. For example, if you only have crime
+data for a particular district, crop the output dataset to the district
+boundary using \code{\link[sf]{st_intersection}}.
+}
+
 \subsection{Automatic cell-size selection}{
 
 If no cell size is given then the cell size will be set so that there are 50

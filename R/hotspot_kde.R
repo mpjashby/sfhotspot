@@ -25,9 +25,9 @@
 #'
 #' @details
 #'
-#' This function uses functions from the \code{\link{SpatialKDE}} package to
-#' create a regular two-dimensional grid of cells and then calculate the density
-#' of points in each cell. The count of points in each cell is also returned.
+#' This function uses functions from the \code{SpatialKDE} package to create a
+#' regular two-dimensional grid of cells and then calculate the density of
+#' points in each cell. The count of points in each cell is also returned.
 #'
 #' ## Coverage of the output data
 #'
@@ -72,116 +72,25 @@ hotspot_kde <- function (
   ...
 ) {
 
-  # Check inputs
+  # Check inputs that are not checked in a helper function
   if (!inherits(data, "sf"))
     rlang::abort("`data` must be an SF object")
   if (any(!sf::st_is(data, "POINT")))
     rlang::abort("`data` must be an SF object containing points")
-  if (!rlang::is_null(cell_size) & !rlang::is_double(cell_size, n = 1))
-    rlang::abort("`cell_size` must be `NULL` or a single numeric value")
-  if (!rlang::is_null(cell_size)) {
-    if (cell_size <= 0) rlang::abort("`cell_size` must be greater than zero")
-  }
-  if (!rlang::is_null(bandwidth) & !rlang::is_double(bandwidth, n = 1))
-    rlang::abort("`bandwidth` must be NULL or a single numeric value")
-  if (!rlang::is_null(bandwidth)) {
-    if (bandwidth <= 0) rlang::abort("`bandwidth` must be greater than zero")
-  }
-  grid_type <- rlang::arg_match(grid_type, c("rect", "hex"))
   if (!rlang::is_logical(quiet))
     rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
-  if (sf::st_is_longlat(data)) {
-    rlang::abort(c(
-      "KDE values cannot be calculated for lon/lat data",
-      "i" = "Transform `data` to use a projected CRS"
-    ))
-  }
-
-  # Find spatial unit
-  unit <- sf::st_crs(data, parameters = TRUE)$units_gdal
-  unit_pl <- ifelse(
-    unit %in% c("metre", "meter"),
-    "metres",
-    ifelse(
-      unit %in% c("foot", "US survey foot"),
-      "feet",
-      ifelse(unit == "degree", "degrees", paste("(unit =", unit))
-    )
-  )
-
-  # Set cell size if not specified
-  if (rlang::is_null(cell_size)) {
-
-    bbox <- sf::st_bbox(data)
-    side_length <- min(bbox$xmax - bbox$xmin, bbox$ymax - bbox$ymin)
-
-    if (unit %in% c("metre", "meter", "foot", "US survey foot")) {
-
-      # If the units are metres or feet, round the cell size so it is a round
-      # number of 100 metres/feet
-      cell_size <- floor((side_length / 50) / 100) * 100
-
-    } else {
-
-      # Otherwise, just set the cell size so there are 50 cells on the shortest
-      # size
-      cell_size <- side_length / 50
-
-    }
-
-    if (rlang::is_false(quiet)) {
-      rlang::inform(c("i" = paste(
-        "Cell size set to", format(cell_size, big.mark = ","), unit_pl,
-        "automatically"
-      )))
-    }
-
-  }
-
-  # Set bandwidth if not specified
-  if (rlang::is_null(bandwidth)) {
-    bandwidth <- bandwidth_nrd_sf(data)
-    if (rlang::is_false(quiet)) {
-      rlang::inform(c("i" = paste(
-        "Bandwidth set to", format(bandwidth, big.mark = ","), unit_pl,
-        "automatically based on rule of thumb"
-      )))
-    }
-  }
 
   # Create grid
-  if (grid_type == "hex") {
-    grid <- SpatialKDE::create_grid_hexagonal(data, cell_size = cell_size)
-  } else {
-    grid <- SpatialKDE::create_grid_rectangular(data, cell_size = cell_size)
-  }
-  grid$id <- 1:nrow(grid)
+  grid <- create_grid(data, cell_size = cell_size, grid_type = grid_type)
 
   # Count points
-  # Join the grid cell IDs to the points layer and, count how many points have
-  # the unique ID of each grid cell, join the counts back to the grid and
-  # replace missing values (the consequence of cells not matched in the second
-  # join) with zeros
-  ids <- sf::st_drop_geometry(sf::st_join(data, grid))
-  counts <- stats::aggregate(ids$offense_type, list("id" = ids$id), FUN = length)
-  counts <- merge(counts, grid, by = "id", all.y = TRUE)
-  counts$n <- ifelse(is.na(counts$x), 0, counts$x)
-  counts <- sf::st_as_sf(counts)
+  counts <- count_points_in_polygons(data, grid)
 
   # Calculate KDE
-  if (rlang::is_true(quiet)) {
-    kde_val <- suppressMessages(
-      SpatialKDE::kde(data, band_width = bandwidth, grid = grid)
-    )
-  } else {
-    kde_val <- SpatialKDE::kde(data, band_width = bandwidth, grid = grid)
-  }
-
-  # Join results
-  result <- counts
-  result$kde <- kde_val$kde_value
+  kde_val <- kernel_density(data, grid, bandwidth = bandwidth, quiet = quiet)
+  counts$kde <- kde_val$kde_value
 
   # Return result
-  sf::st_as_sf(tibble::as_tibble(result[, c("id", "n", "kde", "geometry")]))
+  sf::st_as_sf(tibble::as_tibble(counts[, c("n", "kde", "geometry")]))
 
 }

@@ -52,81 +52,21 @@ hotspot_count <- function (
   quiet = FALSE
 ) {
 
-  # Check inputs
+  # Check inputs that are not checked in a helper function
   if (!inherits(data, "sf"))
     rlang::abort("`data` must be an SF object")
   if (any(!sf::st_is(data, "POINT")))
     rlang::abort("`data` must be an SF object containing points")
-  if (!rlang::is_null(cell_size) & !rlang::is_double(cell_size, n = 1))
-    rlang::abort("`cell_size` must be `NULL` or a single numeric value")
-  if (!rlang::is_null(cell_size)) {
-    if (cell_size <= 0) rlang::abort("`cell_size` must be greater than zero")
-  }
-  grid_type <- rlang::arg_match(grid_type, c("rect", "hex"))
   if (!rlang::is_logical(quiet))
     rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
 
-  # Find spatial unit
-  unit <- sf::st_crs(data, parameters = TRUE)$units_gdal
-  unit_pl <- ifelse(
-    unit %in% c("metre", "meter"),
-    "metres",
-    ifelse(
-      unit %in% c("foot", "US survey foot"),
-      "feet",
-      ifelse(unit == "degree", "degrees", paste("(unit =", unit))
-    )
-  )
-
-  # Set cell size if not specified
-  if (rlang::is_null(cell_size)) {
-
-    bbox <- sf::st_bbox(data)
-    side_length <- min(bbox$xmax - bbox$xmin, bbox$ymax - bbox$ymin)
-
-    if (unit %in% c("metre", "meter", "foot", "US survey foot")) {
-
-      # If the units are metres or feet, round the cell size so it is a round
-      # number of 100 metres/feet
-      cell_size <- floor((side_length / 50) / 100) * 100
-
-    } else {
-
-      # Otherwise, just set the cell size so there are 50 cells on the shortest
-      # size
-      cell_size <- side_length / 50
-
-    }
-
-    if (rlang::is_false(quiet)) {
-      rlang::inform(c("i" = paste(
-        "Cell size set to", format(cell_size, big.mark = ","), unit_pl,
-        "automatically"
-      )))
-    }
-
-  }
-
   # Create grid
-  if (grid_type == "hex") {
-    grid <- SpatialKDE::create_grid_hexagonal(data, cell_size = cell_size)
-  } else {
-    grid <- SpatialKDE::create_grid_rectangular(data, cell_size = cell_size)
-  }
-  grid$id <- 1:nrow(grid)
+  grid <- create_grid(data, cell_size = cell_size, grid_type = grid_type)
 
   # Count points
-  # Join the grid cell IDs to the points layer and, count how many points have
-  # the unique ID of each grid cell, join the counts back to the grid and
-  # replace missing values (the consequence of cells not matched in the second
-  # join) with zeros
-  ids <- sf::st_drop_geometry(sf::st_join(data, grid))
-  counts <- stats::aggregate(ids$offense_type, list("id" = ids$id), FUN = length)
-  counts <- merge(counts, grid, by = "id", all.y = TRUE)
-  counts$n <- ifelse(is.na(counts$x), 0, counts$x)
-  counts <- sf::st_as_sf(counts)
+  counts <- count_points_in_polygons(data, grid)
 
   # Return result
-  sf::st_as_sf(tibble::as_tibble(counts[, c("id", "n", "geometry")]))
+  counts
 
 }

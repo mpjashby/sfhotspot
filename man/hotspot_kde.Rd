@@ -38,7 +38,7 @@ parameters set automatically will be suppressed. The default is
 \item{...}{Further arguments passed to \code{\link[SpatialKDE]{kde}}.}
 }
 \value{
-An \code{\link[sf]{sf}} tibble of regular grid cells and
+An \code{\link[sf]{sf}} tibble of regular grid cells with
 corresponding point counts and kernel density estimates for each cell.
 
 The output from this function can be plotted in the same way as for other
@@ -48,9 +48,20 @@ SF objects, for which see \code{vignette("sf5", package = "sf")}.
 Estimate two-dimensional kernel density of points on a regular grid
 }
 \details{
-This function uses functions from the \code{\link{SpatialKDE}} package to
-create a regular two-dimensional grid of cells and then calculate the density
-of points in each cell. The count of points in each cell is also returned.
+This function uses functions from the \code{SpatialKDE} package to create a
+regular two-dimensional grid of cells and then calculate the density of
+points in each cell. The count of points in each cell is also returned.
+\subsection{Coverage of the output data}{
+
+The grid produced by this function covers the convex hull of the input data
+layer. This means the result may include KDE values for cells that are
+outside the area for which data were provided, which could be misleading. To
+handle this, consider cropping the output layer to the area for which data
+are available. For example, if you only have crime data for a particular
+district, crop the output dataset to the district boundary using
+\code{\link[sf]{st_intersection}}.
+}
+
 \subsection{Automatic cell-size selection}{
 
 If no cell size is given then the cell size will be set so that there are 50
@@ -67,11 +78,11 @@ library(sf)
 memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
 
 # Automatically set grid-cell size, bandwidth and neighbour distance
-hotspot_gistar(memphis_robberies_utm)
+hotspot_kde(memphis_robberies_utm)
 
 # Manually set grid-cell size and bandwidth in metres, since the
-# `memphis_robberies` # dataset uses a co-ordinate reference system (UTM zone
-# 15 north) that is # specified in metres
-hotspot_gistar(memphis_robberies_utm, cell_size = 200, bandwidth = 1000)
+# `memphis_robberies_utm` dataset uses a co-ordinate reference system (UTM
+# zone 15 north) that is specified in metres
+hotspot_kde(memphis_robberies_utm, cell_size = 200, bandwidth = 1000)
 
 }

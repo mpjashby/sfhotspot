@@ -1,0 +1,69 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# sfhotspot
+
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/sfhotspot)](https://CRAN.R-project.org/package=sfhotspot)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+sfhotspot provides functions to identify and understand clusters of points
+(typically representing the locations of places or events). All the functions in
+the package work on and produce [simple
+features](https://r-spatial.github.io/sf/) (SF) objects, which means they can be
+used as part of modern spatial analysis in R.
+
+## Installation
+
+You can install the development version of sfhotspot from 
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("mpjashby/sfhotspot")
+```
+
+## Example
+
+We can use the `hotspot_gistar()` function to identify cells in a regular grid
+in which there are more/fewer points than would be expected if the points were
+distributed randomly. In this example, the points represent the locations of 
+personal robberies in Memphis, which is a dataset included with the package.
+
+```{r example}
+# Load packages
+library(sf)
+library(sfhotspot)
+library(tidyverse)
+
+# Transform data to UTM zone 15N so that we can think in metres, not decimal 
+# degrees
+memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
+
+# Identify hotspots, set all the parameters automatically by not specifying cell 
+# size, bandwidth, etc.
+memphis_robberies_hotspots <- hotspot_gistar(memphis_robberies_utm)
+
+# Visualise the hotspots by showing only those cells that have significantly
+# more points than expected by chance. For those cells, show the estimated
+# density of robberies.
+memphis_robberies_hotspots %>% 
+  filter(gistar > 0, pvalue < 0.05) %>% 
+  ggplot(aes(colour = kde, fill = kde)) +
+  geom_sf() +
+  scale_colour_continuous(aesthetics = c("colour", "fill")) +
+  theme_void()
+```

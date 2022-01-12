@@ -3,6 +3,8 @@
 #' The code here is identical to that in \code{\link[MASS]{bandwidth.nrd}}
 #'
 #' @param data \code{\link[sf]{sf}} data frame containing points.
+#'
+#' @noRd
 
 bandwidth_nrd_sf <- function (data) {
 

@@ -1,6 +1,6 @@
 Package: sfhotspot
-Title: Hotspot Mapping with Simple Features
-Version: 0.0.0.9000
+Title: Hotspot Analysis with Simple Features
+Version: 0.1
 Authors@R: 
     person("Matt", "Ashby", , "matthew.ashby@ucl.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4201-9239"))
@@ -17,4 +17,9 @@ Imports:
     tibble
 Depends: 
     R (>= 2.10)
+Suggests:
+    testthat (>= 3.0.0),
+    lubridate,
+    covr
 LazyData: true
+Config/testthat/edition: 3

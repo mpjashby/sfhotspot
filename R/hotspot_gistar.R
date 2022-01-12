@@ -124,38 +124,20 @@ hotspot_gistar <- function (
   ...
 ) {
 
-  # Check inputs
+  # Check inputs that are not checked in a helper function
   if (!inherits(data, "sf"))
     rlang::abort("`data` must be an SF object")
   if (any(!sf::st_is(data, "POINT")))
     rlang::abort("`data` must be an SF object containing points")
-  if (!rlang::is_null(cell_size) & !rlang::is_double(cell_size, n = 1))
-    rlang::abort("`cell_size` must be `NULL` or a single numeric value")
-  if (!rlang::is_null(cell_size)) {
-    if (cell_size <= 0) rlang::abort("`cell_size` must be greater than zero")
-  }
-  if (!rlang::is_null(bandwidth) & !rlang::is_double(bandwidth, n = 1))
-    rlang::abort("`bandwidth` must be NULL or a single numeric value")
-  if (!rlang::is_null(bandwidth)) {
-    if (bandwidth <= 0) rlang::abort("`bandwidth` must be greater than zero")
-  }
-  grid_type <- rlang::arg_match(grid_type, c("rect", "hex"))
-  if (!rlang::is_null(nb_dist) & !rlang::is_double(nb_dist, n = 1))
-    rlang::abort("`nb_dist` must be `NULL` or a single numeric value")
-  if (!rlang::is_null(nb_dist)) {
-    if (nb_dist <= 0) rlang::abort("`nb_dist` must be greater than zero")
-  }
-  if (!rlang::is_null(p_adjust_method)) {
-    if (!p_adjust_method %in% stats::p.adjust.methods)
-      rlang::abort(paste0(
-        "`p_adjust_method` must be either `NULL` or one of \"",
-        paste(stats::p.adjust.methods, collapse = "\", \""), "\""
-      ))
-  }
-  if (!rlang::is_logical(quiet))
+  if (!rlang::is_logical(quiet, n = 1))
     rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
   if (sf::st_is_longlat(data)) {
     if (rlang::is_true(kde)) {
+      # `kernel_density()` will throw an error in this case as well, but it is
+      # useful to catch it in `hotspot_gistar()` because in `hotspot_gistar()`
+      # we can solve the problem by setting `kde = FALSE` whereas the
+      # recommendation in the error produced by `kernel_density()` is to
+      # transform the data, which may not be necessary
       rlang::abort(c(
         "KDE values cannot be calculated for lon/lat data",
         "i" = "Transform `data` to use a projected CRS or set `kde = FALSE`"
@@ -169,124 +151,43 @@ hotspot_gistar <- function (
     }
   }
 
-  # Find spatial unit
-  unit <- sf::st_crs(data, parameters = TRUE)$units_gdal
-  unit_pl <- ifelse(
-    unit %in% c("metre", "meter"),
-    "metres",
-    ifelse(
-      unit %in% c("foot", "US survey foot"),
-      "feet",
-      ifelse(unit == "degree", "degrees", paste("(unit =", unit))
-    )
-  )
-
-  # Set cell size if not specified
-  if (rlang::is_null(cell_size)) {
-
-    bbox <- sf::st_bbox(data)
-    side_length <- min(bbox$xmax - bbox$xmin, bbox$ymax - bbox$ymin)
-
-    if (unit %in% c("metre", "meter", "foot", "US survey foot")) {
-
-      # If the units are metres or feet, round the cell size so it is a round
-      # number of 100 metres/feet
-      cell_size <- floor((side_length / 50) / 100) * 100
-
-    } else {
-
-      # Otherwise, just set the cell size so there are 50 cells on the shortest
-      # size
-      cell_size <- side_length / 50
-
-    }
-
-    if (rlang::is_false(quiet)) {
-      rlang::inform(c("i" = paste(
-        "Cell size set to", format(cell_size, big.mark = ","), unit_pl,
-        "automatically"
-      )))
-    }
-
-  }
-
-  # Set bandwidth if not specified
-  if (rlang::is_null(bandwidth)) {
-    bandwidth <- bandwidth_nrd_sf(data)
-    if (rlang::is_false(quiet)) {
-      rlang::inform(c("i" = paste(
-        "Bandwidth set to", format(bandwidth, big.mark = ","), unit_pl,
-        "automatically based on rule of thumb"
-      )))
-    }
-  }
-
-  # Set neighbour distance if not specified
-  # No message is created in this case because users will almost always want to
-  # leave the value as the default, and because the default value is fixed so is
-  # given in the manual page
-  if (rlang::is_null(nb_dist)) nb_dist <- cell_size * sqrt(2)
+  # Set cell size if not specified (do this here because it is needed by both
+  # `create_grid()` and `gistar()`)
+  if (rlang::is_null(cell_size))
+    cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
 
   # Create grid
-  if (grid_type == "hex") {
-    grid <- SpatialKDE::create_grid_hexagonal(data, cell_size = cell_size)
-  } else {
-    grid <- SpatialKDE::create_grid_rectangular(data, cell_size = cell_size)
-  }
-  grid$id <- 1:nrow(grid)
+  grid <- create_grid(data, cell_size = cell_size, grid_type = grid_type)
 
   # Count points
-  # Join the grid cell IDs to the points layer and, count how many points have
-  # the unique ID of each grid cell, join the counts back to the grid and
-  # replace missing values (the consequence of cells not matched in the second
-  # join) with zeros
-  ids <- sf::st_drop_geometry(sf::st_join(data, grid))
-  counts <- stats::aggregate(ids$offense_type, list("id" = ids$id), FUN = length)
-  counts <- merge(counts, grid, by = "id", all.y = TRUE)
-  counts$n <- ifelse(is.na(counts$x), 0, counts$x)
-  counts <- sf::st_as_sf(counts)
+  counts <- count_points_in_polygons(data, grid)
 
   # Calculate KDE
-  if (kde == TRUE) {
-    if (rlang::is_true(quiet)) {
-      kde_val <- suppressMessages(
-        SpatialKDE::kde(data, band_width = bandwidth, grid = grid)
-      )
-    } else {
-      kde_val <- SpatialKDE::kde(data, band_width = bandwidth, grid = grid)
-    }
-  }
+  if (rlang::is_true(kde))
+    kde_val <- kernel_density(data, grid, bandwidth = bandwidth, quiet = quiet)
 
-  # Find neighbours
-  centroids <- suppressWarnings(sf::st_centroid(grid))
-  nb <- spdep::dnearneigh(sf::st_coordinates(centroids), 0, nb_dist)
-
-  # Determine if each cell should be treated as a neighbour of itself
-  if (include_self == TRUE) {
-    nb <- spdep::include.self(nb)
-  }
-
-  # Calculate gi* statistic
-  gi <- spdep::localG(counts$n, listw = spdep::nb2listw(nb, style = "B"))
+  # Calculate Gi*
+  result <- gistar(
+    counts,
+    n = "n",
+    nb_dist = nb_dist,
+    cell_size = cell_size,
+    include_self = include_self,
+    p_adjust_method = p_adjust_method,
+    quiet = quiet
+  )
 
   # Join results
-  result <- counts
   if (rlang::is_true(kde)) result$kde <- kde_val$kde_value
-  result$gistar <- as.numeric(gi)
-  result$pvalue <- spdep::p.adjustSP(
-    2 * stats::pnorm(-abs(as.numeric(result$gistar))),
-    nb,
-    method = ifelse(rlang::is_null(p_adjust_method), "none", p_adjust_method)
-  )
 
   # Return result
   if (rlang::is_true(kde)) {
     sf::st_as_sf(tibble::as_tibble(
-      result[, c("id", "n", "kde", "gistar", "pvalue", "geometry")]
+      result[, c("n", "kde", "gistar", "pvalue", "geometry")]
     ))
   } else {
     sf::st_as_sf(tibble::as_tibble(
-      result[, c("id", "n", "gistar", "pvalue", "geometry")]
+      result[, c("n", "gistar", "pvalue", "geometry")]
     ))
   }
 

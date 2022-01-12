@@ -2,3 +2,7 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^data-raw$
+^README\.Rmd$
+^codecov\.yml$
+^R/hotspot_classify.R$
+^R/hotspot_classify_params.R$

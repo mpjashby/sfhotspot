@@ -4,8 +4,57 @@
 \alias{hotspot_count}
 \title{Count points in cells in a two-dimensional grid}
 \usage{
-hotspot_count(data, cell_size = NULL, grid_type = "rect", quiet = FALSE, ...)
+hotspot_count(data, cell_size = NULL, grid_type = "rect", quiet = FALSE)
+}
+\arguments{
+\item{data}{\code{\link[sf]{sf}} data frame containing points.}
+
+\item{cell_size}{\code{numeric} value specifying the size of each equally
+spaced grid cell, using the same units (metres, degrees, etc.) as used in
+the \code{sf} data frame given in the \code{data} argument. If this
+argument is \code{NULL} (the default), the cell size will be calculated
+automatically (see Details).}
+
+\item{grid_type}{\code{character} specifying whether the grid should be made
+up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).}
+
+\item{quiet}{if set to \code{TRUE}, messages reporting the values of any
+parameters set automatically will be suppressed. The default is
+\code{FALSE}.}
+}
+\value{
+An \code{\link[sf]{sf}} tibble of regular grid cells with
+corresponding point counts for each cell.
+
+The output from this function can be plotted in the same way as for other
+SF objects, for which see \code{vignette("sf5", package = "sf")}.
 }
 \description{
 Count points in cells in a two-dimensional grid
+}
+\details{
+This function counts the number of points in each cell in a regular grid.
+\subsection{Automatic cell-size selection}{
+
+If no cell size is given then the cell size will be set so that there are 50
+cells on the shorter side of the grid. If the \code{data} SF object is projected
+in metres or feet, the number of cells will be adjusted upwards so that the
+cell size is a multiple of 100.
+}
+}
+\examples{
+
+# Set cell size automatically
+hotspot_count(memphis_robberies)
+
+# Transform data to UTM zone 15N so that cell_size and bandwidth can be set
+# in metres
+library(sf)
+memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
+
+# Manually set grid-cell size in metres, since the `memphis_robberies_utm`
+# dataset uses a co-ordinate reference system (UTM zone 15 north) that is
+# specified in metres
+hotspot_count(memphis_robberies_utm, cell_size = 200)
+
 }
