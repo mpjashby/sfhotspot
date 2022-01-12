@@ -157,7 +157,7 @@ hotspot_gistar <- function (
     cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
 
   # Create grid
-  grid <- create_grid(data, cell_size = cell_size, grid_type = grid_type)
+  grid <- create_grid(data, cell_size = cell_size, grid_type = grid_type, quiet = quiet)
 
   # Count points
   counts <- count_points_in_polygons(data, grid)

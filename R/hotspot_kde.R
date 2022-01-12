@@ -81,7 +81,7 @@ hotspot_kde <- function (
     rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
 
   # Create grid
-  grid <- create_grid(data, cell_size = cell_size, grid_type = grid_type)
+  grid <- create_grid(data, cell_size = cell_size, grid_type = grid_type, quiet = quiet)
 
   # Count points
   counts <- count_points_in_polygons(data, grid)

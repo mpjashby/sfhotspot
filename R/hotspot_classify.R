@@ -270,7 +270,7 @@ hotspot_classify <- function (
     cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
 
   # Create grid
-  grid <- create_grid(data, cell_size = cell_size, grid_type = grid_type)
+  grid <- create_grid(data, cell_size = cell_size, grid_type = grid_type, quiet = quiet)
 
   # Categorise data by period
   if (unit == "year") {
