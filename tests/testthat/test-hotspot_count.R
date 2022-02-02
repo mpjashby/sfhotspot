@@ -17,12 +17,12 @@ result <- hotspot_count(data = data_sf)
 
 ## Errors ----
 
-test_that("error if `data` is not an SF object containing points", {
+test_that("function produces an error if `data` is not an SF object containing points", {
   expect_error(hotspot_count(data = data_df))
   expect_error(hotspot_count(data = sf::st_cast(data_sf, "LINESTRING")))
 })
 
-test_that("error if `quiet` is not `TRUE` or `FALSE`", {
+test_that("function produces an error if `quiet` is not `TRUE` or `FALSE`", {
   expect_error(hotspot_count(data = data_sf, quiet = character()))
 })
 
@@ -45,8 +45,4 @@ test_that("output object has the required column names", {
 test_that("columns in output have the required types", {
   expect_type(result$n, "double")
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
-})
-
-test_that("output has not changed since last time the package was checked", {
-  expect_snapshot_value(result, style = "serialize")
 })

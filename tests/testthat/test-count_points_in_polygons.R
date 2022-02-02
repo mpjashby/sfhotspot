@@ -53,8 +53,3 @@ test_that("output object has the required column names", {
 test_that("columns in output have the required types", {
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
 })
-
-# Remember to run `snapshot_accept()` if the value for this test changes
-test_that("output has not changed since last time the package was checked", {
-  expect_snapshot_value(result, style = "serialize")
-})
