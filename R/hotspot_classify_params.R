@@ -36,7 +36,7 @@
 #'
 #' @export
 
-hotspot_classify_params <- function (
+hotspot_classify_params <- function(
   hotspot_prop = 0.1,
   persistent_prop = 0.8,
   recent_prop = 0.2,
@@ -49,7 +49,7 @@ hotspot_classify_params <- function (
   # Check inputs that are not checked in another helper function
   lapply(
     list(hotspot_prop, persistent_prop, recent_prop, critical_p),
-    function (x) {
+    function(x) {
       arg_name <- rlang::as_label(rlang::quo(x))
       if (!rlang::is_double(x) | length(x) != 1)
         rlang::abort(paste0("`", arg_name, "` must be a single numeric value"))

@@ -11,7 +11,7 @@
 #'
 #' @noRd
 
-set_bandwidth <- function (data, quiet = TRUE) {
+set_bandwidth <- function(data, quiet = TRUE) {
 
   # Check inputs
   if (!inherits(data, "sf"))

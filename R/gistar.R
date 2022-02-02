@@ -43,7 +43,7 @@
 #'   are given in the manual page for \code{\link[spdep]{localG}}.
 #' @noRd
 
-gistar <- function (
+gistar <- function(
   counts,
   n,
   nb_dist = NULL,

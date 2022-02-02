@@ -14,7 +14,7 @@ result <- hotspot_gistar(data_sf, quiet = TRUE)
 
 ## Errors ----
 
-test_that("error if `data` is not an SF object containing points in a projected CRS", {
+test_that("error if `data` is not an SF points object in a projected CRS", {
   expect_error(hotspot_gistar(data = sf::st_drop_geometry(data_sf)))
   expect_error(hotspot_gistar(data = sf::st_cast(data_sf, "LINESTRING")))
   expect_error(hotspot_gistar(data = sf::st_transform(data_sf, 4326)))
@@ -32,7 +32,9 @@ test_that("error if inputs aren't of length 1", {
 ## Messages ----
 
 test_that("message if `data` use a geographic CRS", {
-  expect_message(hotspot_gistar(data = sf::st_transform(data_sf, 4326), kde = FALSE))
+  expect_message(
+    hotspot_gistar(data = sf::st_transform(data_sf, 4326), kde = FALSE)
+  )
 })
 
 
@@ -48,7 +50,10 @@ test_that("function produces an SF tibble", {
 })
 
 test_that("output object has the required column names", {
-  expect_equal(names(hotspot_gistar(data_sf, kde = FALSE)), c("n", "gistar", "pvalue", "geometry"))
+  expect_equal(
+    names(hotspot_gistar(data_sf, kde = FALSE)),
+    c("n", "gistar", "pvalue", "geometry")
+  )
   expect_equal(names(result), c("n", "kde", "gistar", "pvalue", "geometry"))
 })
 

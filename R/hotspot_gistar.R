@@ -111,7 +111,7 @@
 #'
 #' @export
 
-hotspot_gistar <- function (
+hotspot_gistar <- function(
   data,
   cell_size = NULL,
   grid_type = "rect",
@@ -157,7 +157,12 @@ hotspot_gistar <- function (
     cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
 
   # Create grid
-  grid <- create_grid(data, cell_size = cell_size, grid_type = grid_type, quiet = quiet)
+  grid <- create_grid(
+    data,
+    cell_size = cell_size,
+    grid_type = grid_type,
+    quiet = quiet
+  )
 
   # Count points
   counts <- count_points_in_polygons(data, grid)

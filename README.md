@@ -9,6 +9,7 @@
 status](https://www.r-pkg.org/badges/version/sfhotspot)](https://CRAN.R-project.org/package=sfhotspot)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![R-CMD-check](https://github.com/mpjashby/sfhotspot/workflows/R-CMD-check/badge.svg)](https://github.com/mpjashby/sfhotspot/actions)
 <!-- badges: end -->
 
 sfhotspot provides functions to identify and understand clusters of

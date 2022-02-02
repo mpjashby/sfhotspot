@@ -45,7 +45,7 @@
 #'
 #' @export
 
-hotspot_count <- function (
+hotspot_count <- function(
   data,
   cell_size = NULL,
   grid_type = "rect",
@@ -61,7 +61,12 @@ hotspot_count <- function (
     rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
 
   # Create grid
-  grid <- create_grid(data, cell_size = cell_size, grid_type = grid_type, quiet = quiet)
+  grid <- create_grid(
+    data,
+    cell_size = cell_size,
+    grid_type = grid_type,
+    quiet = quiet
+  )
 
   # Count points
   counts <- count_points_in_polygons(data, grid)

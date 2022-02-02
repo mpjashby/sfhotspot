@@ -6,7 +6,7 @@
 #'
 #' @noRd
 
-bandwidth_nrd_sf <- function (data) {
+bandwidth_nrd_sf <- function(data) {
 
   coords <- suppressWarnings(sf::st_coordinates(data))
 
@@ -14,10 +14,10 @@ bandwidth_nrd_sf <- function (data) {
 
 }
 
-bandwidth_nrd <- function (x) {
+bandwidth_nrd <- function(x) {
 
   r <- stats::quantile(x, c(0.25, 0.75))
-  h <- (r[2] - r[1])/1.34
-  4 * 1.06 * min(sqrt(stats::var(x)), h) * length(x)^(-1/5)
+  h <- (r[2] - r[1]) / 1.34
+  4 * 1.06 * min(sqrt(stats::var(x)), h) * length(x) ^ (-1 / 5)
 
 }

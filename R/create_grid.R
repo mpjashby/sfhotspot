@@ -17,7 +17,7 @@
 #'
 #' @noRd
 
-create_grid <- function (
+create_grid <- function(
   data,
   cell_size = NULL,
   grid_type = "rect",

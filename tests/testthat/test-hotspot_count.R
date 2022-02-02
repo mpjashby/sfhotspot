@@ -17,12 +17,12 @@ result <- hotspot_count(data = data_sf)
 
 ## Errors ----
 
-test_that("function produces an error if `data` is not an SF object containing points", {
+test_that("error if `data` is not an SF object containing points", {
   expect_error(hotspot_count(data = data_df))
   expect_error(hotspot_count(data = sf::st_cast(data_sf, "LINESTRING")))
 })
 
-test_that("function produces an error if `quiet` is not `TRUE` or `FALSE`", {
+test_that("error if `quiet` is not `TRUE` or `FALSE`", {
   expect_error(hotspot_count(data = data_sf, quiet = character()))
 })
 

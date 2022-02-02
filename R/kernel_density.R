@@ -15,7 +15,7 @@
 #'   density estimate for each cell.
 #' @noRd
 
-kernel_density <- function (data, grid, bandwidth = NULL, quiet = TRUE) {
+kernel_density <- function(data, grid, bandwidth = NULL, quiet = TRUE) {
 
   # Check inputs
   if (!inherits(data, "sf"))

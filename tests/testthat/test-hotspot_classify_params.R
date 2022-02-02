@@ -1,7 +1,7 @@
 # All the tests in this file are commented out until `hotspot_classify_params()`
 # is included in the package, which will be when `hotspot_classify()` is ready
 
-# # CHECK INPUTS -----------------------------------------------------------------
+# CHECK INPUTS -----------------------------------------------------------------
 #
 #
 # ## Errors ----
@@ -23,10 +23,12 @@
 #   expect_error(hotspot_classify_params(critical_p = 1:2))
 #   expect_error(hotspot_classify_params(nb_dist = 1:2))
 #   expect_error(hotspot_classify_params(include_self = c(TRUE, FALSE)))
-#   expect_error(hotspot_classify_params(p_adjust_method = stats::p.adjust.methods[1:2]))
+#   expect_error(
+#     hotspot_classify_params(p_adjust_method = stats::p.adjust.methods[1:2])
+#   )
 # })
 #
-# test_that("error if values are of the correct type and length but are invalid", {
+# test_that("error if values are of the correct type/length but are invalid", {
 #   expect_error(hotspot_classify_params(hotspot_prop = 2))
 #   expect_error(hotspot_classify_params(persistent_prop = 2))
 #   expect_error(hotspot_classify_params(recent_prop = 2))
@@ -37,7 +39,7 @@
 #
 #
 #
-# # CHECK OUTPUTS ----------------------------------------------------------------
+# CHECK OUTPUTS ----------------------------------------------------------------
 #
 #
 # ## Correct outputs ----
@@ -46,8 +48,8 @@
 #   expect_identical(
 #     names(hotspot_classify_params()),
 #     c(
-#       "hotspot_prop", "persistent_prop", "recent_prop", "critical_p", "nb_dist",
-#       "include_self", "p_adjust_method"
+#       "hotspot_prop", "persistent_prop", "recent_prop", "critical_p",
+#       "nb_dist", "include_self", "p_adjust_method"
 #     )
 #   )
 # })

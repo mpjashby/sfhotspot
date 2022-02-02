@@ -20,33 +20,58 @@ result <- kernel_density(data = data_sf, grid = grid, bandwidth = 10000)
 
 ## Errors ----
 
-test_that("function produces an error if `data` is not an SF object containing points", {
+test_that("error if `data` is not an SF object containing points", {
   expect_error(kernel_density(data = data_df, grid = grid, bandwidth = 10000))
-  expect_error(kernel_density(data = sf::st_cast(data_sf, "LINESTRING"), grid = grid, bandwidth = 10000))
+  expect_error(kernel_density(
+    data = sf::st_cast(data_sf, "LINESTRING"),
+    grid = grid,
+    bandwidth = 10000
+  ))
 })
 
-test_that("function produces an error if `data` has lon/lat co-ordinates", {
-  expect_error(kernel_density(data = sf::st_transform(data_sf, 4326), grid = grid, bandwidth = 10000))
+test_that("error if `data` has lon/lat co-ordinates", {
+  expect_error(kernel_density(
+    data = sf::st_transform(data_sf, 4326),
+    grid = grid,
+    bandwidth = 10000
+  ))
 })
 
-test_that("function produces an error if `grid` is not an SF object containing polygons", {
-  expect_error(kernel_density(data = data_sf, grid = tibble::tibble(x = 1:3), bandwidth = 10000))
-  expect_error(kernel_density(data = data_sf, grid = sf::st_centroid(grid), bandwidth = 10000))
+test_that("error if `grid` is not an SF object containing polygons", {
+  expect_error(kernel_density(
+    data = data_sf,
+    grid = tibble::tibble(x = 1:3),
+    bandwidth = 10000
+  ))
+  expect_error(kernel_density(
+    data = data_sf,
+    grid = sf::st_centroid(grid),
+    bandwidth = 10000
+  ))
 })
 
-test_that("function produces an error if `grid` has lon/lat co-ordinates", {
-  expect_error(kernel_density(data = data_sf, grid = sf::st_transform(grid, 4326)))
+test_that("error if `grid` has lon/lat co-ordinates", {
+  expect_error(
+    kernel_density(data = data_sf, grid = sf::st_transform(grid, 4326))
+  )
 })
 
-test_that("function produces an error if `bandwidth` is not `NULL` or or a single positive number", {
-  expect_error(kernel_density(data = data_sf, grid = grid, bandwidth = character()))
+test_that("error if `bandwidth` is not `NULL` or or a single positive number", {
+  expect_error(
+    kernel_density(data = data_sf, grid = grid, bandwidth = character())
+  )
   expect_error(kernel_density(data = data_sf, grid = grid, bandwidth = 1:2))
   expect_error(kernel_density(data = data_sf, grid = grid, bandwidth = -1))
   expect_error(kernel_density(data = data_sf, grid = grid, bandwidth = 0))
 })
 
-test_that("function produces an error if `quiet` is not `TRUE` or `FALSE`", {
-  expect_error(kernel_density(data = data_sf, grid = grid, bandwidth = 10000, quiet = character()))
+test_that("error if `quiet` is not `TRUE` or `FALSE`", {
+  expect_error(kernel_density(
+    data = data_sf,
+    grid = grid,
+    bandwidth = 10000,
+    quiet = character())
+  )
 })
 
 
@@ -56,11 +81,19 @@ test_that("function produces an error if `quiet` is not `TRUE` or `FALSE`", {
 
 ## Correct outputs ----
 
-test_that("function produces an SF tibble", {
+test_that("output is an SF tibble", {
   # Multiple tests are needed here to get 100% coverage for this function
   expect_s3_class(result, "sf")
   expect_s3_class(kernel_density(data = data_sf, grid = grid), "sf")
-  expect_s3_class(kernel_density(data = data_sf, grid = grid, bandwidth = 10000, quiet = FALSE), "sf")
+  expect_s3_class(
+    kernel_density(
+      data = data_sf,
+      grid = grid,
+      bandwidth = 10000,
+      quiet = FALSE
+    ),
+    "sf"
+  )
   expect_s3_class(result, "tbl_df")
 })
 
@@ -79,5 +112,8 @@ test_that("column values are within the specified range", {
 
 test_that("output has not changed since last time the package was checked", {
   expect_snapshot_value(result, style = "serialize")
-  expect_snapshot_value(kernel_density(data = data_sf, grid = grid), style = "serialize")
+  expect_snapshot_value(
+    kernel_density(data = data_sf, grid = grid),
+    style = "serialize"
+  )
 })

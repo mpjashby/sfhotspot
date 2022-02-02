@@ -24,7 +24,7 @@
 #' projected in metres or feet. In that case the number of cells will be
 #' adjusted upwards so that the cell size is a multiple of 100.
 
-set_cell_size <- function (data, round = TRUE, quiet = TRUE) {
+set_cell_size <- function(data, round = TRUE, quiet = TRUE) {
 
   # Check inputs
   if (!inherits(data, "sf"))
@@ -50,7 +50,10 @@ set_cell_size <- function (data, round = TRUE, quiet = TRUE) {
   bbox <- sf::st_bbox(data)
   side_length <- min(bbox$xmax - bbox$xmin, bbox$ymax - bbox$ymin)
 
-  if (unit %in% c("metre", "meter", "foot", "US survey foot") & rlang::is_true(round)) {
+  if (
+    unit %in% c("metre", "meter", "foot", "US survey foot") &
+    rlang::is_true(round)
+  ) {
 
     # If the units are metres or feet, round the cell size so it is a round
     # number of 100 metres/feet

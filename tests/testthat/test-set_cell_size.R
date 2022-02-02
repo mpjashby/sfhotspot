@@ -8,15 +8,15 @@ data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 
 ## Errors ----
 
-test_that("function produces an error if `data` is not an SF object", {
+test_that("error if `data` is not an SF object", {
   expect_error(set_cell_size(data = data_df))
 })
 
-test_that("function produces an error if `round` is not `TRUE` or `FALSE`", {
+test_that("error if `round` is not `TRUE` or `FALSE`", {
   expect_error(set_cell_size(data = data_sf, round = character()))
 })
 
-test_that("function produces an error if `quiet` is not `TRUE` or `FALSE`", {
+test_that("error if `quiet` is not `TRUE` or `FALSE`", {
   expect_error(set_cell_size(data = data_sf, quiet = character()))
 })
 
@@ -33,8 +33,14 @@ test_that("function produces a single numeric value", {
 })
 
 test_that("output has not changed since last time the package was checked", {
-  expect_snapshot_value(set_cell_size(data = data_sf, round = TRUE), style = "deparse")
-  expect_snapshot_value(set_cell_size(data = data_sf, round = FALSE), style = "deparse")
+  expect_snapshot_value(
+    set_cell_size(data = data_sf, round = TRUE),
+    style = "deparse"
+  )
+  expect_snapshot_value(
+    set_cell_size(data = data_sf, round = FALSE),
+    style = "deparse"
+  )
 })
 
 

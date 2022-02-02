@@ -1,13 +1,13 @@
 #' Count points in cells in polygons
 #'
 #' @param points \code{\link[sf]{sf}} data frame containing points.
-#' @param polygons \code{\link[sf]{sf}} data frame containing polygon grid cells,
-#'   e.g. as produced by \code{\link{create_grid}}.
+#' @param polygons \code{\link[sf]{sf}} data frame containing polygon grid
+#'   cells, e.g. as produced by \code{\link{create_grid}}.
 #' @return An SF tibble containing counts for each polygon.
 #'
 #' @noRd
 
-count_points_in_polygons <- function (points, polygons) {
+count_points_in_polygons <- function(points, polygons) {
 
   # Check inputs
   if (!inherits(points, "sf"))
@@ -20,7 +20,7 @@ count_points_in_polygons <- function (points, polygons) {
     rlang::abort("`polygons` must be an SF object containing polygons")
 
   # Create a unique ID for each polygon
-  polygons$`.polygon_id` <- 1:nrow(polygons)
+  polygons$`.polygon_id` <- seq_len(nrow(polygons))
 
   # Join the unique polygon IDs to each point
   ids <- sf::st_drop_geometry(sf::st_join(points, polygons))
@@ -39,7 +39,10 @@ count_points_in_polygons <- function (points, polygons) {
   counts$n <- ifelse(is.na(counts$x), 0, counts$x)
 
   # Remove working columns and convert to SF object
-  counts <- sf::st_as_sf(tibble::as_tibble(counts[, c("n", "geometry")]), sf_column_name = "geometry")
+  counts <- sf::st_as_sf(
+    tibble::as_tibble(counts[, c("n", "geometry")]),
+    sf_column_name = "geometry"
+  )
 
   counts
 

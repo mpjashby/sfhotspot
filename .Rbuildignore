@@ -7,3 +7,4 @@
 ^R/hotspot_classify.R$
 ^R/hotspot_classify_params.R$
 ^misc
+^\.github$

@@ -1,4 +1,6 @@
-data_sf <- suppressWarnings(sf::st_centroid(sf::read_sf(system.file("shape/nc.shp", package = "sf"))))
+data_sf <- suppressWarnings(
+  sf::st_centroid(sf::read_sf(system.file("shape/nc.shp", package = "sf")))
+)
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 
 polygons <- create_grid(data = data_sf, cell_size = 0.1)
@@ -14,15 +16,17 @@ result <- count_points_in_polygons(
 
 ## Errors ----
 
-test_that("function produces an error if `points` is not an SF object containing points", {
-  expect_error(count_points_in_polygons(points = data_df, polygons = polygons))
+test_that("error if `points` is not an SF object containing points", {
+  expect_error(
+    count_points_in_polygons(points = data_df, polygons = polygons)
+  )
   expect_error(count_points_in_polygons(
     points = sf::st_cast(data_sf, "LINESTRING"),
     polygons = polygons
   ))
 })
 
-test_that("function produces an error if `polygons` is not an SF object containing polygons", {
+test_that("error if `polygons` is not an SF object containing polygons", {
   expect_error(count_points_in_polygons(points = data_sf, polygons = data_df))
   expect_error(count_points_in_polygons(
     points = data_sf,
