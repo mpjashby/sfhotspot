@@ -49,13 +49,16 @@ library(sf)
 library(sfhotspot)
 library(tidyverse)
 
+
 # Transform data to UTM zone 15N so that we can think in metres, not decimal 
 # degrees
 memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
 
+
 # Identify hotspots, set all the parameters automatically by not specifying cell 
 # size, bandwidth, etc.
 memphis_robberies_hotspots <- hotspot_gistar(memphis_robberies_utm)
+
 
 # Visualise the hotspots by showing only those cells that have significantly
 # more points than expected by chance. For those cells, show the estimated
@@ -65,5 +68,6 @@ memphis_robberies_hotspots %>%
   ggplot(aes(colour = kde, fill = kde)) +
   geom_sf() +
   scale_colour_continuous(aesthetics = c("colour", "fill")) +
+  labs(title = "Density of robberies in Memphis, 2019") +
   theme_void()
 ```
