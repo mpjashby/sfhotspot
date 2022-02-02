@@ -1,6 +1,6 @@
 Package: sfhotspot
 Title: Hotspot Analysis with Simple Features
-Version: 0.1
+Version: 0.1.0
 Authors@R: 
     person("Matt", "Ashby", , "matthew.ashby@ucl.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4201-9239"))
