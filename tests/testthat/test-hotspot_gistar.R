@@ -71,7 +71,3 @@ test_that("column values are within the specified range", {
   expect_true(all(result$pvalue >= 0))
   expect_true(all(result$pvalue <= 1))
 })
-
-test_that("output has not changed since last time the package was checked", {
-  expect_snapshot_value(result, style = "serialize")
-})

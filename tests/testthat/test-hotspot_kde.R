@@ -5,12 +5,7 @@ data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
-result <- hotspot_kde(
-  data = data_sf,
-  cell_size = 1000,
-  bandwidth = 10000,
-  quiet = TRUE
-)
+result <- hotspot_kde(data = data_sf, cell_size = 1000, bandwidth = 10000, quiet = TRUE)
 
 
 
@@ -22,12 +17,12 @@ result <- hotspot_kde(
 
 ## Errors ----
 
-test_that("error if `data` is not an SF object containing points", {
+test_that("function produces an error if `data` is not an SF object containing points", {
   expect_error(hotspot_kde(data = data_df))
   expect_error(hotspot_kde(data = sf::st_cast(data_sf, "LINESTRING")))
 })
 
-test_that("error if `quiet` is not `TRUE` or `FALSE`", {
+test_that("function produces an error if `quiet` is not `TRUE` or `FALSE`", {
   expect_error(hotspot_kde(data = data_sf, quiet = character()))
 })
 
@@ -51,8 +46,4 @@ test_that("columns in output have the required types", {
   expect_type(result$n, "double")
   expect_type(result$kde, "double")
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
-})
-
-test_that("output has not changed since last time the package was checked", {
-  expect_snapshot_value(result, style = "serialize")
 })

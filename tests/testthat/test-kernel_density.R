@@ -109,11 +109,3 @@ test_that("columns in output have the required types", {
 test_that("column values are within the specified range", {
   expect_true(all(result$kde_value >= 0))
 })
-
-test_that("output has not changed since last time the package was checked", {
-  expect_snapshot_value(result, style = "serialize")
-  expect_snapshot_value(
-    kernel_density(data = data_sf, grid = grid),
-    style = "serialize"
-  )
-})

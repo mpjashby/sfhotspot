@@ -31,11 +31,6 @@ test_that("function produces a single numeric value", {
   expect_length(set_bandwidth(data = data_sf), 1)
 })
 
-test_that("output has not changed since last time the package was checked", {
-  expect_snapshot_value(set_bandwidth(data = data_sf), style = "deparse")
-  expect_snapshot_value(set_bandwidth(data = data_sf), style = "deparse")
-})
-
 
 ## Messages ----
 
@@ -52,15 +47,7 @@ test_that("function produces a single numeric value", {
   expect_length(bandwidth_nrd_sf(data_sf), 1)
 })
 
-test_that("output has not changed since last time the package was checked", {
-  expect_snapshot_value(bandwidth_nrd_sf(data_sf), style = "deparse")
-})
-
 test_that("function produces a single numeric value", {
   expect_type(bandwidth_nrd(1:10), "double")
   expect_length(bandwidth_nrd(1:10), 1)
-})
-
-test_that("output has not changed since last time the package was checked", {
-  expect_snapshot_value(bandwidth_nrd(1:10), style = "deparse")
 })
