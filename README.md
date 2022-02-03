@@ -7,9 +7,9 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/sfhotspot)](https://CRAN.R-project.org/package=sfhotspot)
+[![R-CMD-check](https://github.com/mpjashby/sfhotspot/workflows/R-CMD-check/badge.svg)](https://github.com/mpjashby/sfhotspot/actions)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-CMD-check](https://github.com/mpjashby/sfhotspot/workflows/R-CMD-check/badge.svg)](https://github.com/mpjashby/sfhotspot/actions)
 <!-- badges: end -->
 
 sfhotspot provides functions to identify and understand clusters of
@@ -27,6 +27,21 @@ You can install the development version of sfhotspot from
 # install.packages("remotes")
 remotes::install_github("mpjashby/sfhotspot")
 ```
+
+## Functions
+
+sfhotspot has the following functions. All can be used by just supplying
+an SF object containing points, or can be configured using the optional
+arguments to each function.
+
+| name               | use                                                                                                                                                                                                                                       |
+|:-------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `hotspot_count()`  | Count the number of points in each cell of a regular grid. Cell size can be set by the user or chosen automatically.                                                                                                                      |
+| `hotspot_kde()`    | Estimate kernel density for each cell in a regular grid. Cell size and bandwidth can be set by the user or chosen automatically.                                                                                                          |
+| `hotspot_gistar()` | Calculate the Getis–Ord *G*<sub>*i*</sub><sup>\*</sup> statistic for each cell in a regular grid, while optionally estimating kernel density. Cell size, bandwidth and neighbour distance can be set by the user or chosen automatically. |
+
+There is also an included dataset `memphis_robberies` that contains
+records of 2,245 robberies in Memphis, TN, in 2019.
 
 ## Example
 
