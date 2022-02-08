@@ -50,12 +50,19 @@ kernel_density <- function(data, grid, bandwidth = NULL, quiet = TRUE) {
   if (rlang::is_null(bandwidth)) bandwidth <- set_bandwidth(data, quiet = quiet)
 
   # Calculate KDE
+  # Code for suppressing specific messages is from
+  # https://stackoverflow.com/a/38605924/8222654
   if (rlang::is_true(quiet)) {
     kde_val <- suppressMessages(
       SpatialKDE::kde(data, band_width = bandwidth, grid = grid)
     )
   } else {
-    kde_val <- SpatialKDE::kde(data, band_width = bandwidth, grid = grid)
+    withCallingHandlers({
+      kde_val <- SpatialKDE::kde(data, band_width = bandwidth, grid = grid)
+    }, message = function(m) {
+      if (startsWith(conditionMessage(m), "Using centroids instead"))
+        invokeRestart("muffleMessage")
+    })
   }
 
   # Return result

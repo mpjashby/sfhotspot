@@ -5,7 +5,12 @@ data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
-result <- hotspot_kde(data = data_sf, cell_size = 1000, bandwidth = 10000, quiet = TRUE)
+result <- hotspot_kde(
+  data = data_sf,
+  cell_size = 1000,
+  bandwidth = 10000,
+  quiet = TRUE
+)
 
 
 
@@ -17,12 +22,12 @@ result <- hotspot_kde(data = data_sf, cell_size = 1000, bandwidth = 10000, quiet
 
 ## Errors ----
 
-test_that("function produces an error if `data` is not an SF object containing points", {
+test_that("error if `data` is not an SF object containing points", {
   expect_error(hotspot_kde(data = data_df))
   expect_error(hotspot_kde(data = sf::st_cast(data_sf, "LINESTRING")))
 })
 
-test_that("function produces an error if `quiet` is not `TRUE` or `FALSE`", {
+test_that("error if `quiet` is not `TRUE` or `FALSE`", {
   expect_error(hotspot_kde(data = data_sf, quiet = character()))
 })
 
@@ -33,7 +38,7 @@ test_that("function produces an error if `quiet` is not `TRUE` or `FALSE`", {
 
 ## Correct outputs ----
 
-test_that("function produces an SF tibble", {
+test_that("output is an SF tibble", {
   expect_s3_class(result, "sf")
   expect_s3_class(result, "tbl_df")
 })
