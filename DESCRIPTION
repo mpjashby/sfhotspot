@@ -1,15 +1,15 @@
 Package: sfhotspot
-Title: Hotspot Analysis with Simple Features
-Version: 0.1.0
+Title: Hot-Spot Analysis with Simple Features
+Version: 0.1.1
 Authors@R: 
     person("Matt", "Ashby", , "matthew.ashby@ucl.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4201-9239"))
 Description: Identify and understand clusters of points (typically representing 
     the locations of places or events) stored in simple-features (SF) objects.
-    This is useful for analysing, for example, hotspots of crime events using
-    kernel density estimation or the Getis-Ord Gi* statistic. The package 
-    emphasises producing analytical results from point data in a single step, to
-    aid rapid data analysis by users who are starting out in hotspot analysis.
+    This is useful for analysing, for example, hot-spots of crime events. The 
+    package emphasises producing results from point data in a single step based 
+    on reasonable defaults, to aid rapid data analysis by users who are starting 
+    out.
 License: MIT + file LICENSE
 Language: en-GB
 Encoding: UTF-8

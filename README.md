@@ -8,7 +8,7 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/sfhotspot)](https://CRAN.R-project.org/package=sfhotspot)
 [![R-CMD-check](https://github.com/mpjashby/sfhotspot/workflows/R-CMD-check/badge.svg)](https://github.com/mpjashby/sfhotspot/actions)
-[![codecov](https://codecov.io/gh/mpjashby/sfhotspot/branch/main/graph/badge.svg?token=KPS526F0V1)](https://codecov.io/gh/mpjashby/sfhotspot)
+[![codecov](https://codecov.io/gh/mpjashby/sfhotspot/branch/main/graph/badge.svg?token=KPS526F0V1)](https://app.codecov.io/gh/mpjashby/sfhotspot)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
