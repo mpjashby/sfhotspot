@@ -54,12 +54,16 @@
 #' memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
 #'
 #' # Automatically set grid-cell size, bandwidth and neighbour distance
+#' \dontrun{
 #' hotspot_kde(memphis_robberies_utm)
+#' }
 #'
 #' # Manually set grid-cell size and bandwidth in metres, since the
 #' # `memphis_robberies_utm` dataset uses a co-ordinate reference system (UTM
 #' # zone 15 north) that is specified in metres
+#' \dontrun{
 #' hotspot_kde(memphis_robberies_utm, cell_size = 200, bandwidth = 1000)
+#' }
 #'
 #' @export
 

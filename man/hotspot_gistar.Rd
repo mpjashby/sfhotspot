@@ -126,17 +126,23 @@ library(sf)
 memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
 
 # Automatically set grid-cell size, bandwidth and neighbour distance
+\dontrun{
 hotspot_gistar(memphis_robberies_utm)
+}
 
 # Manually set grid-cell size in metres, since the `memphis_robberies`
 # dataset uses a co-ordinate reference system (UTM zone 15 north) that is
 # specified in metres
+\dontrun{
 hotspot_gistar(memphis_robberies_utm, cell_size = 200)
+}
 
 # Automatically set grid-cell size and bandwidth for lon/lat data, since it
 # is not intuitive to set these values manually in decimal degrees. To do
 # this it is necessary to not calculate KDEs due to a limitation in the
 # underlying function.
+\dontrun{
 hotspot_gistar(memphis_robberies, kde = FALSE)
+}
 
 }

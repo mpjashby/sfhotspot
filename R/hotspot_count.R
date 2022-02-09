@@ -31,7 +31,9 @@
 #' @examples
 #'
 #' # Set cell size automatically
+#' \dontrun{
 #' hotspot_count(memphis_robberies)
+#' }
 #'
 #' # Transform data to UTM zone 15N so that cell_size and bandwidth can be set
 #' # in metres
@@ -41,7 +43,9 @@
 #' # Manually set grid-cell size in metres, since the `memphis_robberies_utm`
 #' # dataset uses a co-ordinate reference system (UTM zone 15 north) that is
 #' # specified in metres
+#' \dontrun{
 #' hotspot_count(memphis_robberies_utm, cell_size = 200)
+#' }
 #'
 #' @export
 
