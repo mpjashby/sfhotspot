@@ -94,7 +94,7 @@ This function calculates the Getis-Ord
 underlying implementation uses the \code{\link[spdep]{localG}} function to
 calculate the \eqn{Z} scores and then \code{\link[spdep]{p.adjustSP}}
 function to adjust the corresponding \eqn{p}-values for multiple comparison.
-The function also returns counts of points ineach cell and (by default but
+The function also returns counts of points in each cell and (by default but
 optionally) kernel density estimates using the \code{\link[SpatialKDE]{kde}}
 function.
 \subsection{Coverage of the output data}{

@@ -12,5 +12,5 @@
 #'     simple-features point format}
 #' }
 #'
-#' @source Crime Open Database, \url{http://osf.io/zyaqn/}
+#' @source Crime Open Database, \url{https://osf.io/zyaqn/}
 "memphis_robberies"
