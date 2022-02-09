@@ -13,13 +13,15 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+
 # sfhotspot <img src='man/figures/logo.png' align="right" height="139">
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/sfhotspot)](https://CRAN.R-project.org/package=sfhotspot)
 [![R-CMD-check](https://github.com/mpjashby/sfhotspot/workflows/R-CMD-check/badge.svg)](https://github.com/mpjashby/sfhotspot/actions)
 [![codecov](https://codecov.io/gh/mpjashby/sfhotspot/branch/main/graph/badge.svg?token=KPS526F0V1)](https://codecov.io/gh/mpjashby/sfhotspot)
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
 sfhotspot provides functions to identify and understand clusters of points
@@ -27,6 +29,7 @@ sfhotspot provides functions to identify and understand clusters of points
 the package work on and produce [simple
 features](https://r-spatial.github.io/sf/) (SF) objects, which means they can be
 used as part of modern spatial analysis in R.
+
 
 ## Installation
 

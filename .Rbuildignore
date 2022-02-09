@@ -8,3 +8,4 @@
 ^R/hotspot_classify_params.R$
 ^misc
 ^\.github$
+^cran-comments\.md$

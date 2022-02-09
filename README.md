@@ -10,7 +10,7 @@ status](https://www.r-pkg.org/badges/version/sfhotspot)](https://CRAN.R-project.
 [![R-CMD-check](https://github.com/mpjashby/sfhotspot/workflows/R-CMD-check/badge.svg)](https://github.com/mpjashby/sfhotspot/actions)
 [![codecov](https://codecov.io/gh/mpjashby/sfhotspot/branch/main/graph/badge.svg?token=KPS526F0V1)](https://codecov.io/gh/mpjashby/sfhotspot)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
 sfhotspot provides functions to identify and understand clusters of
@@ -61,8 +61,8 @@ library(tidyverse)
 #> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 #> ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
 #> ✓ tibble  3.1.6     ✓ dplyr   1.0.7
-#> ✓ tidyr   1.1.4     ✓ stringr 1.4.0
-#> ✓ readr   2.1.1     ✓ forcats 0.5.1
+#> ✓ tidyr   1.2.0     ✓ stringr 1.4.0
+#> ✓ readr   2.1.2     ✓ forcats 0.5.1
 #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 #> x dplyr::filter() masks stats::filter()
 #> x dplyr::lag()    masks stats::lag()
@@ -78,8 +78,6 @@ memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
 memphis_robberies_hotspots <- hotspot_gistar(memphis_robberies_utm)
 #> Cell size set to 500 metres automatically
 #> Bandwidth set to 5,592.453 metres automatically based on rule of thumb
-#> Warning: multiple methods tables found for 'direction'
-#> Warning: multiple methods tables found for 'gridDistance'
 #> Using centroids instead of provided `grid` geometries to calculate KDE estimates.
 
 
