@@ -1,4 +1,4 @@
-#' Classify hotspots
+#' Classify hot-spots
 #'
 #' Classify cells in a grid based on changes in the clustering of points
 #' (typically representing events) in a two-dimensional regular grid over time.
@@ -35,20 +35,47 @@
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{FALSE}.
 #' @return An \code{\link[sf]{sf}} tibble of regular grid cells with
-#'   corresponding hotspot classifications for each cell.
+#'   corresponding hot-spot classifications for each cell.
 #'
-#' Hotspots are spatial areas that contain more points than would be expected by
-#' chance; coldspots are areas that contain fewer points than would be expected.
-#' Whether an area is a hotspot can vary over time. This function determines
-#' whether an area is a hotspot for each of several consecutive time periods and
-#' uses that to classify areas according to whether they are persistent,
-#' intermittent, emerging or former hot- or coldspots.
+#' Hot-spots are spatial areas that contain more points than would be expected
+#' by chance; cold-spots are areas that contain fewer points than would be
+#' expected. Whether an area is a hot-spot can vary over time. This function
+#' creates a space-time cube, determines whether an area is a hot-spot for each
+#' of several consecutive time periods and uses that to classify areas according
+#' to whether they are persistent, intermittent, emerging or former hot- or
+#' cold-spots.
 #'
-#' Hot- and coldspots are identified by calculating the Getis-Ord
+#' ## Hot and cold spots
+#'
+#' Hot- and cold-spots are identified by calculating the Getis-Ord
 #' \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}
 #' (gi-star) or
 #' \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}}
 #' \eqn{Z}-score statistic for each cell in a regular grid for each time period.
+#' Cells are classified as follows, using the parameters provided in the
+#' `params` argument:
+#'
+#' * _Persistent hot-/cold-spots_ are cells that have been hot-/cold-spots
+#'   consistently over time. Formally: if the \emph{p}-value is less than
+#'   `critical_p` for at least `persistent_prop` proportion of time periods.
+#' * _Emerging hot-/cold-spots_ are cells that have become hot-/cold-spots
+#'   recently but were not previously. Formally: if the \emph{p}-value is less
+#'   than `critical_p` for at least `hotspot_prop` of time periods defined as
+#'   recent by `recent_prop` but the \emph{p}-value was _not_ less than
+#'   `critical_p` for at least `hotspot_prop` of time periods defined as
+#'   non-recent by `1 - recent_prop`.
+#' * _Former hot-/cold-spots_ are cells that used to be hot-/cold-spots but have
+#'   not been more recently. Formally: if the \emph{p}-value was less than
+#'   `critical_p` for at least `hotspot_prop` of time periods defined as
+#'   non-recent by `1 - recent_prop` but the \emph{p}-value was _not_ less than
+#'   `critical_p` for for at least `hotspot_prop` of time periods defined as
+#'   recent by `recent_prop`.
+#' * _Intermittent hot-/cold-spots_ are cells that have been hot-/cold-spots,
+#'   but not as frequently as persistent hotspots and not only during
+#'   recent/non-recent periods. Formally: if the \emph{p}-value is less than
+#'   `critical_p` for at least `hotspot_prop` of time periods but the cell is
+#'   not an emerging or former hotspot.
+#' * _No pattern_ if none of the above categories apply.
 #'
 #' ## Coverage of the output data
 #'
@@ -68,6 +95,10 @@
 #' cells on the shorter side of the grid. If the `data` SF object is projected
 #' in metres or feet, the number of cells will be adjusted upwards so that the
 #' cell size is a multiple of 100.
+#'
+#' @references
+#' Chainey, S. (2020). \emph{Understanding Crime: Analyzing the Geography of
+#' Crime}. Redlands, CA: ESRI.
 #'
 #' @export
 
@@ -110,22 +141,27 @@ hotspot_classify <- function(
       ))
     }
   }
-  if (!rlang::is_null(period) & !rlang::is_character(period))
-    rlang::abort("`period` must be `NULL` or a character value")
-  # ADD CHECK FOR `start` ARGUMENT
-  if (!rlang::is_logical(collapse))
+  if (!rlang::is_null(period) & !rlang::is_character(period, n = 1))
+    rlang::abort("`period` must be `NULL` or a single character value")
+  if (
+    !rlang::is_null(start) &
+    !(rlang::inherits_any(start, c("Date", "POSIXt")) & length(start) == 1)
+  ) {
+    rlang::abort("`start` must be `NULL` or a single `Date` or `POSIX` value")
+  }
+  if (!rlang::is_logical(collapse, n = 1))
     rlang::abort("`collapse` must be `TRUE` or `FALSE`")
   if (!rlang::is_bare_list(params))
     rlang::abort(c(
       "`params` must be a list",
       "i" = "use `hotspot_classify_params()` to construct the `params` argument"
     ))
-  if (!all(names(params) %in% names(rlang::fn_fmls(hotspot_classify_params))))
+  if (!all(names(rlang::fn_fmls(hotspot_classify_params)) %in% names(params)))
     rlang::abort(c(
       "`params` must be a list containing all the required parameters",
       "i" = "use `hotspot_classify_params()` to construct the `params` argument"
     ))
-  if (!rlang::is_logical(quiet))
+  if (!rlang::is_logical(quiet, n = 1))
     rlang::abort("`quiet` must be `TRUE` or `FALSE`")
 
   # Find time column if not specified
@@ -143,6 +179,12 @@ hotspot_classify <- function(
     } else {
       time <- names(data)[date_cols[1]]
     }
+  }
+
+  # Error if start date is before first time in data
+  if (!rlang::is_null(start)) {
+    if (start > min(data[[time]]))
+      rlang::abort("`start` must be before the first time present in the data")
   }
 
   # Set start date if not specified
@@ -255,8 +297,8 @@ hotspot_classify <- function(
 
       if (rlang::is_false(quiet)) {
         rlang::inform(c(
-          str_glue(
-            "The range of dates in the data is not a multiple of the chosen ",
+          paste(
+            "The range of dates in the data is not a multiple of the chosen",
             "period"
           ),
           "i" = paste(
@@ -274,8 +316,8 @@ hotspot_classify <- function(
           "The final period contains only",
           format(period_remainder, digits = 1), unit
         ),
-        "i" = str_glue(
-          "Set `collapse = TRUE` to collapse this period into the penultimate ",
+        "i" = paste(
+          "Set `collapse = TRUE` to collapse this period into the penultimate",
           "period"
         )
       ))
@@ -338,7 +380,7 @@ hotspot_classify <- function(
         rlang::warn(c(
           paste("Zero points relate to the period beginning", y),
           "i" = paste(
-            "This period will be excluded from the classification of hotspots"
+            "This period will be excluded from the classification of hot-spots"
           ),
           "i" = paste(
             "Consider changing the period using the `period` argument or the",
