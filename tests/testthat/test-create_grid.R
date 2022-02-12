@@ -10,22 +10,22 @@ result <- create_grid(data = data_sf, cell_size = 0.1)
 
 ## Errors ----
 
-test_that("function produces an error if `data` is not an SF object", {
+test_that("error if `data` is not an SF object", {
   expect_error(create_grid(data = data_df))
 })
 
-test_that("function produces an error if `cell_size` is not `NULL` or or a single positive number", {
+test_that("error if `cell_size` is not `NULL` or or a single positive number", {
   expect_error(create_grid(data = data_sf, cell_size = character()))
   expect_error(create_grid(data = data_sf, cell_size = 1:2))
   expect_error(create_grid(data = data_sf, cell_size = -1))
   expect_error(create_grid(data = data_sf, cell_size = 0))
 })
 
-test_that("function produces an error if `grid_type` is not 'rect' or 'hex'", {
+test_that("error if `grid_type` is not 'rect' or 'hex'", {
   expect_error(create_grid(data = data_sf, grid_type = "triangle"))
 })
 
-test_that("function produces an error if `quiet` is not `TRUE` or `FALSE`", {
+test_that("error if `quiet` is not `TRUE` or `FALSE`", {
   expect_error(create_grid(data = data_sf, quiet = character()))
 })
 
@@ -39,7 +39,10 @@ test_that("function produces an error if `quiet` is not `TRUE` or `FALSE`", {
 test_that("function produces an SF tibble", {
   expect_s3_class(result, "sf")
   expect_s3_class(result, "tbl_df")
-  expect_s3_class(create_grid(data = data_sf, cell_size = 0.1, grid_type = "hex"), "sf")
+  expect_s3_class(
+    create_grid(data = data_sf, cell_size = 0.1, grid_type = "hex"),
+    "sf"
+  )
 })
 
 test_that("output object has the required column names", {

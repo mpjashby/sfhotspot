@@ -1,5 +1,8 @@
 data_sf <- head(memphis_robberies, 1000)
-counts <- count_points_in_polygons(points = data_sf, polygons = create_grid(data_sf))
+counts <- count_points_in_polygons(
+  points = data_sf,
+  polygons = create_grid(data_sf)
+)
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
@@ -35,14 +38,20 @@ test_that("error if inputs aren't of length 1", {
   expect_error(gistar(counts = counts, n = n, nb_dist = 1:2))
   expect_error(gistar(counts = counts, n = n, cell_size = 1:2))
   expect_error(gistar(counts = counts, n = n, include_self = c(TRUE, FALSE)))
-  expect_error(gistar(counts = counts, n = n, p_adjust_method = stats::p.adjust.methods[1:2]))
+  expect_error(gistar(
+    counts = counts,
+    n = n,
+    p_adjust_method = stats::p.adjust.methods[1:2])
+  )
   expect_error(gistar(counts = counts, n = n, quiet = c(TRUE, FALSE)))
 })
 
-test_that("error if values are of the correct type and length but are invalid", {
+test_that("error if values are of the correct type/length but are invalid", {
   expect_error(gistar(counts = counts, n = n, nb_dist = -1))
   expect_error(gistar(counts = counts, n = n, cell_size = -1))
-  expect_error(gistar(counts = counts, n = n, p_adjust_method = "some other method"))
+  expect_error(
+    gistar(counts = counts, n = n, p_adjust_method = "some other method")
+  )
 })
 
 
@@ -73,4 +82,3 @@ test_that("column values are within the specified range", {
   expect_true(all(result$pvalue >= 0))
   expect_true(all(result$pvalue <= 1))
 })
-
