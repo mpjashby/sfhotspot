@@ -88,22 +88,27 @@
 #' in metres or feet, the number of cells will be adjusted upwards so that the
 #' cell size is a multiple of 100.
 #'
+#' @references
+#' Getis, A. & Ord, J. K. (1992). The Analysis of Spatial Association by Use of
+#' Distance Statistics. \emph{Geographical Analysis}, 24(3), 189-206.
+#' doi:\doi{10.1111/j.1538-4632.1992.tb00261.x}
+#'
 #' @examples
 #' library(sf)
 #'
 #' # Transform data to UTM zone 15N so that cell_size and bandwidth can be set
 #' # in metres
-#' memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
+#' memphis_robberies_utm <- st_transform(memphis_robberies_jan, 32615)
 #'
 #' # Automatically set grid-cell size, bandwidth and neighbour distance
-#' \dontrun{
+#' \donttest{
 #' hotspot_gistar(memphis_robberies_utm)
 #' }
 #'
 #' # Manually set grid-cell size in metres, since the `memphis_robberies`
 #' # dataset uses a co-ordinate reference system (UTM zone 15 north) that is
 #' # specified in metres
-#' \dontrun{
+#' \donttest{
 #' hotspot_gistar(memphis_robberies_utm, cell_size = 200)
 #' }
 #'
@@ -111,7 +116,7 @@
 #' # is not intuitive to set these values manually in decimal degrees. To do
 #' # this it is necessary to not calculate KDEs due to a limitation in the
 #' # underlying function.
-#' \dontrun{
+#' \donttest{
 #' hotspot_gistar(memphis_robberies, kde = FALSE)
 #' }
 #'

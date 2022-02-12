@@ -46,22 +46,28 @@
 #' in metres or feet, the number of cells will be adjusted upwards so that the
 #' cell size is a multiple of 100.
 #'
+#' @references
+#' Yin, P. (2020). Kernels and Density Estimation. \emph{The Geographic
+#' Information Science & Technology Body of Knowledge} (1st Quarter 2020
+#' Edition), John P. Wilson (ed.).
+#' doi:\doi{10.22224/gistbok/2020.1.12}
+#'
 #' @examples
 #' library(sf)
 #'
 #' # Transform data to UTM zone 15N so that cell_size and bandwidth can be set
 #' # in metres
-#' memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
+#' memphis_robberies_utm <- st_transform(memphis_robberies_jan, 32615)
 #'
 #' # Automatically set grid-cell size, bandwidth and neighbour distance
-#' \dontrun{
+#' \donttest{
 #' hotspot_kde(memphis_robberies_utm)
 #' }
 #'
 #' # Manually set grid-cell size and bandwidth in metres, since the
 #' # `memphis_robberies_utm` dataset uses a co-ordinate reference system (UTM
 #' # zone 15 north) that is specified in metres
-#' \dontrun{
+#' \donttest{
 #' hotspot_kde(memphis_robberies_utm, cell_size = 200, bandwidth = 1000)
 #' }
 #'

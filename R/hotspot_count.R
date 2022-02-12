@@ -31,19 +31,19 @@
 #' @examples
 #'
 #' # Set cell size automatically
-#' \dontrun{
-#' hotspot_count(memphis_robberies)
+#' \donttest{
+#' hotspot_count(memphis_robberies_jan)
 #' }
 #'
 #' # Transform data to UTM zone 15N so that cell_size and bandwidth can be set
 #' # in metres
 #' library(sf)
-#' memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
+#' memphis_robberies_utm <- st_transform(memphis_robberies_jan, 32615)
 #'
 #' # Manually set grid-cell size in metres, since the `memphis_robberies_utm`
 #' # dataset uses a co-ordinate reference system (UTM zone 15 north) that is
 #' # specified in metres
-#' \dontrun{
+#' \donttest{
 #' hotspot_count(memphis_robberies_utm, cell_size = 200)
 #' }
 #'
