@@ -1,3 +1,10 @@
+# sfhotspot 0.2.1
+
+* Added `hotspot_classify()` and `hotspot_classify_params()` functions.
+* Added references to function documentation pages and the DESCRIPTION file.
+* Changed `\dontrun{}` in some of the documentation examples to `\donttest{}`.
+
+
 # sfhotspot 0.1.1
 
 * Fixed a problem with some of the examples in the documentation taking too long

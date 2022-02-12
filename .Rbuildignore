@@ -4,8 +4,6 @@
 ^data-raw$
 ^README\.Rmd$
 ^codecov\.yml$
-^R/hotspot_classify.R$
-^R/hotspot_classify_params.R$
 ^misc
 ^\.github$
 ^cran-comments\.md$
