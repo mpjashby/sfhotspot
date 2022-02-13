@@ -13,7 +13,7 @@
 #'   \code{TRUE}.
 #' @param ... Further arguments passed to \code{link[sf]{st_make_grid}}.
 #'
-#' @return a simple features tibble containing polygons representing grid cells.
+#' @return A simple features tibble containing polygons representing grid cells.
 #'
 #' @noRd
 

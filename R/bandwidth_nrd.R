@@ -4,6 +4,8 @@
 #'
 #' @param data \code{\link[sf]{sf}} data frame containing points.
 #'
+#' @return A single numeric value giving the chosen bandwidth.
+#'
 #' @noRd
 
 bandwidth_nrd_sf <- function(data) {
