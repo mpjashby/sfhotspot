@@ -1,4 +1,4 @@
-# sfhotspot 0.2.1
+# sfhotspot 0.2.0
 
 * Added `hotspot_classify()` and `hotspot_classify_params()` functions.
 * Added references to function documentation pages and the DESCRIPTION file.
