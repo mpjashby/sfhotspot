@@ -53,7 +53,8 @@ knitr::kable(data.frame(
   "name" = c(
     "`hotspot_count()`", 
     "`hotspot_kde()`", 
-    "`hotspot_gistar()`"
+    "`hotspot_gistar()`",
+    "`hotspot_classify()`"
   ),
   "use" = c(
     paste(
@@ -68,6 +69,12 @@ knitr::kable(data.frame(
       "Calculate the Getis–Ord $G_i^*$ statistic for each cell in a regular",
       "grid, while optionally estimating kernel density. Cell size, bandwidth",
       "and neighbour distance can be set by the user or chosen automatically."
+    ),
+    paste(
+      "Classify grid cells according to whether they have had significant",
+      "clusters of points at different time periods. All parameters can be",
+      "chosen automatically or be set by the user using the",
+      "`hotspot_classify_params()` helper function."
     )
   )
 ))

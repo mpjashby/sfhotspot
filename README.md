@@ -35,11 +35,12 @@ sfhotspot has the following functions. All can be used by just supplying
 an SF object containing points, or can be configured using the optional
 arguments to each function.
 
-| name               | use                                                                                                                                                                                                                                       |
-|:-------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `hotspot_count()`  | Count the number of points in each cell of a regular grid. Cell size can be set by the user or chosen automatically.                                                                                                                      |
-| `hotspot_kde()`    | Estimate kernel density for each cell in a regular grid. Cell size and bandwidth can be set by the user or chosen automatically.                                                                                                          |
-| `hotspot_gistar()` | Calculate the Getis–Ord *G*<sub>*i*</sub><sup>\*</sup> statistic for each cell in a regular grid, while optionally estimating kernel density. Cell size, bandwidth and neighbour distance can be set by the user or chosen automatically. |
+| name                 | use                                                                                                                                                                                                                                       |
+|:---------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `hotspot_count()`    | Count the number of points in each cell of a regular grid. Cell size can be set by the user or chosen automatically.                                                                                                                      |
+| `hotspot_kde()`      | Estimate kernel density for each cell in a regular grid. Cell size and bandwidth can be set by the user or chosen automatically.                                                                                                          |
+| `hotspot_gistar()`   | Calculate the Getis–Ord *G*<sub>*i*</sub><sup>\*</sup> statistic for each cell in a regular grid, while optionally estimating kernel density. Cell size, bandwidth and neighbour distance can be set by the user or chosen automatically. |
+| `hotspot_classify()` | Classify grid cells according to whether they have had significant clusters of points at different time periods. All parameters can be chosen automatically or be set by the user using the `hotspot_classify_params()` helper function.  |
 
 There is also an included dataset `memphis_robberies` that contains
 records of 2,245 robberies in Memphis, TN, in 2019.
@@ -60,7 +61,7 @@ library(sfhotspot)
 library(tidyverse)
 #> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 #> ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-#> ✓ tibble  3.1.6     ✓ dplyr   1.0.7
+#> ✓ tibble  3.1.6     ✓ dplyr   1.0.8
 #> ✓ tidyr   1.2.0     ✓ stringr 1.4.0
 #> ✓ readr   2.1.2     ✓ forcats 0.5.1
 #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
