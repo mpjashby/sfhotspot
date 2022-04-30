@@ -4,6 +4,10 @@ set.seed(123)
 # to use local state plane CRS
 data_sf <- sf::st_transform(head(memphis_robberies, 100), 2843)
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
+data_missing_crs <- sf::st_sf(
+  row = 1:2,
+  geometry = sf::st_sfc(sf::st_point(c(1, 1)), sf::st_point(c(2, 2)))
+)
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
@@ -32,6 +36,14 @@ test_that("error if `data` is not an SF object containing points", {
 test_that("error if `data` has lon/lat co-ordinates", {
   expect_error(kernel_density(
     data = sf::st_transform(data_sf, 4326),
+    grid = grid,
+    bandwidth = 10000
+  ))
+})
+
+test_that("error if `data` has no CRS", {
+  expect_error(kernel_density(
+    data = data_missing_crs,
     grid = grid,
     bandwidth = 10000
   ))

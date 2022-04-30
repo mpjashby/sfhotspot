@@ -36,13 +36,19 @@ set_cell_size <- function(data, round = TRUE, quiet = TRUE) {
 
   # Find spatial unit
   unit <- sf::st_crs(data, parameters = TRUE)$units_gdal
+
+  # Replace empty unit to prevent the error described at
+  # https://github.com/mpjashby/sfhotspot/issues/9
+  if (rlang::is_empty(unit)) unit <- "unknown"
+
+  # Find plural form of unit
   unit_pl <- ifelse(
     unit %in% c("metre", "meter"),
     "metres",
     ifelse(
       unit %in% c("foot", "US survey foot"),
       "feet",
-      ifelse(unit == "degree", "degrees", paste("(unit =", unit))
+      ifelse(unit == "degree", "degrees", paste0("(unit = ", unit, ")"))
     )
   )
 

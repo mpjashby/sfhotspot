@@ -1,5 +1,9 @@
 data_sf <- sf::st_transform(head(memphis_robberies, 10), 2843)
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
+data_missing_crs <- sf::st_sf(
+  row = 1:2,
+  geometry = sf::st_sfc(sf::st_point(c(1, 1)), sf::st_point(c(2, 2)))
+)
 
 
 
@@ -39,6 +43,10 @@ test_that("output has not changed since last time the package was checked", {
   )
   expect_snapshot_value(
     set_cell_size(data = data_sf, round = FALSE),
+    style = "deparse"
+  )
+  expect_snapshot_value(
+    set_cell_size(data = data_missing_crs),
     style = "deparse"
   )
 })

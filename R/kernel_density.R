@@ -22,9 +22,13 @@ kernel_density <- function(data, grid, bandwidth = NULL, quiet = TRUE) {
     rlang::abort("`data` must be an SF object")
   if (any(!sf::st_is(data, "POINT")))
     rlang::abort("`data` must be an SF object containing points")
-  if (sf::st_is_longlat(data)) {
+  if (
+    sf::st_is_longlat(data) |
+    rlang::is_empty(sf::st_crs(data, parameters = TRUE))
+  ) {
     rlang::abort(c(
-      "KDE values cannot be calculated for lon/lat data",
+      "KDE values cannot be calculated for lon/lat data or data without a co-ordinate reference system",
+      "i" = "Check projection of `data` using st_crs()",
       "i" = "Transform `data` to use a projected CRS"
     ))
   }
