@@ -47,11 +47,14 @@ create_grid <- function(
     ...
   )
 
-  # Return result
-  sf::st_as_sf(
+  # Construct result
+  result <- sf::st_as_sf(
     tibble::tibble(geometry = grid),
     crs = sf::st_crs(data),
     sf_column_name = "geometry"
   )
+
+  # Clip result grid to convex hull of data and return
+  sf::st_intersection(result, sf::st_convex_hull(sf::st_union(data)))
 
 }
