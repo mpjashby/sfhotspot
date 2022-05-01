@@ -125,10 +125,7 @@ hotspot_classify <- function(
   )
 
   # Check inputs that are not checked in a helper function
-  if (!inherits(data, "sf"))
-    rlang::abort("`data` must be an SF object")
-  if (any(!sf::st_is(data, "POINT")))
-    rlang::abort("`data` must be an SF object containing points")
+  validate_inputs(data = data, quiet = quiet)
   if (!rlang::is_false(time) & !time %in% names(data))
     rlang::abort(
       "`time` must be `NULL` or the name of a column in the `data` object"
@@ -161,8 +158,6 @@ hotspot_classify <- function(
       "`params` must be a list containing all the required parameters",
       "i" = "use `hotspot_classify_params()` to construct the `params` argument"
     ))
-  if (!rlang::is_logical(quiet, n = 1))
-    rlang::abort("`quiet` must be `TRUE` or `FALSE`")
 
   # Find time column if not specified
   if (isFALSE(time)) {

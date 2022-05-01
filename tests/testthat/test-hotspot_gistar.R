@@ -8,30 +8,21 @@ result <- hotspot_gistar(data_sf, quiet = TRUE)
 
 # CHECK INPUTS -----------------------------------------------------------------
 
-# Note that only inputs evaluated in `hotspot_gistar()` are tested here; those
-# evaluated in helper functions are tested in the test files for those functions
+# Note that common inputs are tested in `validate_inputs()` and tested in the
+# corresponding test file
 
 
 ## Errors ----
 
-test_that("error if `data` is not an SF points object in a projected CRS", {
-  expect_error(hotspot_gistar(data = sf::st_drop_geometry(data_sf)))
-  expect_error(hotspot_gistar(data = sf::st_cast(data_sf, "LINESTRING")))
+test_that("error if `data` doesn't use a projected CRS", {
   expect_error(hotspot_gistar(data = sf::st_transform(data_sf, 4326)))
 })
 
-test_that("error if inputs don't have correct types", {
-  expect_error(hotspot_gistar(data = data_sf, quiet = character()))
-})
-
-test_that("error if inputs aren't of length 1", {
-  expect_error(hotspot_gistar(data = data_sf, quiet = c(TRUE, FALSE)))
-})
 
 
 ## Messages ----
 
-test_that("message if `data` use a geographic CRS", {
+test_that("message if `data` uses a geographic CRS and KDE not performed", {
   expect_message(
     hotspot_gistar(data = sf::st_transform(data_sf, 4326), kde = FALSE)
   )

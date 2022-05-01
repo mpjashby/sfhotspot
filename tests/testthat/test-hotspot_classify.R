@@ -4,10 +4,8 @@ result <- hotspot_classify(data_sf)
 
 # CHECK INPUTS -----------------------------------------------------------------
 
-test_that("error if `data` is not an SF points", {
-  expect_error(hotspot_classify(data = sf::st_drop_geometry(data_sf)))
-  expect_error(hotspot_classify(data = sf::st_cast(data_sf, "LINESTRING")))
-})
+# Note that common inputs are tested in `validate_inputs()` and tested in the
+# corresponding test file
 
 test_that("error if no Date/POSIX columns present in the data", {
   expect_error(
@@ -35,7 +33,6 @@ test_that("error if inputs don't have correct types", {
   expect_error(hotspot_classify(data_sf, start = "foo"))
   expect_error(hotspot_classify(data_sf, collapse = "foo"))
   expect_error(hotspot_classify(data_sf, params = "foo"))
-  expect_error(hotspot_classify(data_sf, quiet = "foo"))
 })
 
 test_that("error if inputs aren't of correct length", {
@@ -47,7 +44,6 @@ test_that("error if inputs aren't of correct length", {
   expect_error(
     hotspot_classify(data_sf, params = hotspot_classify_params()[1:2])
   )
-  expect_error(hotspot_classify(data_sf, quiet = "foo"))
 })
 
 test_that("error if values are of the correct type/length but are invalid", {

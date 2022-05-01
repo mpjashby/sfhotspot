@@ -136,15 +136,12 @@ hotspot_gistar <- function(
 ) {
 
   # Check inputs that are not checked in a helper function
-  if (!inherits(data, "sf"))
-    rlang::abort("`data` must be an SF object")
-  if (any(!sf::st_is(data, "POINT")))
-    rlang::abort("`data` must be an SF object containing points")
-  if (!rlang::is_logical(quiet, n = 1))
-    rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
+  validate_inputs(data = data, quiet = quiet)
+
+  # Check whether `data` can be used to estimate KDE values
   if (sf::st_is_longlat(data)) {
     if (rlang::is_true(kde)) {
-      # `kernel_density()` will throw an error in this case as well, but it is
+      # `kernel_density()` checks this and throws an error as well, but it is
       # useful to catch it in `hotspot_gistar()` because in `hotspot_gistar()`
       # we can solve the problem by setting `kde = FALSE` whereas the
       # recommendation in the error produced by `kernel_density()` is to
@@ -157,7 +154,7 @@ hotspot_gistar <- function(
       rlang::inform(c(
         "The co-ordinates in `data` are latitudes and longitudes",
         "i" = "`cell_size` and `bandwidth` will be in decimal degrees",
-        "i" = "Transform `data` to use a projected CRS or set `kde = FALSE`"
+        "i" = "Consider transforming `data` to use a projected CRS"
       ))
     }
   }

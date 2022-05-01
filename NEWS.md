@@ -1,3 +1,10 @@
+# sfhotspot 0.2.2
+
+* Added checking for empty geometries and co-ordinates on Null Island (or
+  equivalent zero co-ordinates in other co-ordinate systems). Empty geometries
+  produce an error and zero co-ordinates produce a warning.
+
+
 # sfhotspot 0.2.1
 
 * Fixed a bug where a grid of cells could not be created for an SF object with 
@@ -6,6 +13,7 @@
 * Fixed a bug where the grid returned by the `hotspot*()` family of functions 
   was not clipped to the convex hull of the data, as specified in the 
   documentation.
+
 
 # sfhotspot 0.2.0
 

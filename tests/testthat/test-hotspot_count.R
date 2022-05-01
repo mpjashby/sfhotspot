@@ -11,20 +11,8 @@ result <- hotspot_count(data = data_sf)
 
 # CHECK INPUTS -----------------------------------------------------------------
 
-# Note that only inputs evaluated in `hotspot_count()` are tested here; those
-# evaluated in helper functions are tested in the test files for those functions
-
-
-## Errors ----
-
-test_that("error if `data` is not an SF object containing points", {
-  expect_error(hotspot_count(data = data_df))
-  expect_error(hotspot_count(data = sf::st_cast(data_sf, "LINESTRING")))
-})
-
-test_that("error if `quiet` is not `TRUE` or `FALSE`", {
-  expect_error(hotspot_count(data = data_sf, quiet = character()))
-})
+# Note that common inputs are tested in `validate_inputs()` and tested in the
+# corresponding test file
 
 
 

@@ -83,12 +83,7 @@ hotspot_kde <- function(
 ) {
 
   # Check inputs that are not checked in a helper function
-  if (!inherits(data, "sf"))
-    rlang::abort("`data` must be an SF object")
-  if (any(!sf::st_is(data, "POINT")))
-    rlang::abort("`data` must be an SF object containing points")
-  if (!rlang::is_logical(quiet))
-    rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
+  validate_inputs(data = data, quiet = quiet)
 
   # Create grid
   grid <- create_grid(
