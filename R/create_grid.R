@@ -54,7 +54,22 @@ create_grid <- function(
     sf_column_name = "geometry"
   )
 
-  # Clip result grid to convex hull of data and return
-  sf::st_intersection(result, sf::st_convex_hull(sf::st_union(data)))
+  # Clip result grid to convex hull of data
+  result <- sf::st_make_valid(
+    sf::st_intersection(result, sf::st_convex_hull(sf::st_union(data)))
+  )
+
+  # Keep only the polygons (not points or lines) in the grid
+  result <- result[sf::st_is(result$geometry, "POLYGON"), ]
+
+  # Error if there are no valid rows in the data
+  if (nrow(result) == 0 | !inherits(result, "sf"))
+    rlang::abort(c(
+      "Could not create a grid of cells from the supplied point data",
+      "i" = "try plotting `data` to check the points it contains can be meaningfully covered by a grid"
+    ))
+
+  # Return result
+  result
 
 }
