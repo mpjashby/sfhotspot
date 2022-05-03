@@ -35,12 +35,16 @@ sfhotspot has the following functions. All can be used by just supplying
 an SF object containing points, or can be configured using the optional
 arguments to each function.
 
-| name                 | use                                                                                                                                                                                                                                       |
-|:---------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `hotspot_count()`    | Count the number of points in each cell of a regular grid. Cell size can be set by the user or chosen automatically.                                                                                                                      |
-| `hotspot_kde()`      | Estimate kernel density for each cell in a regular grid. Cell size and bandwidth can be set by the user or chosen automatically.                                                                                                          |
-| `hotspot_gistar()`   | Calculate the Getis–Ord *G*<sub>*i*</sub><sup>\*</sup> statistic for each cell in a regular grid, while optionally estimating kernel density. Cell size, bandwidth and neighbour distance can be set by the user or chosen automatically. |
-| `hotspot_classify()` | Classify grid cells according to whether they have had significant clusters of points at different time periods. All parameters can be chosen automatically or be set by the user using the `hotspot_classify_params()` helper function.  |
+| name                 | use                                                                                                                                                                                                                                                                                                                  |
+|:---------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `hotspot_count()`    | Count the number of points in each cell of a regular grid. Cell size can be set by the user or chosen automatically.                                                                                                                                                                                                 |
+| `hotspot_kde()`      | Estimate kernel density for each cell in a regular grid. Cell size and bandwidth can be set by the user or chosen automatically.                                                                                                                                                                                     |
+| `hotspot_gistar()`   | Calculate the Getis–Ord ![G_i^\*](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;G_i%5E%2A "G_i^*") statistic for each cell in a regular grid, while optionally estimating kernel density. Cell size, bandwidth and neighbour distance can be set by the user or chosen automatically. |
+| `hotspot_classify()` | Classify grid cells according to whether they have had significant clusters of points at different time periods. All parameters can be chosen automatically or be set by the user using the `hotspot_classify_params()` helper function.                                                                             |
+
+The results produced by `hotspot_count()`, `hotspot_kde()` and
+`hotspot_classify()` can be easily plotted using included methods for
+`autoplot()`.
 
 There is also an included dataset `memphis_robberies` that contains
 records of 2,245 robberies in Memphis, TN, in 2019.
@@ -79,7 +83,6 @@ memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
 memphis_robberies_hotspots <- hotspot_gistar(memphis_robberies_utm)
 #> Cell size set to 500 metres automatically
 #> Bandwidth set to 5,592.453 metres automatically based on rule of thumb
-#> Using centroids instead of provided `grid` geometries to calculate KDE estimates.
 
 
 # Visualise the hotspots by showing only those cells that have significantly

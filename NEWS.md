@@ -1,3 +1,11 @@
+# sfhotspot 0.3.0
+
+* Added `autoplot()` methods for plotting the results produced by 
+  `hotspot_count()`, `hotspot_kde()` and `hotspot_classify()`.
+* Added `bandwidth_adjust` argument to `hotspot_kde()` and `hotspot_gistar()` so
+  that bandwidth can be set relative to the default.
+
+
 # sfhotspot 0.2.2
 
 * Added checking for empty geometries and co-ordinates on Null Island (or

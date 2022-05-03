@@ -38,6 +38,7 @@ autoplot.hspt_n <- function(object, ...) {
 
 
 #' @describeIn autoplot.hspt_n Create a ggplot layer of grid counts
+#' @importFrom rlang .data
 autolayer.hspt_n <- function(object, ...) {
 
   # Validate inputs
@@ -49,7 +50,7 @@ autolayer.hspt_n <- function(object, ...) {
 
   # Create layer
   ggplot2::geom_sf(
-    mapping = ggplot2::aes(colour = n, fill = n),
+    mapping = ggplot2::aes(colour = .data$n, fill = .data$n),
     data = object,
     inherit.aes = FALSE,
     ...
@@ -99,6 +100,7 @@ autoplot.hspt_k <- function(object, ...) {
 
 
 #' @describeIn autoplot.hspt_k Create a ggplot layer of kernel-density values
+#' @importFrom rlang .data
 autolayer.hspt_k <- function(object, ...) {
 
   # Validate inputs
@@ -110,7 +112,7 @@ autolayer.hspt_k <- function(object, ...) {
 
   # Create layer
   ggplot2::geom_sf(
-    mapping = ggplot2::aes(colour = kde, fill = kde),
+    mapping = ggplot2::aes(colour = .data$kde, fill = .data$kde),
     data = object,
     inherit.aes = FALSE,
     ...
@@ -135,6 +137,7 @@ autolayer.hspt_k <- function(object, ...) {
 #' the appearance of the plot by adding calls to further \code{ggplot2}
 #' functions.
 #'
+#' @importFrom rlang .data
 #' @export
 autoplot.hspt_c <- function(object, ...) {
 
@@ -147,8 +150,8 @@ autoplot.hspt_c <- function(object, ...) {
   ggplot2::ggplot() +
     ggplot2::geom_sf(
       mapping = ggplot2::aes(
-        colour = hotspot_category,
-        fill = hotspot_category
+        colour = .data$hotspot_category,
+        fill = .data$hotspot_category
       ),
       data = object,
       ...

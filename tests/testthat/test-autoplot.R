@@ -1,6 +1,6 @@
 set.seed(123)
 
-data_sf <- head(memphis_robberies, 1000)
+data_sf <- memphis_robberies
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 result_count <- hotspot_count(data_sf, cell_size = 0.01, quiet = TRUE)
 result_kde <- hotspot_kde(

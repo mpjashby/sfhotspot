@@ -21,10 +21,8 @@
 #'   \code{FALSE}.
 #' @param ... Further arguments passed to \code{\link[SpatialKDE]{kde}}.
 #' @return An \code{\link[sf]{sf}} tibble of regular grid cells with
-#'   corresponding point counts and kernel density estimates for each cell.
-#'
-#'   The output from this function can be plotted in the same way as for other
-#'   SF objects, for which see \code{vignette("sf5", package = "sf")}.
+#'   corresponding point counts and kernel density estimates for each cell. This
+#'   can be plotted using \code{\link{autoplot}}.
 #'
 #' @details
 #'

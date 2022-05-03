@@ -66,7 +66,10 @@ create_grid <- function(
   if (nrow(result) == 0 | !inherits(result, "sf"))
     rlang::abort(c(
       "Could not create a grid of cells from the supplied point data",
-      "i" = "try plotting `data` to check the points it contains can be meaningfully covered by a grid"
+      "i" = paste(
+        "try plotting `data` to check the points it contains can be",
+        "meaningfully covered by a grid"
+      )
     ))
 
   # Return result

@@ -35,7 +35,8 @@
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{FALSE}.
 #' @return An \code{\link[sf]{sf}} tibble of regular grid cells with
-#'   corresponding hot-spot classifications for each cell.
+#'   corresponding hot-spot classifications for each cell. This can be plotted
+#'   using \code{\link{autoplot}}.
 #'
 #' Hot-spots are spatial areas that contain more points than would be expected
 #' by chance; cold-spots are areas that contain fewer points than would be

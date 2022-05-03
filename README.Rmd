@@ -80,6 +80,10 @@ knitr::kable(data.frame(
 ))
 ```
 
+The results produced by `hotspot_count()`, `hotspot_kde()` and 
+`hotspot_classify()` can be easily plotted using included methods for 
+`autoplot()`.
+
 There is also an included dataset `memphis_robberies` that contains records of
 `r format(nrow(sfhotspot::memphis_robberies), big.mark = ",")` robberies in 
 Memphis, TN, in 2019.

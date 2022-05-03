@@ -12,10 +12,8 @@
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{FALSE}.
 #' @return An \code{\link[sf]{sf}} tibble of regular grid cells with
-#'   corresponding point counts for each cell.
-#'
-#'   The output from this function can be plotted in the same way as for other
-#'   SF objects, for which see \code{vignette("sf5", package = "sf")}.
+#'   corresponding point counts for each cell. This can be plotted using
+#'   \code{\link{autoplot}}.
 #'
 #' @details
 #'

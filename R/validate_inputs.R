@@ -32,7 +32,10 @@ validate_inputs <- function(data, quiet, ..., call = rlang::caller_env()) {
   if (any(coords$is_zero) & rlang::is_false(quiet)) {
     rlang::warn(c(
       "`data` contains points with co-ordinates at position `0, 0`",
-      "i" = "these co-ordinates can indicate a problem with the data, e.g. an error during data recording or preparation",
+      "i" = paste(
+        "these co-ordinates can indicate a problem with the data, e.g. an",
+        "error during data recording or preparation"
+      ),
       "i" = "check data (e.g. by mapping) to ensure co-ordinates are correct"
     ))
   }
