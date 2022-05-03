@@ -21,9 +21,10 @@ result <- hotspot_count(data = data_sf)
 
 ## Correct outputs ----
 
-test_that("output is an SF tibble", {
+test_that("output is an SF tibble with class hspt_n", {
   expect_s3_class(result, "sf")
   expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "hspt_n")
 })
 
 test_that("output object has the required column names", {

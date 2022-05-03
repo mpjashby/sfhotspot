@@ -71,6 +71,6 @@ hotspot_count <- function(
   counts <- count_points_in_polygons(data, grid)
 
   # Return result
-  counts
+  structure(counts, class = c("hspt_n", class(counts)))
 
 }

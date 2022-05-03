@@ -568,6 +568,7 @@ hotspot_classify <- function(
   )
 
   # Return result
-  grid[, c("hotspot_category", "geometry")]
+  result <- grid[, c("hotspot_category", "geometry")]
+  structure(result, class = c("hspt_c", class(result)))
 
 }

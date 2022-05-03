@@ -57,9 +57,10 @@ test_that("error if values are of the correct type/length but are invalid", {
 
 ## Correct outputs ----
 
-test_that("function produces an SF tibble", {
+test_that("function produces an SF tibble with the class hspt_c", {
   expect_s3_class(result, "sf")
   expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "hspt_c")
 })
 
 test_that("output object has the required column names", {

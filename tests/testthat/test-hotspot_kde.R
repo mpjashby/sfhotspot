@@ -26,9 +26,10 @@ result <- hotspot_kde(
 
 ## Correct outputs ----
 
-test_that("output is an SF tibble", {
+test_that("output is an SF tibble with class hspt_k", {
   expect_s3_class(result, "sf")
   expect_s3_class(result, "tbl_df")
+  expect_s3_class(result, "hspt_k")
 })
 
 test_that("output object has the required column names", {
