@@ -60,7 +60,7 @@ kernel_density <- function(
     rlang::abort("`bandwidth_adjust` must be a single numeric value")
   if (bandwidth_adjust <= 0)
     rlang::abort("`bandwidth_adjust` must be greater than zero")
-  if (!rlang::is_logical(quiet))
+  if (!rlang::is_logical(quiet, n = 1))
     rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
 
   # Set bandwidth if not specified

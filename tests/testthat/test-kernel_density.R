@@ -70,11 +70,17 @@ test_that("error if `bandwidth` is not `NULL` or or a single positive number", {
 
 test_that("error if `bandwidth_adjust` is not a single positive number", {
   expect_error(
-    kernel_density(data = data_sf, grid = grid, bandwidth = character())
+    kernel_density(data = data_sf, grid = grid, bandwidth_adjust = character())
   )
-  expect_error(kernel_density(data = data_sf, grid = grid, bandwidth = 1:2))
-  expect_error(kernel_density(data = data_sf, grid = grid, bandwidth = -1))
-  expect_error(kernel_density(data = data_sf, grid = grid, bandwidth = 0))
+  expect_error(
+    kernel_density(data = data_sf, grid = grid, bandwidth_adjust = 1:2)
+  )
+  expect_error(
+    kernel_density(data = data_sf, grid = grid, bandwidth_adjust = -1)
+  )
+  expect_error(
+    kernel_density(data = data_sf, grid = grid, bandwidth_adjust = 0)
+  )
 })
 
 test_that("error if `quiet` is not `TRUE` or `FALSE`", {
