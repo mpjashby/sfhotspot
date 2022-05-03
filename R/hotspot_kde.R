@@ -13,6 +13,9 @@
 #'   (the default), the bandwidth will be specified automatically using the mean
 #'   result of \code{\link[MASS]{bandwidth.nrd}} called on the \code{x} and
 #'   \code{y} co-ordinates separately.
+#' @param bandwidth_adjust single positive \code{numeric} value by which the
+#'   value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
+#'   relative to the default.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{FALSE}.
@@ -78,6 +81,7 @@ hotspot_kde <- function(
   cell_size = NULL,
   grid_type = "rect",
   bandwidth = NULL,
+  bandwidth_adjust = 1,
   quiet = FALSE,
   ...
 ) {
@@ -97,10 +101,17 @@ hotspot_kde <- function(
   counts <- count_points_in_polygons(data, grid)
 
   # Calculate KDE
-  kde_val <- kernel_density(data, grid, bandwidth = bandwidth, quiet = quiet)
+  kde_val <- kernel_density(
+    data,
+    grid,
+    bandwidth = bandwidth,
+    bandwidth_adjust = bandwidth_adjust,
+    quiet = quiet
+  )
   counts$kde <- kde_val$kde_value
 
   # Return result
-  sf::st_as_sf(tibble::as_tibble(counts[, c("n", "kde", "geometry")]))
+  result <- sf::st_as_sf(tibble::as_tibble(counts[, c("n", "kde", "geometry")]))
+  structure(result, class = c("hspt_k", class(result)))
 
 }

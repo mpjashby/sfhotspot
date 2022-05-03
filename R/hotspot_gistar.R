@@ -19,6 +19,9 @@
 #'   (the default), the bandwidth will be specified automatically using the mean
 #'   result of \code{\link[MASS]{bandwidth.nrd}} called on the \code{x} and
 #'   \code{y} co-ordinates separately.
+#' @param bandwidth_adjust single positive \code{numeric} value by which the
+#'   value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
+#'   relative to the default.
 #' @param nb_dist The distance around a cell that contains the neighbours of
 #'   that cell, which are used in calculating the statistic. If this argument is
 #'   \code{NULL} (the default), \code{nb_dist} is set as \code{cell_size *
@@ -128,6 +131,7 @@ hotspot_gistar <- function(
   grid_type = "rect",
   kde = TRUE,
   bandwidth = NULL,
+  bandwidth_adjust = 1,
   nb_dist = NULL,
   include_self = TRUE,
   p_adjust_method = NULL,
@@ -176,8 +180,15 @@ hotspot_gistar <- function(
   counts <- count_points_in_polygons(data, grid)
 
   # Calculate KDE
-  if (rlang::is_true(kde))
-    kde_val <- kernel_density(data, grid, bandwidth = bandwidth, quiet = quiet)
+  if (rlang::is_true(kde)) {
+    kde_val <- kernel_density(
+      data,
+      grid,
+      bandwidth = bandwidth,
+      bandwidth_adjust = bandwidth_adjust,
+      quiet = quiet
+    )
+  }
 
   # Calculate Gi*
   result <- gistar(

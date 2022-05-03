@@ -18,20 +18,11 @@ result <- kernel_density(data = data_sf, grid = grid, bandwidth = 10000)
 
 # CHECK INPUTS -----------------------------------------------------------------
 
-# Note that only inputs evaluated in `hotspot_kde()` are tested here; those
+# Note that only inputs evaluated in `kernel_density()` are tested here; those
 # evaluated in helper functions are tested in the test files for those functions
 
 
 ## Errors ----
-
-test_that("error if `data` is not an SF object containing points", {
-  expect_error(kernel_density(data = data_df, grid = grid, bandwidth = 10000))
-  expect_error(kernel_density(
-    data = sf::st_cast(data_sf, "LINESTRING"),
-    grid = grid,
-    bandwidth = 10000
-  ))
-})
 
 test_that("error if `data` has lon/lat co-ordinates", {
   expect_error(kernel_density(
@@ -69,6 +60,15 @@ test_that("error if `grid` has lon/lat co-ordinates", {
 })
 
 test_that("error if `bandwidth` is not `NULL` or or a single positive number", {
+  expect_error(
+    kernel_density(data = data_sf, grid = grid, bandwidth = character())
+  )
+  expect_error(kernel_density(data = data_sf, grid = grid, bandwidth = 1:2))
+  expect_error(kernel_density(data = data_sf, grid = grid, bandwidth = -1))
+  expect_error(kernel_density(data = data_sf, grid = grid, bandwidth = 0))
+})
+
+test_that("error if `bandwidth_adjust` is not a single positive number", {
   expect_error(
     kernel_density(data = data_sf, grid = grid, bandwidth = character())
   )

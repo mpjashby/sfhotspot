@@ -10,6 +10,7 @@ hotspot_gistar(
   grid_type = "rect",
   kde = TRUE,
   bandwidth = NULL,
+  bandwidth_adjust = 1,
   nb_dist = NULL,
   include_self = TRUE,
   p_adjust_method = NULL,
@@ -37,6 +38,10 @@ calculating the kernel density estimates. If this argument is \code{NULL}
 (the default), the bandwidth will be specified automatically using the mean
 result of \code{\link[MASS]{bandwidth.nrd}} called on the \code{x} and
 \code{y} co-ordinates separately.}
+
+\item{bandwidth_adjust}{single positive \code{numeric} value by which the
+value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
+relative to the default.}
 
 \item{nb_dist}{The distance around a cell that contains the neighbours of
 that cell, which are used in calculating the statistic. If this argument is
