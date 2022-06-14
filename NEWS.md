@@ -1,3 +1,9 @@
+# sfhotspot 0.3.1
+
+* Fixed bug where `...` arguments were not passed on to `SpatialKDE::kde()` as
+  specified in the documentation.
+
+
 # sfhotspot 0.3.0
 
 * Added `autoplot()` methods for plotting the results produced by 
@@ -18,7 +24,7 @@
 * Fixed a bug where a grid of cells could not be created for an SF object with 
   no CRS defined (and improved the error message when trying to calculate KDE 
   values in this circumstance).
-* Fixed a bug where the grid returned by the `hotspot*()` family of functions 
+* Fixed a bug where the grid returned by the `hotspot_*()` family of functions 
   was not clipped to the convex hull of the data, as specified in the 
   documentation.
 

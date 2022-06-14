@@ -186,7 +186,8 @@ hotspot_gistar <- function(
       grid,
       bandwidth = bandwidth,
       bandwidth_adjust = bandwidth_adjust,
-      quiet = quiet
+      quiet = quiet,
+      ...
     )
   }
 
