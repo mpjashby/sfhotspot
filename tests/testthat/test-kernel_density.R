@@ -113,6 +113,10 @@ test_that("output is an SF tibble", {
     "sf"
   )
   expect_s3_class(result, "tbl_df")
+  expect_s3_class(
+    kernel_density(data = data_sf, grid = grid, kernel = "triweight"),
+    "sf"
+  )
 })
 
 test_that("output object has the required column names", {

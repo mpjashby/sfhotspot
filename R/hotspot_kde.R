@@ -104,7 +104,8 @@ hotspot_kde <- function(
     grid,
     bandwidth = bandwidth,
     bandwidth_adjust = bandwidth_adjust,
-    quiet = quiet
+    quiet = quiet,
+    ...
   )
   counts$kde <- kde_val$kde_value
 

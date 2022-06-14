@@ -14,6 +14,7 @@
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{TRUE}.
+#' @param ... Further arguments passed to \code{\link[SpatialKDE]{kde}}.
 #' @return An SF object based on \code{grid} with a column indicating the
 #'   density estimate for each cell.
 #' @noRd
@@ -23,7 +24,8 @@ kernel_density <- function(
   grid,
   bandwidth = NULL,
   bandwidth_adjust = 1,
-  quiet = TRUE
+  quiet = TRUE,
+  ...
 ) {
 
   # Check inputs
@@ -74,7 +76,8 @@ kernel_density <- function(
       SpatialKDE::kde(
         data,
         band_width = bandwidth * bandwidth_adjust,
-        grid = grid
+        grid = grid,
+        ...
       )
     )
   } else {
@@ -82,7 +85,8 @@ kernel_density <- function(
       kde_val <- SpatialKDE::kde(
         data,
         band_width = bandwidth * bandwidth_adjust,
-        grid = grid
+        grid = grid,
+        ...
       )
     }, message = function(m) {
       if (startsWith(conditionMessage(m), "Using centroids instead"))
