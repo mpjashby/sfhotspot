@@ -1,3 +1,13 @@
+# sfhotspot 0.4.0
+
+* Users can now provide their own grid using the `grid` argument to the 
+  `hotspot_*()` family of functions.
+* New function `hotspot_grid()` added so users can create a rectangular or
+  hexagonal grid separately from counting points, calculating KDE values, etc.
+  This may be useful to use the same grid for different datasets covering a
+  similar area.
+
+
 # sfhotspot 0.3.1
 
 * Fixed bug where `...` arguments were not passed on to `SpatialKDE::kde()` as

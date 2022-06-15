@@ -3,11 +3,13 @@
 #' @param data \code{\link[sf]{sf}} data frame containing points.
 #' @param cell_size \code{numeric} value specifying the size of each equally
 #'   spaced grid cell, using the same units (metres, degrees, etc.) as used in
-#'   the \code{sf} data frame given in the \code{data} argument. If this
-#'   argument is \code{NULL} (the default), the cell size will be calculated
-#'   automatically (see Details).
+#'   the \code{sf} data frame given in the \code{data} argument. Ignored if
+#'   \code{grid} is not \code{NULL}. If this argument and \code{grid} are
+#'   \code{NULL} (the default), the cell size will be calculated automatically
+#'   (see Details).
 #' @param grid_type \code{character} specifying whether the grid should be made
 #'   up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).
+#'   Ignored if \code{grid} is not \code{NULL}.
 #' @param bandwidth \code{numeric} value specifying the bandwidth to be used in
 #'   calculating the kernel density estimates. If this argument is \code{NULL}
 #'   (the default), the bandwidth will be specified automatically using the mean
@@ -16,6 +18,8 @@
 #' @param bandwidth_adjust single positive \code{numeric} value by which the
 #'   value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
 #'   relative to the default.
+#' @param grid \code{\link[sf]{sf}} data frame containing points containing
+#'   polygons, which will be used as the grid for which counts are made.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{FALSE}.
@@ -80,20 +84,23 @@ hotspot_kde <- function(
   grid_type = "rect",
   bandwidth = NULL,
   bandwidth_adjust = 1,
+  grid = NULL,
   quiet = FALSE,
   ...
 ) {
 
   # Check inputs that are not checked in a helper function
-  validate_inputs(data = data, quiet = quiet)
+  validate_inputs(data = data, grid = grid, quiet = quiet)
 
   # Create grid
-  grid <- create_grid(
-    data,
-    cell_size = cell_size,
-    grid_type = grid_type,
-    quiet = quiet
-  )
+  if (rlang::is_null(grid)) {
+    grid <- create_grid(
+      data,
+      cell_size = cell_size,
+      grid_type = grid_type,
+      quiet = quiet
+    )
+  }
 
   # Count points
   counts <- count_points_in_polygons(data, grid)

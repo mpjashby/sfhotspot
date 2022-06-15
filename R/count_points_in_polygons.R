@@ -38,6 +38,18 @@ count_points_in_polygons <- function(points, polygons) {
   # Replace NAs produced by zero counts with zeros
   counts$n <- ifelse(is.na(counts$x), 0, counts$x)
 
+  # Check if any points were not counted in polygons (e.g. because the polygons
+  # do not cover all the points)
+  if (nrow(points) > sum(counts$n)) {
+    rlang::warn(c(
+      paste(
+        format(nrow(points) - sum(counts$n), big.mark = ","),
+        "points are outside the area covered by the supplied polygons."
+      ),
+      "i" = "These points have not been used in generating the results."
+    ))
+  }
+
   # Remove working columns and convert to SF object
   counts <- sf::st_as_sf(
     tibble::as_tibble(counts[, c("n", "geometry")]),

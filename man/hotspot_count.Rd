@@ -4,19 +4,30 @@
 \alias{hotspot_count}
 \title{Count points in cells in a two-dimensional grid}
 \usage{
-hotspot_count(data, cell_size = NULL, grid_type = "rect", quiet = FALSE)
+hotspot_count(
+  data,
+  cell_size = NULL,
+  grid_type = "rect",
+  grid = NULL,
+  quiet = FALSE
+)
 }
 \arguments{
 \item{data}{\code{\link[sf]{sf}} data frame containing points.}
 
 \item{cell_size}{\code{numeric} value specifying the size of each equally
 spaced grid cell, using the same units (metres, degrees, etc.) as used in
-the \code{sf} data frame given in the \code{data} argument. If this
-argument is \code{NULL} (the default), the cell size will be calculated
-automatically (see Details).}
+the \code{sf} data frame given in the \code{data} argument. Ignored if
+\code{grid} is not \code{NULL}. If this argument and \code{grid} are
+\code{NULL} (the default), the cell size will be calculated automatically
+(see Details).}
 
 \item{grid_type}{\code{character} specifying whether the grid should be made
-up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).}
+up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).
+Ignored if \code{grid} is not \code{NULL}.}
+
+\item{grid}{\code{\link[sf]{sf}} data frame containing points containing
+polygons, which will be used as the grid for which counts are made.}
 
 \item{quiet}{if set to \code{TRUE}, messages reporting the values of any
 parameters set automatically will be suppressed. The default is
@@ -34,10 +45,10 @@ Count points in cells in a two-dimensional grid
 This function counts the number of points in each cell in a regular grid.
 \subsection{Automatic cell-size selection}{
 
-If no cell size is given then the cell size will be set so that there are 50
-cells on the shorter side of the grid. If the \code{data} SF object is projected
-in metres or feet, the number of cells will be adjusted upwards so that the
-cell size is a multiple of 100.
+If \code{grid} is \code{NULL} and no cell size is given, the cell size will be set so
+that there are 50 cells on the shorter side of the grid. If the \code{data} SF
+object is projected in metres or feet, the number of cells will be adjusted
+upwards so that the cell size is a multiple of 100.
 }
 }
 \examples{

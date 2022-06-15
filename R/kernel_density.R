@@ -29,7 +29,6 @@ kernel_density <- function(
 ) {
 
   # Check inputs
-  validate_inputs(data = data, quiet = quiet)
   if (
     sf::st_is_longlat(data) |
     rlang::is_empty(sf::st_crs(data, parameters = TRUE))

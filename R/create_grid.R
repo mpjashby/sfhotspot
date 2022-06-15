@@ -10,12 +10,33 @@
 #'   up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
-#'   \code{TRUE}.
+#'   \code{FALSE}.
 #' @param ... Further arguments passed to \code{link[sf]{st_make_grid}}.
 #'
 #' @return A simple features tibble containing polygons representing grid cells.
 #'
-#' @noRd
+#' The grid will be based on the convex hull of \code{data}, expanded by a
+#' buffer of \code{cell_size / 2} to ensure all the points in \code{data} fall
+#' within the resulting grid.
+#'
+#' @export
+#'
+
+hotspot_grid <- function(
+  data,
+  cell_size = NULL,
+  grid_type = "rect",
+  quiet = FALSE,
+  ...
+) {
+  create_grid(
+    data = data,
+    cell_size = cell_size,
+    grid_type = grid_type,
+    quiet = quiet,
+    ...
+  )
+}
 
 create_grid <- function(
   data,
@@ -33,15 +54,21 @@ create_grid <- function(
   if (!rlang::is_null(cell_size)) {
     if (cell_size <= 0) rlang::abort("`cell_size` must be greater than zero")
   }
-  grid_type <- rlang::arg_match(grid_type, c("rect", "hex"))
+  rlang::arg_match(grid_type, c("rect", "hex"))
 
   # Set cell size if not specified
   if (rlang::is_null(cell_size))
     cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
 
+  # Create buffered convex hull around data
+  hull <- sf::st_buffer(
+    sf::st_convex_hull(sf::st_union(data)),
+    dist = cell_size / 2
+  )
+
   # Create grid
   grid <- sf::st_make_grid(
-    data,
+    hull,
     cellsize = cell_size,
     square = grid_type == "rect",
     ...
@@ -54,9 +81,9 @@ create_grid <- function(
     sf_column_name = "geometry"
   )
 
-  # Clip result grid to convex hull of data
+  # Clip result grid to convex hull of data, retaining full grid cells
   result <- sf::st_make_valid(
-    sf::st_intersection(result, sf::st_convex_hull(sf::st_union(data)))
+    result[sf::st_intersects(result, hull, sparse = FALSE)[, 1], ]
   )
 
   # Keep only the polygons (not points or lines) in the grid

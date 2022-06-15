@@ -7,11 +7,13 @@
 #' @param data \code{\link[sf]{sf}} data frame containing points.
 #' @param cell_size \code{numeric} value specifying the size of each equally
 #'   spaced grid cell, using the same units (metres, degrees, etc.) as used in
-#'   the \code{sf} data frame given in the \code{data} argument. If this
-#'   argument is \code{NULL} (the default), the cell size will be calculated
-#'   automatically (see Details).
+#'   the \code{sf} data frame given in the \code{data} argument. Ignored if
+#'   \code{grid} is not \code{NULL}. If this argument and \code{grid} are
+#'   \code{NULL} (the default), the cell size will be calculated automatically
+#'   (see Details).
 #' @param grid_type \code{character} specifying whether the grid should be made
 #'   up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).
+#'   Ignored if \code{grid} is not \code{NULL}.
 #' @param kde \code{TRUE} (the default) or \code{FALSE} indicating whether
 #'   kernel density estimates (KDE) should be produced for each grid cell.
 #' @param bandwidth \code{numeric} value specifying the bandwidth to be used in
@@ -22,6 +24,8 @@
 #' @param bandwidth_adjust single positive \code{numeric} value by which the
 #'   value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
 #'   relative to the default.
+#' @param grid \code{\link[sf]{sf}} data frame containing points containing
+#'   polygons, which will be used as the grid for which counts are made.
 #' @param nb_dist The distance around a cell that contains the neighbours of
 #'   that cell, which are used in calculating the statistic. If this argument is
 #'   \code{NULL} (the default), \code{nb_dist} is set as \code{cell_size *
@@ -132,6 +136,7 @@ hotspot_gistar <- function(
   kde = TRUE,
   bandwidth = NULL,
   bandwidth_adjust = 1,
+  grid = NULL,
   nb_dist = NULL,
   include_self = TRUE,
   p_adjust_method = NULL,
@@ -140,7 +145,7 @@ hotspot_gistar <- function(
 ) {
 
   # Check inputs that are not checked in a helper function
-  validate_inputs(data = data, quiet = quiet)
+  validate_inputs(data = data, grid = grid, quiet = quiet)
 
   # Check whether `data` can be used to estimate KDE values
   if (sf::st_is_longlat(data)) {
@@ -169,12 +174,14 @@ hotspot_gistar <- function(
     cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
 
   # Create grid
-  grid <- create_grid(
-    data,
-    cell_size = cell_size,
-    grid_type = grid_type,
-    quiet = quiet
-  )
+  if (rlang::is_null(grid)) {
+    grid <- create_grid(
+      data,
+      cell_size = cell_size,
+      grid_type = grid_type,
+      quiet = quiet
+    )
+  }
 
   # Count points
   counts <- count_points_in_polygons(data, grid)

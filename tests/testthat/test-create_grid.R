@@ -1,8 +1,5 @@
 data_sf <- head(memphis_robberies, 10)
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
-data_line <- sf::st_as_sf(
-  tibble::tibble(geometry = list(sf::st_point(c(1, 1)), sf::st_point(c(2, 2))))
-)
 
 result <- create_grid(data = data_sf, cell_size = 0.1)
 
@@ -30,10 +27,6 @@ test_that("error if `grid_type` is not 'rect' or 'hex'", {
 
 test_that("error if `quiet` is not `TRUE` or `FALSE`", {
   expect_error(create_grid(data = data_sf, quiet = character()))
-})
-
-test_that("error if `data` contains points in a line", {
-  expect_error(create_grid(data = data_line))
 })
 
 

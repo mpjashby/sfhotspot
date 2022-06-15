@@ -11,6 +11,7 @@ hotspot_classify(
   start = NULL,
   cell_size = NULL,
   grid_type = "rect",
+  grid = NULL,
   collapse = FALSE,
   params = hotspot_classify_params(),
   quiet = FALSE
@@ -38,12 +39,17 @@ or at the earliest time found in the data otherwise.}
 
 \item{cell_size}{\code{numeric} value specifying the size of each equally
 spaced grid cell, using the same units (metres, degrees, etc.) as used in
-the \code{sf} data frame given in the \code{data} argument. If this
-argument is \code{NULL} (the default), the cell size will be calculated
-automatically (see Details).}
+the \code{sf} data frame given in the \code{data} argument. Ignored if
+\code{grid} is not \code{NULL}. If this argument and \code{grid} are
+\code{NULL} (the default), the cell size will be calculated automatically
+(see Details).}
 
 \item{grid_type}{\code{character} specifying whether the grid should be made
-up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).}
+up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).
+Ignored if \code{grid} is not \code{NULL}.}
+
+\item{grid}{\code{\link[sf]{sf}} data frame containing points containing
+polygons, which will be used as the grid for which counts are made.}
 
 \item{collapse}{If the range of dates in the data is not a multiple of
 \code{period}, the final period will be shorter than the others. In that

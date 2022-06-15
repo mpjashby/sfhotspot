@@ -10,6 +10,7 @@ hotspot_kde(
   grid_type = "rect",
   bandwidth = NULL,
   bandwidth_adjust = 1,
+  grid = NULL,
   quiet = FALSE,
   ...
 )
@@ -19,12 +20,14 @@ hotspot_kde(
 
 \item{cell_size}{\code{numeric} value specifying the size of each equally
 spaced grid cell, using the same units (metres, degrees, etc.) as used in
-the \code{sf} data frame given in the \code{data} argument. If this
-argument is \code{NULL} (the default), the cell size will be calculated
-automatically (see Details).}
+the \code{sf} data frame given in the \code{data} argument. Ignored if
+\code{grid} is not \code{NULL}. If this argument and \code{grid} are
+\code{NULL} (the default), the cell size will be calculated automatically
+(see Details).}
 
 \item{grid_type}{\code{character} specifying whether the grid should be made
-up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).}
+up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).
+Ignored if \code{grid} is not \code{NULL}.}
 
 \item{bandwidth}{\code{numeric} value specifying the bandwidth to be used in
 calculating the kernel density estimates. If this argument is \code{NULL}
@@ -35,6 +38,9 @@ result of \code{\link[MASS]{bandwidth.nrd}} called on the \code{x} and
 \item{bandwidth_adjust}{single positive \code{numeric} value by which the
 value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
 relative to the default.}
+
+\item{grid}{\code{\link[sf]{sf}} data frame containing points containing
+polygons, which will be used as the grid for which counts are made.}
 
 \item{quiet}{if set to \code{TRUE}, messages reporting the values of any
 parameters set automatically will be suppressed. The default is

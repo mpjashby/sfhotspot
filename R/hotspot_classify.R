@@ -20,11 +20,15 @@
 #'   or at the earliest time found in the data otherwise.
 #' @param cell_size \code{numeric} value specifying the size of each equally
 #'   spaced grid cell, using the same units (metres, degrees, etc.) as used in
-#'   the \code{sf} data frame given in the \code{data} argument. If this
-#'   argument is \code{NULL} (the default), the cell size will be calculated
-#'   automatically (see Details).
+#'   the \code{sf} data frame given in the \code{data} argument. Ignored if
+#'   \code{grid} is not \code{NULL}. If this argument and \code{grid} are
+#'   \code{NULL} (the default), the cell size will be calculated automatically
+#'   (see Details).
 #' @param grid_type \code{character} specifying whether the grid should be made
 #'   up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).
+#'   Ignored if \code{grid} is not \code{NULL}.
+#' @param grid \code{\link[sf]{sf}} data frame containing points containing
+#'   polygons, which will be used as the grid for which counts are made.
 #' @param collapse If the range of dates in the data is not a multiple of
 #'   \code{period}, the final period will be shorter than the others. In that
 #'   case, should this shorter period be collapsed into the penultimate period?
@@ -110,6 +114,7 @@ hotspot_classify <- function(
   start = NULL,
   cell_size = NULL,
   grid_type = "rect",
+  grid = NULL,
   collapse = FALSE,
   params = hotspot_classify_params(),
   quiet = FALSE
@@ -126,7 +131,7 @@ hotspot_classify <- function(
   )
 
   # Check inputs that are not checked in a helper function
-  validate_inputs(data = data, quiet = quiet)
+  validate_inputs(data = data, grid = grid, quiet = quiet)
   if (!rlang::is_false(time) & !time %in% names(data))
     rlang::abort(
       "`time` must be `NULL` or the name of a column in the `data` object"
@@ -335,12 +340,14 @@ hotspot_classify <- function(
     cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
 
   # Create grid
-  grid <- create_grid(
-    data,
-    cell_size = cell_size,
-    grid_type = grid_type,
-    quiet = quiet
-  )
+  if (rlang::is_null(grid)) {
+    grid <- create_grid(
+      data,
+      cell_size = cell_size,
+      grid_type = grid_type,
+      quiet = quiet
+    )
+  }
 
   # Categorise data by period
   if (unit == "year") {
