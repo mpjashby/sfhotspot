@@ -14,7 +14,7 @@ These checks should be run **in this order** before submitting to CRAN. If any o
 - [ ]  `devtools::document()`
 - [ ] `pkgdown::build_site()`
 - [ ] `devtools::check()`
-- [ ] `devtoolls::check_rhub()`
+- [ ] `devtools::check_rhub()`
 - [ ] `devtools::check_win_devel()`
 - [ ] update `NEWS.md`
 - [ ] update `DESCRIPTION`, including incrementing version number
