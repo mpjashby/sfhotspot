@@ -3,6 +3,7 @@ set.seed(123)
 # KDE can only be calculated for projected co-ordinates, so first convert data
 # to use local state plane CRS
 data_sf <- sf::st_transform(head(memphis_robberies, 100), 2843)
+data_sf$wt <- runif(nrow(data_sf), max = 1000)
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 data_missing_crs <- sf::st_sf(
   row = 1:2,
@@ -59,7 +60,7 @@ test_that("error if `grid` has lon/lat co-ordinates", {
   )
 })
 
-test_that("error if `bandwidth` is not `NULL` or or a single positive number", {
+test_that("error if `bandwidth` is not `NULL` or a single positive number", {
   expect_error(
     kernel_density(data = data_sf, grid = grid, bandwidth = character())
   )
@@ -81,6 +82,12 @@ test_that("error if `bandwidth_adjust` is not a single positive number", {
   expect_error(
     kernel_density(data = data_sf, grid = grid, bandwidth_adjust = 0)
   )
+})
+
+test_that("error if `weights` is not the name of a column in the data", {
+  expect_error(kernel_density(data = data_sf, grid = grid, weights = "blah"))
+  expect_error(kernel_density(data = data_sf, grid = grid, weights = wts))
+  expect_error(kernel_density(data = data_sf, grid = grid, weights = date))
 })
 
 test_that("error if `quiet` is not `TRUE` or `FALSE`", {

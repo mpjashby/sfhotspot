@@ -11,6 +11,7 @@ hotspot_kde(
   bandwidth = NULL,
   bandwidth_adjust = 1,
   grid = NULL,
+  weights = NULL,
   quiet = FALSE,
   ...
 )
@@ -39,8 +40,11 @@ result of \code{\link[MASS]{bandwidth.nrd}} called on the \code{x} and
 value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
 relative to the default.}
 
-\item{grid}{\code{\link[sf]{sf}} data frame containing points containing
-polygons, which will be used as the grid for which counts are made.}
+\item{grid}{\code{\link[sf]{sf}} data frame containing polygons, which will
+be used as the grid for which counts are made.}
+
+\item{weights}{\code{NULL} or the name of a column in \code{data} to be used
+as weights for weighted counts and KDE values.}
 
 \item{quiet}{if set to \code{TRUE}, messages reporting the values of any
 parameters set automatically will be suppressed. The default is

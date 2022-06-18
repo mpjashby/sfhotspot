@@ -12,6 +12,7 @@ hotspot_gistar(
   bandwidth = NULL,
   bandwidth_adjust = 1,
   grid = NULL,
+  weights = NULL,
   nb_dist = NULL,
   include_self = TRUE,
   p_adjust_method = NULL,
@@ -46,8 +47,11 @@ result of \code{\link[MASS]{bandwidth.nrd}} called on the \code{x} and
 value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
 relative to the default.}
 
-\item{grid}{\code{\link[sf]{sf}} data frame containing points containing
-polygons, which will be used as the grid for which counts are made.}
+\item{grid}{\code{\link[sf]{sf}} data frame containing polygons, which will
+be used as the grid for which counts are made.}
+
+\item{weights}{\code{NULL} or the name of a column in \code{data} to be used
+as weights for weighted counts and KDE values.}
 
 \item{nb_dist}{The distance around a cell that contains the neighbours of
 that cell, which are used in calculating the statistic. If this argument is

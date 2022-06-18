@@ -18,8 +18,10 @@
 #' @param bandwidth_adjust single positive \code{numeric} value by which the
 #'   value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
 #'   relative to the default.
-#' @param grid \code{\link[sf]{sf}} data frame containing points containing
-#'   polygons, which will be used as the grid for which counts are made.
+#' @param grid \code{\link[sf]{sf}} data frame containing polygons, which will
+#'   be used as the grid for which counts are made.
+#' @param weights \code{NULL} or the name of a column in \code{data} to be used
+#'   as weights for weighted counts and KDE values.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{FALSE}.
@@ -85,9 +87,17 @@ hotspot_kde <- function(
   bandwidth = NULL,
   bandwidth_adjust = 1,
   grid = NULL,
+  weights = NULL,
   quiet = FALSE,
   ...
 ) {
+
+  # Process arguments that are column names
+  weights <- ifelse(
+    rlang::quo_is_null(rlang::enquo(weights)),
+    NA_character_,
+    rlang::as_name(rlang::enquo(weights))
+  )
 
   # Check inputs that are not checked in a helper function
   validate_inputs(data = data, grid = grid, quiet = quiet)
@@ -102,22 +112,43 @@ hotspot_kde <- function(
     )
   }
 
-  # Count points
-  counts <- count_points_in_polygons(data, grid)
+  # Count points and calculate KDE
+  if (rlang::is_chr_na(weights)) {
+    counts <- count_points_in_polygons(data, grid)
+    kde_val <- kernel_density(
+      data,
+      grid,
+      bandwidth = bandwidth,
+      bandwidth_adjust = bandwidth_adjust,
+      quiet = quiet,
+      ...
+    )
+  } else {
+    counts <- count_points_in_polygons(data, grid, weights = weights)
+    kde_val <- kernel_density(
+      data,
+      grid,
+      bandwidth = bandwidth,
+      bandwidth_adjust = bandwidth_adjust,
+      weights = weights,
+      quiet = quiet,
+      ...
+    )
+  }
 
-  # Calculate KDE
-  kde_val <- kernel_density(
-    data,
-    grid,
-    bandwidth = bandwidth,
-    bandwidth_adjust = bandwidth_adjust,
-    quiet = quiet,
-    ...
-  )
+  # Add KDE
   counts$kde <- kde_val$kde_value
 
   # Return result
-  result <- sf::st_as_sf(tibble::as_tibble(counts[, c("n", "kde", "geometry")]))
+  if ("sum" %in% names(counts)) {
+    result <- sf::st_as_sf(
+      tibble::as_tibble(counts[, c("n", "sum", "kde", "geometry")])
+    )
+  } else {
+    result <- sf::st_as_sf(
+      tibble::as_tibble(counts[, c("n", "kde", "geometry")])
+    )
+  }
   structure(result, class = c("hspt_k", class(result)))
 
 }

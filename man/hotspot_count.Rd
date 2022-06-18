@@ -9,6 +9,7 @@ hotspot_count(
   cell_size = NULL,
   grid_type = "rect",
   grid = NULL,
+  weights = NULL,
   quiet = FALSE
 )
 }
@@ -26,8 +27,11 @@ the \code{sf} data frame given in the \code{data} argument. Ignored if
 up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).
 Ignored if \code{grid} is not \code{NULL}.}
 
-\item{grid}{\code{\link[sf]{sf}} data frame containing points containing
-polygons, which will be used as the grid for which counts are made.}
+\item{grid}{\code{\link[sf]{sf}} data frame containing polygons, which will
+be used as the grid for which counts are made.}
+
+\item{weights}{\code{NULL} or the name of a column in \code{data} to be used
+as weights for weighted counts.}
 
 \item{quiet}{if set to \code{TRUE}, messages reporting the values of any
 parameters set automatically will be suppressed. The default is
@@ -42,7 +46,9 @@ corresponding point counts for each cell. This can be plotted using
 Count points in cells in a two-dimensional grid
 }
 \details{
-This function counts the number of points in each cell in a regular grid.
+This function counts the number of points in each cell in a regular grid. If
+a column name in \code{data} is supplied with the \code{weights} argument,
+weighted counts will also be produced.
 \subsection{Automatic cell-size selection}{
 
 If \code{grid} is \code{NULL} and no cell size is given, the cell size will be set so

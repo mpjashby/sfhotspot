@@ -3,21 +3,32 @@
 #' @param points \code{\link[sf]{sf}} data frame containing points.
 #' @param polygons \code{\link[sf]{sf}} data frame containing polygon grid
 #'   cells, e.g. as produced by \code{\link{create_grid}}.
+#' @param weights character vector giving the name of a numeric column in
+#'   \code{points} representing weights for weighted counts.
 #' @return An SF tibble containing counts for each polygon.
 #'
 #' @noRd
 
-count_points_in_polygons <- function(points, polygons) {
+count_points_in_polygons <- function(points, polygons, weights = NULL) {
 
   # Check inputs
   if (!inherits(points, "sf"))
-    rlang::abort("`points` must be an SF object")
+    rlang::abort("`points` must be an SF object.")
   if (any(!sf::st_is(points, "POINT")))
-    rlang::abort("`points` must be an SF object containing points")
+    rlang::abort("`points` must be an SF object containing points.")
   if (!inherits(polygons, "sf"))
-    rlang::abort("`polygons` must be an SF object")
+    rlang::abort("`polygons` must be an SF object.")
   if (any(!sf::st_is(polygons, "POLYGON")))
-    rlang::abort("`polygons` must be an SF object containing polygons")
+    rlang::abort("`polygons` must be an SF object containing polygons.")
+  if (!rlang::is_null(weights)) {
+    if (!weights %in% names(points))
+      rlang::abort("`weights` must be `NULL` or the name of a single column.")
+    if (!rlang::is_bare_numeric(points[[weights]])) {
+      rlang::abort(
+        "`weights` must be `NULL` or the name of a column of numeric values."
+      )
+    }
+  }
 
   # Create a unique ID for each polygon
   polygons$`.polygon_id` <- seq_len(nrow(polygons))
@@ -38,6 +49,19 @@ count_points_in_polygons <- function(points, polygons) {
   # Replace NAs produced by zero counts with zeros
   counts$n <- ifelse(is.na(counts$x), 0, counts$x)
 
+  # If weights are provided, sum those and join them
+  if (!rlang::is_null(weights)) {
+    sums <- stats::aggregate(
+      ids[[weights]],
+      list(".polygon_id" = ids$`.polygon_id`),
+      FUN = sum
+    )
+    sums$sum <- sums$x
+    sums$x <- NULL
+    sums_merged <- merge(sums, polygons, by = ".polygon_id", all.y = TRUE)
+    counts$sum <- ifelse(is.na(sums_merged$sum), 0, sums_merged$sum)
+  }
+
   # Check if any points were not counted in polygons (e.g. because the polygons
   # do not cover all the points)
   if (nrow(points) > sum(counts$n)) {
@@ -51,10 +75,17 @@ count_points_in_polygons <- function(points, polygons) {
   }
 
   # Remove working columns and convert to SF object
-  counts <- sf::st_as_sf(
-    tibble::as_tibble(counts[, c("n", "geometry")]),
-    sf_column_name = "geometry"
-  )
+  if (!rlang::is_null(weights)) {
+    counts <- sf::st_as_sf(
+      tibble::as_tibble(counts[, c("n", "sum", "geometry")]),
+      sf_column_name = "geometry"
+    )
+  } else {
+    counts <- sf::st_as_sf(
+      tibble::as_tibble(counts[, c("n", "geometry")]),
+      sf_column_name = "geometry"
+    )
+  }
 
   counts
 

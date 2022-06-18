@@ -10,8 +10,10 @@
 #' @param grid_type \code{character} specifying whether the grid should be made
 #'   up of squares (\code{"rect"}, the default) or hexagons (\code{"hex"}).
 #'   Ignored if \code{grid} is not \code{NULL}.
-#' @param grid \code{\link[sf]{sf}} data frame containing points containing
-#'   polygons, which will be used as the grid for which counts are made.
+#' @param grid \code{\link[sf]{sf}} data frame containing polygons, which will
+#'   be used as the grid for which counts are made.
+#' @param weights \code{NULL} or the name of a column in \code{data} to be used
+#'   as weights for weighted counts.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{FALSE}.
@@ -21,7 +23,9 @@
 #'
 #' @details
 #'
-#' This function counts the number of points in each cell in a regular grid.
+#' This function counts the number of points in each cell in a regular grid. If
+#' a column name in \code{data} is supplied with the \code{weights} argument,
+#' weighted counts will also be produced.
 #'
 #' ## Automatic cell-size selection
 #'
@@ -56,8 +60,16 @@ hotspot_count <- function(
   cell_size = NULL,
   grid_type = "rect",
   grid = NULL,
+  weights = NULL,
   quiet = FALSE
 ) {
+
+  # Process arguments that are column names
+  weights <- ifelse(
+    rlang::quo_is_null(rlang::enquo(weights)),
+    NA_character_,
+    rlang::as_name(rlang::enquo(weights))
+  )
 
   # Check inputs that are not checked in a helper function
   validate_inputs(data = data, grid = grid, quiet = quiet)
@@ -73,7 +85,11 @@ hotspot_count <- function(
   }
 
   # Count points
-  counts <- count_points_in_polygons(data, grid)
+  if (rlang::is_chr_na(weights)) {
+    counts <- count_points_in_polygons(data, grid)
+  } else {
+    counts <- count_points_in_polygons(data, grid, weights = weights)
+  }
 
   # Return result
   structure(counts, class = c("hspt_n", class(counts)))

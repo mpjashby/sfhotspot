@@ -24,8 +24,10 @@
 #' @param bandwidth_adjust single positive \code{numeric} value by which the
 #'   value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
 #'   relative to the default.
-#' @param grid \code{\link[sf]{sf}} data frame containing points containing
-#'   polygons, which will be used as the grid for which counts are made.
+#' @param grid \code{\link[sf]{sf}} data frame containing polygons, which will
+#'   be used as the grid for which counts are made.
+#' @param weights \code{NULL} or the name of a column in \code{data} to be used
+#'   as weights for weighted counts and KDE values.
 #' @param nb_dist The distance around a cell that contains the neighbours of
 #'   that cell, which are used in calculating the statistic. If this argument is
 #'   \code{NULL} (the default), \code{nb_dist} is set as \code{cell_size *
@@ -137,12 +139,20 @@ hotspot_gistar <- function(
   bandwidth = NULL,
   bandwidth_adjust = 1,
   grid = NULL,
+  weights = NULL,
   nb_dist = NULL,
   include_self = TRUE,
   p_adjust_method = NULL,
   quiet = FALSE,
   ...
 ) {
+
+  # Process arguments that are column names
+  weights <- ifelse(
+    rlang::quo_is_null(rlang::enquo(weights)),
+    NA_character_,
+    rlang::as_name(rlang::enquo(weights))
+  )
 
   # Check inputs that are not checked in a helper function
   validate_inputs(data = data, grid = grid, quiet = quiet)
@@ -183,19 +193,32 @@ hotspot_gistar <- function(
     )
   }
 
-  # Count points
-  counts <- count_points_in_polygons(data, grid)
-
-  # Calculate KDE
-  if (rlang::is_true(kde)) {
-    kde_val <- kernel_density(
-      data,
-      grid,
-      bandwidth = bandwidth,
-      bandwidth_adjust = bandwidth_adjust,
-      quiet = quiet,
-      ...
-    )
+  # Count points and calculate KDE
+  if (rlang::is_chr_na(weights)) {
+    counts <- count_points_in_polygons(data, grid)
+    if (rlang::is_true(kde)) {
+      kde_val <- kernel_density(
+        data,
+        grid,
+        bandwidth = bandwidth,
+        bandwidth_adjust = bandwidth_adjust,
+        quiet = quiet,
+        ...
+      )
+    }
+  } else {
+    counts <- count_points_in_polygons(data, grid, weights = weights)
+    if (rlang::is_true(kde)) {
+      kde_val <- kernel_density(
+        data,
+        grid,
+        bandwidth = bandwidth,
+        bandwidth_adjust = bandwidth_adjust,
+        weights = weights,
+        quiet = quiet,
+        ...
+      )
+    }
   }
 
   # Calculate Gi*
@@ -213,7 +236,15 @@ hotspot_gistar <- function(
   if (rlang::is_true(kde)) result$kde <- kde_val$kde_value
 
   # Return result
-  if (rlang::is_true(kde)) {
+  if (rlang::is_true(kde) & !rlang::is_chr_na(weights)) {
+    sf::st_as_sf(tibble::as_tibble(
+      result[, c("n", "sum", "kde", "gistar", "pvalue", "geometry")]
+    ))
+  } else if (!rlang::is_chr_na(weights)) {
+    sf::st_as_sf(tibble::as_tibble(
+      result[, c("n", "sum", "gistar", "pvalue", "geometry")]
+    ))
+  } else if (rlang::is_true(kde)) {
     sf::st_as_sf(tibble::as_tibble(
       result[, c("n", "kde", "gistar", "pvalue", "geometry")]
     ))

@@ -11,6 +11,8 @@
 #' @param bandwidth_adjust single positive \code{numeric} value by which the
 #'   value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
 #'   relative to the default.
+#' @param weights character vector giving the name of a numeric column in
+#'   \code{data} representing weights for weighted KDE values.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{TRUE}.
@@ -24,6 +26,7 @@ kernel_density <- function(
   grid,
   bandwidth = NULL,
   bandwidth_adjust = 1,
+  weights = NULL,
   quiet = TRUE,
   ...
 ) {
@@ -61,6 +64,15 @@ kernel_density <- function(
     rlang::abort("`bandwidth_adjust` must be a single numeric value")
   if (bandwidth_adjust <= 0)
     rlang::abort("`bandwidth_adjust` must be greater than zero")
+  if (!rlang::is_null(weights)) {
+    if (!weights %in% names(data) | !rlang::is_character(weights, n = 1))
+      rlang::abort("`weights` must be `NULL` or the name of a single column.")
+    if (!rlang::is_bare_numeric(data[[weights]])) {
+      rlang::abort(
+        "`weights` must be `NULL` or the name of a column of numeric values."
+      )
+    }
+  }
   if (!rlang::is_logical(quiet, n = 1))
     rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
 
@@ -71,22 +83,44 @@ kernel_density <- function(
   # Code for suppressing specific messages is from
   # https://stackoverflow.com/a/38605924/8222654
   if (rlang::is_true(quiet)) {
-    kde_val <- suppressMessages(
-      SpatialKDE::kde(
-        data,
-        band_width = bandwidth * bandwidth_adjust,
-        grid = grid,
-        ...
+    if (rlang::is_null(weights)) {
+      kde_val <- suppressMessages(
+        SpatialKDE::kde(
+          data,
+          band_width = bandwidth * bandwidth_adjust,
+          grid = grid,
+          ...
+        )
       )
-    )
+    } else {
+      kde_val <- suppressMessages(
+        SpatialKDE::kde(
+          data,
+          band_width = bandwidth * bandwidth_adjust,
+          weights = data[[weights]],
+          grid = grid,
+          ...
+        )
+      )
+    }
   } else {
     withCallingHandlers({
-      kde_val <- SpatialKDE::kde(
-        data,
-        band_width = bandwidth * bandwidth_adjust,
-        grid = grid,
-        ...
-      )
+      if (rlang::is_null(weights)) {
+        kde_val <- SpatialKDE::kde(
+          data,
+          band_width = bandwidth * bandwidth_adjust,
+          grid = grid,
+          ...
+        )
+      } else {
+        kde_val <- SpatialKDE::kde(
+          data,
+          band_width = bandwidth * bandwidth_adjust,
+          weights = data[[weights]],
+          grid = grid,
+          ...
+        )
+      }
     }, message = function(m) {
       if (startsWith(conditionMessage(m), "Using centroids instead"))
         invokeRestart("muffleMessage")

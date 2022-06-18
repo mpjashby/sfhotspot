@@ -1,3 +1,10 @@
+# sfhotspot 0.5.0
+
+* Users can now specify weights for counts of points and kernel density 
+  estimation via the `weights` argument to `hotspot_count()`, `hotspot_kde()` 
+  and `hotspot_gistar()`.
+
+
 # sfhotspot 0.4.0
 
 * Users can now provide their own grid using the `grid` argument to the 

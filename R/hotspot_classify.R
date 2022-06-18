@@ -476,28 +476,35 @@ hotspot_classify <- function(
 
   # Set number of recent periods
   recent_periods <- floor(params$recent_prop * ncol(ch))
+  recent_warn <- FALSE
   if (recent_periods < 1 | ncol(ch) - recent_periods < 1) {
     recent_periods <- 1
+    recent_warn <- TRUE
+  }
+  if (ncol(ch) - recent_periods < 1) {
+    rlang::abort(c(
+      "Zero periods identified as being non-recent",
+      "i" = "There must be at least one recent and one non-recent period",
+      "i" = paste(
+        "Specify a shorter period to generate at least one non-recent period,",
+        "or specify a smaller proportion of periods to be treated as recent",
+        "using `hotspot_classify_params()`"
+      )
+    ))
+  }
+  if (rlang::is_true(recent_warn)) {
+    # Warn here, rather than above, so that if both recent periods and
+    # non-recent periods are zero then the above error will happen before this
+    # warning
     rlang::warn(c(
       "Zero periods identified as being recent",
-      "i" = "the final period will be treated as being recent",
+      "i" = "The final period will be treated as being recent",
       "i" = paste(
-        "specify a larger proportion of periods to be treated as recent using",
+        "Specify a larger proportion of periods to be treated as recent using",
         "`hotspot_classify_params()`"
       )
     ))
   }
-  if (ncol(ch) - recent_periods < 1) rlang::abort(c(
-    "Zero periods identified as being non-recent",
-    "i" = "there must be at least one recent and one non-recent period",
-    "i" = paste(
-      "specify a shorter period to generate at least one non-recent period, or"
-    ),
-    "i" = paste(
-      "specify a smaller proportion of periods to be treated as recent using",
-      "`hotspot_classify_params()`"
-    )
-  ))
 
   # Count number of significant values
   cs <- tibble::tibble(
