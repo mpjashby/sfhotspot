@@ -16,6 +16,8 @@ Description: Identify and understand clusters of points (typically representing
     classification (Chainey (2020) ISBN:158948584X).
 License: MIT + file LICENSE
 Language: en-GB
+URL: http://pkgs.lesscrime.info/sfhotspot
+BugReports: https://github.com/mpjashby/sfhotspot/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
