@@ -1,6 +1,8 @@
 #' Automatically determine a suitable cell size for a two-dimensional grid
 #'
 #' @param data \code{\link[sf]{sf}} data frame containing points.
+#' @param adjust single positive \code{numeric} value by which the returned
+#'   value will subsequently be multiplied.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{TRUE}.
@@ -9,17 +11,18 @@
 #'   the same spatial units as specified in the co-ordinate reference system of
 #'   the supplied \code{data} object.
 #'
+#' Note: although this function issues a message reporting the adjusted
+#' bandwidth (i.e. \code{bandwidth * adjust}), the return value from this
+#' function is (because of how this function is used in combination with others)
+#' the \emph{unadjusted} bandwidth.
+#'
 #' @noRd
 
-set_bandwidth <- function(data, quiet = TRUE, label = "") {
+set_bandwidth <- function(data, adjust = 1, quiet = TRUE, label = "") {
 
   # Check inputs
-  if (!inherits(data, "sf"))
-    rlang::abort("`data` must be an SF object")
-  if (any(!sf::st_is(data, "POINT")))
-    rlang::abort("`data` must be an SF object containing points")
-  if (!rlang::is_logical(quiet))
-    rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
+  validate_inputs(data = data, quiet = quiet, call = rlang::caller_env())
+  validate_bandwidth(adjust = adjust, call = rlang::caller_env())
 
   # Find spatial unit
   unit <- sf::st_crs(data, parameters = TRUE)$units_gdal
@@ -33,12 +36,22 @@ set_bandwidth <- function(data, quiet = TRUE, label = "") {
     )
   )
 
+  # Calculate bandwidth
   bandwidth <- bandwidth_nrd_sf(data)
 
+  # Adjust bandwidth for reporting
+  adjusted_bandwidth <- ifelse(
+    bandwidth * adjust > 1000,
+    round(bandwidth * adjust),
+    bandwidth * adjust
+  )
+
   if (rlang::is_false(quiet)) {
-    rlang::inform(paste(
-      "Bandwidth", label, "set to", format(bandwidth, big.mark = ","), unit_pl,
-      "automatically based on rule of thumb"
+    rlang::inform(paste0(
+      ifelse(adjust != 1, "Adjusted bandwidth", "Bandwidth"),
+      ifelse(label != "", paste0(" ", label), ""),
+      " set to ", format(adjusted_bandwidth, big.mark = ","), " ", unit_pl,
+      " automatically based on rule of thumb"
     ))
   }
 

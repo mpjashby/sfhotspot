@@ -7,16 +7,16 @@
 #' @param data \code{\link[sf]{sf}} data frame containing points.
 #' @param grid \code{\link[sf]{sf}} data frame containing polygons.
 #' @param quiet a single logical value.
+#' @param name_data name of the data argument in the calling function.
 #' @param call the environment in which the function is called.
 #'
 #' @noRd
 
 validate_inputs <- function(
   data,
-  grid,
-  quiet,
+  grid = NULL,
+  quiet = TRUE,
   name_data = "data",
-  # ...,
   call = rlang::caller_env()
 ) {
 

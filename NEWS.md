@@ -1,6 +1,12 @@
+# sfhotspot 0.6.1
+
+* Fixed bug in which the message produced when setting bandwidth automatically
+  referred to the unadjusted rather than adjusted bandwidth (#22).
+
+
 # sfhotspot 0.6.0
 * New function `hotspot_dual_kde()` for estimating different relations between
-  the density of two point layers.
+  the density of two point layers (#1).
 * New dataset `memphis_population` showing the 2020 population of the centroids 
   of census blocks in Memphis, TN.
 

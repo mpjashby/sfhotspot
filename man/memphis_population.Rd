@@ -5,7 +5,7 @@
 \alias{memphis_population}
 \title{Populations of census blocks in Memphis in 2020}
 \format{
-A simple-features tibble with 10,393 rows and four variables:
+A simple-features tibble with 10,393 rows and three variables:
 \describe{
 \item{geoid}{the census GEOID for each block}
 \item{population}{the number of people residing in each block}
@@ -21,7 +21,7 @@ US Census Bureau. Census 2020, Redistricting Data summary file.
 memphis_population
 }
 \description{
-A dataset containing records of the centroids of census blocks in Memphis,
-Tennessee, in 2020.
+A dataset containing records of populations associated with the centroids of
+census blocks in Memphis, Tennessee, in 2020.
 }
 \keyword{datasets}

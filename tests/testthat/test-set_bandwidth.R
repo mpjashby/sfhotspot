@@ -26,7 +26,7 @@ test_that("function produces an error if `quiet` is not `TRUE` or `FALSE`", {
 
 ## Correct outputs ----
 
-test_that("function produces a single numeric value", {
+test_that("output is a single numeric value", {
   expect_type(set_bandwidth(data = data_sf), "double")
   expect_length(set_bandwidth(data = data_sf), 1)
 })
@@ -34,7 +34,7 @@ test_that("function produces a single numeric value", {
 
 ## Messages ----
 
-test_that("function produces a message advising of calculated bandwidth", {
+test_that("message advising of calculated bandwidth", {
   expect_message(set_bandwidth(data = data_sf, quiet = FALSE))
 })
 

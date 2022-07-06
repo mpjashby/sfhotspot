@@ -47,7 +47,6 @@ test_that("error if inputs aren't of correct length", {
 })
 
 test_that("error if values are of the correct type/length but are invalid", {
-  expect_error(hotspot_classify(data_sf, period = "10 years"))
   expect_error(hotspot_classify(data_sf, start = Sys.Date()))
 })
 
