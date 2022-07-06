@@ -1,4 +1,4 @@
-#' Estimate two-dimensional kernel density of points on a regular grid
+#' Estimate two-dimensional kernel density of points
 #'
 #' @param data \code{\link[sf]{sf}} data frame containing points.
 #' @param cell_size \code{numeric} value specifying the size of each equally
@@ -12,29 +12,30 @@
 #'   Ignored if \code{grid} is not \code{NULL}.
 #' @param bandwidth \code{numeric} value specifying the bandwidth to be used in
 #'   calculating the kernel density estimates. If this argument is \code{NULL}
-#'   (the default), the bandwidth will be specified automatically using the mean
-#'   result of \code{\link[MASS]{bandwidth.nrd}} called on the \code{x} and
-#'   \code{y} co-ordinates separately.
+#'   (the default), the bandwidth will be determined automatically using the
+#'   result of \code{\link[MASS]{bandwidth.nrd}} called on the co-ordinates of
+#'   \code{data}.
 #' @param bandwidth_adjust single positive \code{numeric} value by which the
 #'   value of \code{bandwidth} is multiplied. Useful for setting the bandwidth
 #'   relative to the default.
 #' @param grid \code{\link[sf]{sf}} data frame containing polygons, which will
-#'   be used as the grid for which counts are made.
+#'   be used as the grid for which densities are estimated.
 #' @param weights \code{NULL} or the name of a column in \code{data} to be used
 #'   as weights for weighted counts and KDE values.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{FALSE}.
 #' @param ... Further arguments passed to \code{\link[SpatialKDE]{kde}}.
-#' @return An \code{\link[sf]{sf}} tibble of regular grid cells with
-#'   corresponding point counts and kernel density estimates for each cell. This
-#'   can be plotted using \code{\link{autoplot}}.
+#' @return An \code{\link[sf]{sf}} tibble of grid cells with corresponding point
+#'   counts and kernel density estimates for each cell. This can be plotted
+#'   using \code{\link{autoplot}}.
 #'
 #' @details
 #'
-#' This function uses functions from the \code{SpatialKDE} package to create a
-#' regular two-dimensional grid of cells and then calculate the density of
-#' points in each cell. The count of points in each cell is also returned.
+#' This function creates a regular two-dimensional grid of cells (unless a
+#' custom grid is specified with \code{grid}) and calculates the density of
+#' points in each cell on that grid using functions from the \code{SpatialKDE}
+#' package. The count of points in each cell is also returned.
 #'
 #' ## Coverage of the output data
 #'

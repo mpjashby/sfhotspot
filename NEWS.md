@@ -1,3 +1,10 @@
+# sfhotspot 0.6.0
+* New function `hotspot_dual_kde()` for estimating different relations between
+  the density of two point layers.
+* New dataset `memphis_population` showing the 2020 population of the centroids 
+  of census blocks in Memphis, TN.
+
+
 # sfhotspot 0.5.0
 
 * Users can now specify weights for counts of points and kernel density 

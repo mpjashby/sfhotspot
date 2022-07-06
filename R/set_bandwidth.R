@@ -11,7 +11,7 @@
 #'
 #' @noRd
 
-set_bandwidth <- function(data, quiet = TRUE) {
+set_bandwidth <- function(data, quiet = TRUE, label = "") {
 
   # Check inputs
   if (!inherits(data, "sf"))
@@ -37,7 +37,7 @@ set_bandwidth <- function(data, quiet = TRUE) {
 
   if (rlang::is_false(quiet)) {
     rlang::inform(paste(
-      "Bandwidth set to", format(bandwidth, big.mark = ","), unit_pl,
+      "Bandwidth", label, "set to", format(bandwidth, big.mark = ","), unit_pl,
       "automatically based on rule of thumb"
     ))
   }

@@ -55,15 +55,7 @@ kernel_density <- function(
       "i" = "Transform `grid` to use a projected CRS"
     ))
   }
-  if (!rlang::is_null(bandwidth) & !rlang::is_double(bandwidth, n = 1))
-    rlang::abort("`bandwidth` must be NULL or a single numeric value")
-  if (!rlang::is_null(bandwidth)) {
-    if (bandwidth <= 0) rlang::abort("`bandwidth` must be greater than zero")
-  }
-  if (!rlang::is_double(bandwidth_adjust, n = 1))
-    rlang::abort("`bandwidth_adjust` must be a single numeric value")
-  if (bandwidth_adjust <= 0)
-    rlang::abort("`bandwidth_adjust` must be greater than zero")
+  validate_bandwidth(bandwidth = bandwidth, adjust = bandwidth_adjust)
   if (!rlang::is_null(weights)) {
     if (!weights %in% names(data) | !rlang::is_character(weights, n = 1))
       rlang::abort("`weights` must be `NULL` or the name of a single column.")

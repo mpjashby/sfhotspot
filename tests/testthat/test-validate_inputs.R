@@ -53,6 +53,18 @@ test_that("error if `quiet` is not a single `TRUE` or `FALSE` value", {
   )
 })
 
+test_that(
+  "error if `bandwidth` or `bandwidth_adjust` are of the wrong type or length",
+  {
+    expect_error(validate_bandwidth(bandwidth = "blah"))
+    expect_error(validate_bandwidth(bandwidth = c(2, 3)))
+    expect_error(validate_bandwidth(bandwidth = -1))
+    expect_error(validate_bandwidth(adjust = "blah"))
+    expect_error(validate_bandwidth(adjust = c(2, 3)))
+    expect_error(validate_bandwidth(adjust = -1))
+  }
+)
+
 
 ## Warnings ----
 
@@ -72,4 +84,6 @@ test_that("Warning if `data` contain zero co-ordinates", {
 test_that("Result is an invisible `NULL` value", {
   expect_invisible(validate_inputs(data = data_sf, grid = grid, quiet = FALSE))
   expect_null(validate_inputs(data = data_sf, grid = grid, quiet = FALSE))
+  expect_invisible(validate_bandwidth(bandwidth = 1))
+  expect_null(validate_bandwidth(bandwidth = 1))
 })
