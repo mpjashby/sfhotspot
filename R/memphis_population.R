@@ -13,4 +13,5 @@
 #'
 #' @source US Census Bureau. Census 2020, Redistricting Data summary file.
 #'   <https://www.census.gov/programs-surveys/decennial-census/about/rdo/summary-files.html>
+#'
 "memphis_population"

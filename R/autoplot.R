@@ -128,7 +128,7 @@ autolayer.hspt_k <- function(object, ...) {
 #' default values.
 #'
 #' @param object An object with the class \code{hspt_c}, e.g. as produced by
-#' \code{\link{hotspot_classify}}.
+#'   \code{\link{hotspot_classify}}.
 #' @param ... Currently ignored, but may be used for further options in future.
 #'
 #' @return A \code{\link[ggplot2]{ggplot}} object.
@@ -171,5 +171,68 @@ autoplot.hspt_c <- function(object, ...) {
       fill = "hotspot\ncategory"
     ) +
     ggplot2::theme_minimal()
+
+}
+
+
+
+#' Plot map of changes in grid counts
+#'
+#' Plot the output produced by \code{\link{hotspot_change}} with reasonable
+#' default values.
+#'
+#' @param object An object with the class \code{hspt_d}, e.g. as produced by
+#'   \code{\link{hotspot_change}}.
+#' @param ... Currently ignored, but may be used for further options in future.
+#'
+#' @return A \code{\link[ggplot2]{ggplot}} object.
+#'
+#' This function returns a \code{ggplot} object, meaning you can further control
+#' the appearance of the plot by adding calls to further \code{ggplot2}
+#' functions.
+#'
+#' @importFrom rlang .data
+#' @export
+autoplot.hspt_d <- function(object, ...) {
+
+  # Validate inputs
+  if (!inherits(object, "sf")) rlang::abort("`object` must be an SF object")
+  if (!rlang::has_name(object, "change"))
+    rlang::abort("`object` must contain a column called `change`")
+  if (!rlang::is_double(object$change))
+    rlang::abort("The `change` column in `object` must be numeric")
+
+  # Create plot
+  ggplot2::ggplot() +
+    autolayer(object, ...) +
+    ggplot2::scale_colour_gradient2(aesthetics = c("colour", "fill")) +
+    ggplot2::labs(
+      colour = "difference\nin number\nof points",
+      fill = "difference\nin number\nof points"
+    ) +
+    ggplot2::theme_minimal()
+
+}
+
+
+
+#' @describeIn autoplot.hspt_k Create a ggplot layer of change in grid counts
+#' @importFrom rlang .data
+autolayer.hspt_d <- function(object, ...) {
+
+  # Validate inputs
+  if (!inherits(object, "sf")) rlang::abort("`object` must be an SF object")
+  if (!rlang::has_name(object, "change"))
+    rlang::abort("`object` must contain a column called `change`")
+  if (!rlang::is_double(object$change))
+    rlang::abort("The `change` column in `object` must be numeric")
+
+  # Create layer
+  ggplot2::geom_sf(
+    mapping = ggplot2::aes(colour = .data$change, fill = .data$change),
+    data = object,
+    inherit.aes = FALSE,
+    ...
+  )
 
 }

@@ -51,8 +51,10 @@ each function.
 ```{r functions-table, echo=FALSE}
 knitr::kable(data.frame(
   "name" = c(
-    "`hotspot_count()`", 
+    "`hotspot_count()`",
+    "`hotspot_change()`",
     "`hotspot_kde()`", 
+    "`hotspot_dual_kde()`", 
     "`hotspot_gistar()`",
     "`hotspot_classify()`"
   ),
@@ -62,8 +64,16 @@ knitr::kable(data.frame(
       "can be set by the user or chosen automatically."
     ),
     paste(
+      "Measure the change in the count of points in each cell between two",
+      "periods of time."
+    ),
+    paste(
       "Estimate kernel density for each cell in a regular grid. Cell size and",
       "bandwidth can be set by the user or chosen automatically."
+    ),
+    paste(
+      "Compare the kernel density of two layers of points, e.g. to estimate",
+      "the local risk of an event occurring relative to local population."
     ),
     paste(
       "Calculate the Getis–Ord $G_i^*$ statistic for each cell in a regular",
@@ -80,13 +90,21 @@ knitr::kable(data.frame(
 ))
 ```
 
-The results produced by `hotspot_count()`, `hotspot_kde()` and 
-`hotspot_classify()` can be easily plotted using included methods for 
-`autoplot()`.
+The results produced by `hotspot_count()`, `hotspot_change()`, `hotspot_kde()`, 
+`hotspot_dual_kde()` and `hotspot_classify()` can be easily plotted using 
+included methods for`autoplot()` and `autolayer()`.
 
-There is also an included dataset `memphis_robberies` that contains records of
-`r format(nrow(sfhotspot::memphis_robberies), big.mark = ",")` robberies in 
-Memphis, TN, in 2019.
+There are also included datasets: 
+
+  * `memphis_robberies`, containing records of
+    `r format(nrow(sfhotspot::memphis_robberies), big.mark = ",")` robberies in 
+    Memphis, TN, in 2019.
+  * `memphis_robberies_jan`, containing the same data but only for the 
+    `r format(nrow(sfhotspot::memphis_robberies_jan), big.mark = ",")` robberies 
+    recorded in January 2019.
+  * `memphis_population`, containing population counts for the centroids of
+    `r format(nrow(sfhotspot::memphis_population), big.mark = ",")` census 
+    blocks in Memphis, TN, in 2020.
 
 
 ## Example

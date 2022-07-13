@@ -7,7 +7,9 @@ reference:
 - desc: "Tools for analysing hotspots."
 - contents:
   - hotspot_count
+  - hotspot_change
   - hotspot_kde
+  - hotspot_dual_kde
   - hotspot_gistar
   - starts_with("hotspot_classify")
   - hotspot_grid
@@ -21,4 +23,4 @@ reference:
 - title: "Sample data"
 - desc: "Sample data that can be used with the functions in this package."
 - contents:
-  - starts_with("memphis_robberies")
+  - starts_with("memphis_")

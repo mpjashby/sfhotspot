@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">sfhotspot</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>data</dt>
-<dd><p><code><a href="https://rdrr.io/pkg/sf/man/sf.html" class="external-link">sf</a></code> data frame containing points.</p></dd>
+<dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> data frame containing points.</p></dd>
 
 
 <dt>cell_size</dt>
@@ -83,7 +83,7 @@ Ignored if <code>grid</code> is not <code>NULL</code>.</p></dd>
 
 
 <dt>grid</dt>
-<dd><p><code><a href="https://rdrr.io/pkg/sf/man/sf.html" class="external-link">sf</a></code> data frame containing polygons, which will
+<dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> data frame containing polygons, which will
 be used as the grid for which counts are made.</p></dd>
 
 
@@ -102,7 +102,7 @@ parameters set automatically will be suppressed. The default is
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>An <code><a href="https://rdrr.io/pkg/sf/man/sf.html" class="external-link">sf</a></code> tibble of regular grid cells with
+<p>An <code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> tibble of regular grid cells with
 corresponding point counts for each cell. This can be plotted using
 <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></code>.</p>
     </div>
@@ -154,7 +154,7 @@ upwards so that the cell size is a multiple of 100.</p>
 <span class="r-in"><span class="co"># in metres</span></span>
 <span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Linking to GEOS 3.9.1, GDAL 3.2.3, PROJ 7.2.1; sf_use_s2() is TRUE</span>
-<span class="r-in"><span class="va">memphis_robberies_utm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sf/man/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">memphis_robberies_jan</span>, <span class="fl">32615</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">memphis_robberies_utm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">memphis_robberies_jan</span>, <span class="fl">32615</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Manually set grid-cell size in metres, since the `memphis_robberies_utm`</span></span>
 <span class="r-in"><span class="co"># dataset uses a co-ordinate reference system (UTM zone 15 north) that is</span></span>

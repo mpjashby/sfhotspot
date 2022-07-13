@@ -22,10 +22,16 @@
     <loc>http://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_c.html</loc>
   </url>
   <url>
+    <loc>http://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_d.html</loc>
+  </url>
+  <url>
     <loc>http://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_k.html</loc>
   </url>
   <url>
     <loc>http://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_n.html</loc>
+  </url>
+  <url>
+    <loc>http://pkgs.lesscrime.info/sfhotspot/reference/hotspot_change.html</loc>
   </url>
   <url>
     <loc>http://pkgs.lesscrime.info/sfhotspot/reference/hotspot_classify.html</loc>
@@ -35,6 +41,9 @@
   </url>
   <url>
     <loc>http://pkgs.lesscrime.info/sfhotspot/reference/hotspot_count.html</loc>
+  </url>
+  <url>
+    <loc>http://pkgs.lesscrime.info/sfhotspot/reference/hotspot_dual_kde.html</loc>
   </url>
   <url>
     <loc>http://pkgs.lesscrime.info/sfhotspot/reference/hotspot_gistar.html</loc>
@@ -47,6 +56,9 @@
   </url>
   <url>
     <loc>http://pkgs.lesscrime.info/sfhotspot/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>http://pkgs.lesscrime.info/sfhotspot/reference/memphis_population.html</loc>
   </url>
   <url>
     <loc>http://pkgs.lesscrime.info/sfhotspot/reference/memphis_robberies.html</loc>

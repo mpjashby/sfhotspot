@@ -14,7 +14,7 @@ distributed randomly."><meta property="og:image" content="http://pkgs.lesscrime.
     
     <a class="navbar-brand me-2" href="../index.html">sfhotspot</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,7 +77,7 @@ distributed randomly.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>data</dt>
-<dd><p><code><a href="https://rdrr.io/pkg/sf/man/sf.html" class="external-link">sf</a></code> data frame containing points.</p></dd>
+<dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> data frame containing points.</p></dd>
 
 
 <dt>cell_size</dt>
@@ -115,7 +115,7 @@ relative to the default.</p></dd>
 
 
 <dt>grid</dt>
-<dd><p><code><a href="https://rdrr.io/pkg/sf/man/sf.html" class="external-link">sf</a></code> data frame containing polygons, which will
+<dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> data frame containing polygons, which will
 be used as the grid for which counts are made.</p></dd>
 
 
@@ -164,7 +164,7 @@ ignored if <code>kde = FALSE</code>.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>An <code><a href="https://rdrr.io/pkg/sf/man/sf.html" class="external-link">sf</a></code> tibble of regular grid cells with
+<p>An <code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> tibble of regular grid cells with
 corresponding point counts,
 <i>G</i><sub><i>i</i></sub><sup>*</sup> or
 <i>G</i><sub><i>i</i></sub><sup>*</sup></p>
@@ -182,7 +182,7 @@ Critical values of
 
 
 <p>The output from this function can be plotted in the same way as for other
-SF objects, for which see <code><a href="https://cran.rstudio.com/web/packages/sf/vignettes/sf5.html" class="external-link">vignette("sf5", package = "sf")</a></code>.</p>
+SF objects, for which see <code><a href="https://r-spatial.github.io/sf/articles/sf5.html" class="external-link">vignette("sf5", package = "sf")</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -208,7 +208,7 @@ values for cells that are outside the area for which data were provided,
 which could be misleading. To handle this, consider cropping the output layer
 to the area for which data are available. For example, if you only have crime
 data for a particular district, crop the output dataset to the district
-boundary using <code><a href="https://rdrr.io/pkg/sf/man/geos_binary_ops.html" class="external-link">st_intersection</a></code>.</p>
+boundary using <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></code>.</p>
 </div>
 
 <div class="section">
@@ -235,13 +235,13 @@ doi:doi: <a href="https://doi.org/10.1111/j.1538-4632.1992.tb00261.x" class="ext
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Transform data to UTM zone 15N so that cell_size and bandwidth can be set</span></span>
 <span class="r-in"><span class="co"># in metres</span></span>
-<span class="r-in"><span class="va">memphis_robberies_utm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sf/man/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">memphis_robberies_jan</span>, <span class="fl">32615</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">memphis_robberies_utm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">memphis_robberies_jan</span>, <span class="fl">32615</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Automatically set grid-cell size, bandwidth and neighbour distance</span></span>
 <span class="r-in"><span class="co"># \donttest{</span></span>
 <span class="r-in"><span class="fu">hotspot_gistar</span><span class="op">(</span><span class="va">memphis_robberies_utm</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Cell size set to 500 metres automatically</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Bandwidth set to 8,876.669 metres automatically based on rule of thumb</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Bandwidth set to 8,877 metres automatically based on rule of thumb</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 2715 features and 4 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: POLYGON</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
@@ -268,7 +268,7 @@ doi:doi: <a href="https://doi.org/10.1111/j.1538-4632.1992.tb00261.x" class="ext
 <span class="r-in"><span class="co"># specified in metres</span></span>
 <span class="r-in"><span class="co"># \donttest{</span></span>
 <span class="r-in"><span class="fu">hotspot_gistar</span><span class="op">(</span><span class="va">memphis_robberies_utm</span>, cell_size <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Bandwidth set to 8,876.669 metres automatically based on rule of thumb</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Bandwidth set to 8,877 metres automatically based on rule of thumb</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 16133 features and 4 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: POLYGON</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>

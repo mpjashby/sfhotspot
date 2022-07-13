@@ -1,3 +1,10 @@
+# sfhotspot 0.7.0
+
+* New function `hotspot_change()` and corresponding methods for `autoplot()` and
+  `autolayer()` for measuring change in the frequency of events between two time
+  periods (#14).
+
+
 # sfhotspot 0.6.1
 
 * Fixed bug in which the message produced when setting bandwidth automatically

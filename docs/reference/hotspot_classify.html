@@ -12,7 +12,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">sfhotspot</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,7 +71,7 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>data</dt>
-<dd><p><code><a href="https://rdrr.io/pkg/sf/man/sf.html" class="external-link">sf</a></code> data frame containing points.</p></dd>
+<dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> data frame containing points.</p></dd>
 
 
 <dt>time</dt>
@@ -113,7 +113,7 @@ Ignored if <code>grid</code> is not <code>NULL</code>.</p></dd>
 
 
 <dt>grid</dt>
-<dd><p><code><a href="https://rdrr.io/pkg/sf/man/sf.html" class="external-link">sf</a></code> data frame containing points containing
+<dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> data frame containing points containing
 polygons, which will be used as the grid for which counts are made.</p></dd>
 
 
@@ -139,7 +139,7 @@ parameters set automatically will be suppressed. The default is
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>An <code><a href="https://rdrr.io/pkg/sf/man/sf.html" class="external-link">sf</a></code> tibble of regular grid cells with
+<p>An <code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> tibble of regular grid cells with
 corresponding hot-spot classifications for each cell. This can be plotted
 using <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></code>.</p>
 
@@ -197,7 +197,7 @@ values for cells that are outside the area for which data were provided,
 which could be misleading. To handle this, consider cropping the output layer
 to the area for which data are available. For example, if you only have crime
 data for a particular district, crop the output dataset to the district
-boundary using <code><a href="https://rdrr.io/pkg/sf/man/geos_binary_ops.html" class="external-link">st_intersection</a></code>.</p>
+boundary using <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></code>.</p>
 </div>
 
 
