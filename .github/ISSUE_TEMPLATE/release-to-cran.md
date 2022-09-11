@@ -12,6 +12,7 @@ These checks should be run **in this order** before submitting to CRAN. If any o
 - [ ] `urlchecker::url_check()`
 - [ ] `devtools::spell_check()`
 - [ ]  `devtools::document()`
+- [ ] `devtools::build_readme()`
 - [ ] `pkgdown::build_site()`
 - [ ] `devtools::check()`
 - [ ] `devtools::check_rhub()`
