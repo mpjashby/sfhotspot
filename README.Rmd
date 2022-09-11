@@ -98,7 +98,7 @@ There are also included datasets:
 
   * `memphis_robberies`, containing records of
     `r format(nrow(sfhotspot::memphis_robberies), big.mark = ",")` robberies in 
-    Memphis, TN, in 2019.
+    Memphis, TN, in 2019. 
   * `memphis_robberies_jan`, containing the same data but only for the 
     `r format(nrow(sfhotspot::memphis_robberies_jan), big.mark = ",")` robberies 
     recorded in January 2019.
