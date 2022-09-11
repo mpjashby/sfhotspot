@@ -3,14 +3,11 @@
 \name{autoplot.hspt_k}
 \alias{autoplot.hspt_k}
 \alias{autolayer.hspt_k}
-\alias{autolayer.hspt_d}
 \title{Plot map of kernel-density values}
 \usage{
 \method{autoplot}{hspt_k}(object, ...)
 
 \method{autolayer}{hspt_k}(object, ...)
-
-\method{autolayer}{hspt_d}(object, ...)
 }
 \arguments{
 \item{object}{An object with the class \code{hspt_k}, e.g. as produced by
@@ -33,8 +30,6 @@ default values.
 }
 \section{Functions}{
 \itemize{
-\item \code{autolayer.hspt_k}: Create a ggplot layer of kernel-density values
+\item \code{autolayer(hspt_k)}: Create a ggplot layer of kernel-density values
 
-\item \code{autolayer.hspt_d}: Create a ggplot layer of change in grid counts
 }}
-

@@ -30,6 +30,6 @@ default values.
 }
 \section{Functions}{
 \itemize{
-\item \code{autolayer.hspt_n}: Create a ggplot layer of grid counts
-}}
+\item \code{autolayer(hspt_n)}: Create a ggplot layer of grid counts
 
+}}

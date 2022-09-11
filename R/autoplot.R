@@ -216,7 +216,7 @@ autoplot.hspt_d <- function(object, ...) {
 
 
 
-#' @describeIn autoplot.hspt_k Create a ggplot layer of change in grid counts
+#' @describeIn autoplot.hspt_d Create a ggplot layer of change in grid counts
 #' @importFrom rlang .data
 autolayer.hspt_d <- function(object, ...) {
 

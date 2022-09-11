@@ -20,7 +20,7 @@ URL: http://pkgs.lesscrime.info/sfhotspot/
 BugReports: https://github.com/mpjashby/sfhotspot/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Imports:
     ggplot2,
     rlang,
@@ -33,6 +33,8 @@ Depends:
 Suggests:
     testthat (>= 3.0.0),
     lubridate,
-    covr
+    covr,
+    knitr,
+    rmarkdown
 LazyData: true
 Config/testthat/edition: 3

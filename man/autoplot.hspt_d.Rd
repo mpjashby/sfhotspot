@@ -2,9 +2,12 @@
 % Please edit documentation in R/autoplot.R
 \name{autoplot.hspt_d}
 \alias{autoplot.hspt_d}
+\alias{autolayer.hspt_d}
 \title{Plot map of changes in grid counts}
 \usage{
 \method{autoplot}{hspt_d}(object, ...)
+
+\method{autolayer}{hspt_d}(object, ...)
 }
 \arguments{
 \item{object}{An object with the class \code{hspt_d}, e.g. as produced by
@@ -23,3 +26,8 @@ functions.
 Plot the output produced by \code{\link{hotspot_change}} with reasonable
 default values.
 }
+\section{Functions}{
+\itemize{
+\item \code{autolayer(hspt_d)}: Create a ggplot layer of change in grid counts
+
+}}

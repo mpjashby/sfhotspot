@@ -1,8 +1,8 @@
-pandoc: 2.14.0.3
-pkgdown: 2.0.4
+pandoc: '2.18'
+pkgdown: 2.0.6
 pkgdown_sha: ~
 articles: {}
-last_built: 2022-07-12T19:01Z
+last_built: 2022-09-11T17:43Z
 urls:
   reference: http://pkgs.lesscrime.info/sfhotspot/reference
   article: http://pkgs.lesscrime.info/sfhotspot/articles
