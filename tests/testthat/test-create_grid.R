@@ -1,4 +1,5 @@
 data_sf <- head(memphis_robberies, 10)
+data_sf_m <- sf::st_transform(data_sf, "EPSG:2843")
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 
 result <- create_grid(data = data_sf, cell_size = 0.1)
@@ -51,4 +52,11 @@ test_that("output object has the required column names", {
 
 test_that("columns in output have the required types", {
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
+})
+
+
+## Warnings ----
+
+test_that("produces warning if grid has 100,000+ cells", {
+  expect_warning(create_grid(data_sf_m, cell_size = 40, quiet = FALSE))
 })

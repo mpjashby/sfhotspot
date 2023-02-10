@@ -13,4 +13,5 @@
 ^docs$
 ^pkgdown$
 ^original_data$
-^vignettes
+^doc$
+^Meta$

@@ -43,3 +43,8 @@ R/st_transform_auto.R
 
 /original_data/
 inst/doc
+/doc/
+/Meta/
+
+# Cache directories
+/vignettes/rosm.cache/

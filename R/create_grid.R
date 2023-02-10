@@ -91,13 +91,34 @@ create_grid <- function(
 
   # Error if there are no valid rows in the data
   if (nrow(result) == 0 | !inherits(result, "sf"))
-    rlang::abort(c(
-      "Could not create a grid of cells from the supplied point data",
-      "i" = paste(
-        "try plotting `data` to check the points it contains can be",
-        "meaningfully covered by a grid"
-      )
-    ))
+    rlang::abort(
+      c(
+        "Could not create a grid of cells from the supplied point data",
+        "i" = paste(
+          "try plotting `data` to check the points it contains can be",
+          "meaningfully covered by a grid"
+        )
+      ),
+      call = rlang::caller_env(),
+      use_cli_format = TRUE
+    )
+
+  # Warn if the number of cells will be huge
+  if (nrow(result) > 100000 & quiet == FALSE) {
+    rlang::warn(
+      c(
+        paste(
+          "The grid contains",
+          format(nrow(result), big.mark = ","),
+          "cells"
+        ),
+        "!" = "This may cause other functions to run slowly.",
+        "i" = "Consider setting `cell_size` to a larger value"
+      ),
+      call = rlang::caller_env(),
+      use_cli_format = TRUE
+    )
+  }
 
   # Return result
   result
