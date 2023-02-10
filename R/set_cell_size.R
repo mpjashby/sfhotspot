@@ -34,6 +34,10 @@ set_cell_size <- function(data, round = TRUE, quiet = TRUE) {
   if (!rlang::is_logical(quiet))
     rlang::abort("`quiet` must be `TRUE` or `FALSE`")
 
+  # Set constants
+  num_cells <- 50
+  rounding_size <- 100
+
   # Find spatial unit
   unit <- sf::st_crs(data, parameters = TRUE)$units_gdal
 
@@ -55,15 +59,21 @@ set_cell_size <- function(data, round = TRUE, quiet = TRUE) {
   # Calculate cell size
   bbox <- sf::st_bbox(data)
   side_length <- min(bbox$xmax - bbox$xmin, bbox$ymax - bbox$ymin)
+  rounded_mini <- floor((side_length / num_cells) / rounding_size)
 
   if (
     unit %in% c("metre", "meter", "foot", "US survey foot") &
+    # If `side_length` is less than 5,000 m/ft, rounding the cell size will
+    # result in a cell size of zero, which will cause other functions to error.
+    # To avoid this, only round the cell size if the rounded cell size will be
+    # greater than zero. (#26)
+    rounded_mini > 0 &
     rlang::is_true(round)
   ) {
 
     # If the units are metres or feet, round the cell size so it is a round
     # number of 100 metres/feet
-    cell_size <- floor((side_length / 50) / 100) * 100
+    cell_size <- rounded_mini * rounding_size
 
   } else {
 
@@ -74,10 +84,18 @@ set_cell_size <- function(data, round = TRUE, quiet = TRUE) {
   }
 
   if (rlang::is_false(quiet)) {
-    rlang::inform(c(paste(
-      "Cell size set to", format(cell_size, big.mark = ","), unit_pl,
-      "automatically"
-    )))
+    rlang::inform(
+      c(
+        paste(
+          "Cell size set to",
+          format(cell_size, big.mark = ","),
+          unit_pl,
+          "automatically"
+        )
+      ),
+      call = rlang::caller_env(),
+      use_cli_format = TRUE
+    )
   }
 
   cell_size
