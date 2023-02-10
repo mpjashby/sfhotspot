@@ -35,14 +35,14 @@ sfhotspot has the following functions. All can be used by just supplying
 an SF object containing points, or can be configured using the optional
 arguments to each function.
 
-| name                 | use                                                                                                                                                                                                                                                                                                                  |
-|:---------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `hotspot_count()`    | Count the number of points in each cell of a regular grid. Cell size can be set by the user or chosen automatically.                                                                                                                                                                                                 |
-| `hotspot_change()`   | Measure the change in the count of points in each cell between two periods of time.                                                                                                                                                                                                                                  |
-| `hotspot_kde()`      | Estimate kernel density for each cell in a regular grid. Cell size and bandwidth can be set by the user or chosen automatically.                                                                                                                                                                                     |
-| `hotspot_dual_kde()` | Compare the kernel density of two layers of points, e.g. to estimate the local risk of an event occurring relative to local population.                                                                                                                                                                              |
-| `hotspot_gistar()`   | Calculate the Getis–Ord ![G_i^\*](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;G_i%5E%2A "G_i^*") statistic for each cell in a regular grid, while optionally estimating kernel density. Cell size, bandwidth and neighbour distance can be set by the user or chosen automatically. |
-| `hotspot_classify()` | Classify grid cells according to whether they have had significant clusters of points at different time periods. All parameters can be chosen automatically or be set by the user using the `hotspot_classify_params()` helper function.                                                                             |
+| name                 | use                                                                                                                                                                                                                                      |
+|:---------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `hotspot_count()`    | Count the number of points in each cell of a regular grid. Cell size can be set by the user or chosen automatically.                                                                                                                     |
+| `hotspot_change()`   | Measure the change in the count of points in each cell between two periods of time.                                                                                                                                                      |
+| `hotspot_kde()`      | Estimate kernel density for each cell in a regular grid. Cell size and bandwidth can be set by the user or chosen automatically.                                                                                                         |
+| `hotspot_dual_kde()` | Compare the kernel density of two layers of points, e.g. to estimate the local risk of an event occurring relative to local population.                                                                                                  |
+| `hotspot_gistar()`   | Calculate the Getis–Ord $G_i^*$ statistic for each cell in a regular grid, while optionally estimating kernel density. Cell size, bandwidth and neighbour distance can be set by the user or chosen automatically.                       |
+| `hotspot_classify()` | Classify grid cells according to whether they have had significant clusters of points at different time periods. All parameters can be chosen automatically or be set by the user using the `hotspot_classify_params()` helper function. |
 
 The results produced by `hotspot_count()`, `hotspot_change()`,
 `hotspot_kde()`, `hotspot_dual_kde()` and `hotspot_classify()` can be
@@ -50,12 +50,12 @@ easily plotted using included methods for`autoplot()` and `autolayer()`.
 
 There are also included datasets:
 
--   `memphis_robberies`, containing records of 2,245 robberies in
-    Memphis, TN, in 2019.
--   `memphis_robberies_jan`, containing the same data but only for the
-    206 robberies recorded in January 2019.
--   `memphis_population`, containing population counts for the centroids
-    of 10,393 census blocks in Memphis, TN, in 2020.
+- `memphis_robberies`, containing records of 2,245 robberies in Memphis,
+  TN, in 2019.
+- `memphis_robberies_jan`, containing the same data but only for the 206
+  robberies recorded in January 2019.
+- `memphis_population`, containing population counts for the centroids
+  of 10,393 census blocks in Memphis, TN, in 2020.
 
 ## Example
 
@@ -68,16 +68,15 @@ dataset included with the package.
 ``` r
 # Load packages
 library(sf)
-#> Linking to GEOS 3.10.2, GDAL 3.4.2, PROJ 8.2.1; sf_use_s2() is TRUE
+#> Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE
 library(sfhotspot)
 library(tidyverse)
-#> ── Attaching packages
-#> ───────────────────────────────────────
-#> tidyverse 1.3.2 ──
-#> ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
-#> ✔ tibble  3.1.8     ✔ dplyr   1.0.9
-#> ✔ tidyr   1.2.0     ✔ stringr 1.4.0
-#> ✔ readr   2.1.2     ✔ forcats 0.5.1
+#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2
+#> ──
+#> ✔ ggplot2 3.4.0      ✔ purrr   1.0.1 
+#> ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+#> ✔ tidyr   1.2.1      ✔ stringr 1.5.0 
+#> ✔ readr   2.1.3      ✔ forcats 0.5.2 
 #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 #> ✖ dplyr::filter() masks stats::filter()
 #> ✖ dplyr::lag()    masks stats::lag()
@@ -93,6 +92,7 @@ memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
 memphis_robberies_hotspots <- hotspot_gistar(memphis_robberies_utm)
 #> Cell size set to 500 metres automatically
 #> Bandwidth set to 5,592 metres automatically based on rule of thumb
+#> Done: [--------------------------------------------------------------------] .Done: [====----------------------------------------------------------------] .Done: [=====---------------------------------------------------------------] .Done: [======--------------------------------------------------------------] .Done: [=======-------------------------------------------------------------] .Done: [========------------------------------------------------------------] .Done: [=========-----------------------------------------------------------] .Done: [==========----------------------------------------------------------] .Done: [===========---------------------------------------------------------] .Done: [============--------------------------------------------------------] .Done: [=============-------------------------------------------------------] .Done: [==============------------------------------------------------------] .Done: [===============-----------------------------------------------------] .Done: [================----------------------------------------------------] .Done: [=================---------------------------------------------------] .Done: [==================--------------------------------------------------] .Done: [===================-------------------------------------------------] .Done: [====================------------------------------------------------] .Done: [=====================-----------------------------------------------] .Done: [======================----------------------------------------------] .Done: [=======================---------------------------------------------] .Done: [========================--------------------------------------------] .Done: [=========================-------------------------------------------] .Done: [==========================------------------------------------------] .Done: [===========================-----------------------------------------] .Done: [============================----------------------------------------] .Done: [=============================---------------------------------------] .Done: [==============================--------------------------------------] .Done: [===============================-------------------------------------] .Done: [================================------------------------------------] .Done: [=================================-----------------------------------] .Done: [==================================----------------------------------] .Done: [===================================---------------------------------] .Done: [====================================--------------------------------] .Done: [=====================================-------------------------------] .Done: [======================================------------------------------] .Done: [=======================================-----------------------------] .Done: [========================================----------------------------] .Done: [=========================================---------------------------] .Done: [==========================================--------------------------] .Done: [===========================================-------------------------] .Done: [============================================------------------------] .Done: [=============================================-----------------------] .Done: [==============================================----------------------] .Done: [===============================================---------------------] .Done: [================================================--------------------] .Done: [=================================================-------------------] .Done: [==================================================------------------] .Done: [===================================================-----------------] .Done: [====================================================----------------] .Done: [=====================================================---------------] .Done: [======================================================--------------] .Done: [=======================================================-------------] .Done: [========================================================------------] .Done: [=========================================================-----------] .Done: [==========================================================----------] .Done: [===========================================================---------] .Done: [============================================================--------] .Done: [=============================================================-------] .Done: [==============================================================------] .Done: [===============================================================-----] .Done: [================================================================----] .Done: [=================================================================---] .Done: [==================================================================--] .Done: [===================================================================-] .Done: [====================================================================] .                                                                              
 
 
 # Visualise the hotspots by showing only those cells that have significantly
@@ -102,7 +102,7 @@ memphis_robberies_hotspots %>%
   filter(gistar > 0, pvalue < 0.05) %>% 
   ggplot(aes(colour = kde, fill = kde)) +
   geom_sf() +
-  scale_colour_continuous(aesthetics = c("colour", "fill")) +
+  scale_colour_distiller(aesthetics = c("colour", "fill"), direction = 1) +
   labs(title = "Density of robberies in Memphis, 2019") +
   theme_void()
 ```

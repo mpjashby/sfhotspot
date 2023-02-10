@@ -138,7 +138,7 @@ memphis_robberies_hotspots %>%
   filter(gistar > 0, pvalue < 0.05) %>% 
   ggplot(aes(colour = kde, fill = kde)) +
   geom_sf() +
-  scale_colour_continuous(aesthetics = c("colour", "fill")) +
+  scale_colour_distiller(aesthetics = c("colour", "fill"), direction = 1) +
   labs(title = "Density of robberies in Memphis, 2019") +
   theme_void()
 ```

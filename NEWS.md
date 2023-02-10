@@ -1,3 +1,11 @@
+# sfhotspot 0.7.1
+
+* Added warning if automatically created grids contain more than 100,000 cells,
+  since this can cause other functions in the package to run very slowly (#24).
+* Fixed bug in which cell size could be incorrectly rounded to zero (#26).
+* Removed `covr` dependency.
+
+
 # sfhotspot 0.7.0
 
 * New function `hotspot_change()` and corresponding methods for `autoplot()` and
