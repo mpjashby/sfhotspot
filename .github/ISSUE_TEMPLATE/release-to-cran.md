@@ -11,12 +11,13 @@ These checks should be run **in this order** before submitting to CRAN. If any o
 
 - [ ] `urlchecker::url_check()`
 - [ ] `devtools::spell_check()`
-- [ ]  `devtools::document()`
+- [ ] `devtools::document()`
 - [ ] `devtools::build_readme()`
+- [ ] `devtools::build_vignettes()`
 - [ ] `pkgdown::build_site()`
 - [ ] `devtools::check()`
-- [ ] `devtools::check_rhub()`
 - [ ] `devtools::check_win_devel()`
+- [ ] `devtools::check_rhub()`
 - [ ] update `NEWS.md`
 - [ ] update `DESCRIPTION`, including incrementing version number
 - [ ] update `cran-comments.md`
