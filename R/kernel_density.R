@@ -81,6 +81,7 @@ kernel_density <- function(
           data,
           band_width = bandwidth * bandwidth_adjust,
           grid = grid,
+          quiet = quiet,
           ...
         )
       )
@@ -91,6 +92,7 @@ kernel_density <- function(
           band_width = bandwidth * bandwidth_adjust,
           weights = data[[weights]],
           grid = grid,
+          quiet = quiet,
           ...
         )
       )
