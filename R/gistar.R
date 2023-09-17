@@ -89,6 +89,9 @@ gistar <- function(
   if (!rlang::is_logical(quiet, n = 1))
     rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
 
+  # Replace name of geometry column in SF objects if necessary
+  counts <- set_geometry_name(counts)
+
   # Set cell size if not specified
   if (rlang::is_null(nb_dist) & rlang::is_null(cell_size))
     cell_size <- set_cell_size(counts, round = TRUE, quiet = quiet)

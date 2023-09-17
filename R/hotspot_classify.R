@@ -165,6 +165,9 @@ hotspot_classify <- function(
       "i" = "use `hotspot_classify_params()` to construct the `params` argument"
     ))
 
+  # Replace name of geometry column in SF objects if necessary
+  grid <- set_geometry_name(grid)
+
   # Find time column if not specified
   if (isFALSE(time)) {
     date_cols <- which(

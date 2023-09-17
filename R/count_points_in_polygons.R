@@ -30,6 +30,9 @@ count_points_in_polygons <- function(points, polygons, weights = NULL) {
     }
   }
 
+  # Replace name of geometry column in SF objects if necessary
+  polygons <- set_geometry_name(polygons)
+
   # Create a unique ID for each polygon
   polygons$`.polygon_id` <- seq_len(nrow(polygons))
 

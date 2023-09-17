@@ -68,6 +68,9 @@ kernel_density <- function(
   if (!rlang::is_logical(quiet, n = 1))
     rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
 
+  # Replace name of geometry column in SF objects if necessary
+  grid <- set_geometry_name(grid)
+
   # Set bandwidth if not specified
   if (rlang::is_null(bandwidth)) bandwidth <- set_bandwidth(data, quiet = quiet)
 

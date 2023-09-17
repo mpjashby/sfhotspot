@@ -4,7 +4,10 @@ data_sf <- suppressWarnings(
 data_sf$wt <- runif(nrow(data_sf), max = 1000)
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 
-polygons <- create_grid(data = data_sf, cell_size = 0.1)
+polygons <- sf::st_set_geometry(
+  create_grid(data = data_sf, cell_size = 0.1),
+  "random_geom_column_name"
+)
 result <- count_points_in_polygons(
   points = data_sf,
   polygons = polygons

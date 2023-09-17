@@ -171,6 +171,9 @@ hotspot_change <- function(
     }
   }
 
+  # Replace name of geometry column in SF objects if necessary
+  grid <- set_geometry_name(grid)
+
   # Find time column if not specified
   if (rlang::is_false(groups) & rlang::is_false(time)) {
     date_cols <- which(

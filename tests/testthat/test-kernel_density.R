@@ -12,7 +12,10 @@ data_missing_crs <- sf::st_sf(
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
-grid <- create_grid(data = data_sf, cell_size = 1000)
+grid <- sf::st_set_geometry(
+  create_grid(data = data_sf, cell_size = 1000),
+  "random_geom_column_name"
+)
 result <- kernel_density(data = data_sf, grid = grid, bandwidth = 10000)
 
 
