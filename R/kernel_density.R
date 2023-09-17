@@ -72,7 +72,9 @@ kernel_density <- function(
   grid <- set_geometry_name(grid)
 
   # Set bandwidth if not specified
-  if (rlang::is_null(bandwidth)) bandwidth <- set_bandwidth(data, quiet = quiet)
+  if (rlang::is_null(bandwidth)) {
+    bandwidth <- set_bandwidth(data, quiet = quiet, adjust = bandwidth_adjust)
+  }
 
   # Calculate KDE
   # Code for suppressing specific messages is from
