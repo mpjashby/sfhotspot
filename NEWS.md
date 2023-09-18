@@ -1,3 +1,13 @@
+# sfhotspot 0.8.0
+
+* All functions can now handle SF objects in which the geometry column has a
+  name other than `geometry` (#30).
+* `hotspot_kde()` progress bar is now suppressed by `quiet = TRUE` (#25).
+* When KDE bandwidth is selected automatically based on a rule of thumb, the
+  reported bandwidth now takes into account the value of `bandwidth_adjust` 
+  (#32).
+
+
 # sfhotspot 0.7.1
 
 * Added warning if automatically created grids contain more than 100,000 cells,

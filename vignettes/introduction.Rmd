@@ -19,7 +19,6 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, echo=FALSE, include=FALSE}
-library(ggspatial)
 library(sf)
 library(sfhotspot)
 library(ggplot2)
@@ -29,7 +28,7 @@ sfhotspot is a package for understanding patterns in data that represent points 
 
 The specific motivation for this package was to analyse the locations of crimes, but the functions should be useful for understanding patterns in points representing other features or events. The package is called sfhotspot because it works with (and -- where relevant -- produces) SF objects as produced by the [sf](https://r-spatial.github.io/sf/) package. sfhotspot also produces data that is [*tidy*](https://tidyr.tidyverse.org/articles/tidy-data.html), making it easy to use functions from packages such as [dplyr](https://dplyr.tidyverse.org/) to filter the results, etc. 
 
-All the functions in sfhotspot work on an SF data frame or tibble in which each row in the data represents a single point (e.g. the location of an event). In this introduction we will use the built-in `memphis_robberies` dataset to show how each of the `hotspot_*()` family of functions works. `memphis_robberies` contains details of `r format(nrow(memphis_robberies), big.mark = ",")` robberies in Memphis, Tennessee, in 2019. To make the maps easier to read, we will use the `annotation_map_tile()` function from the [`ggspatial` package](https://paleolimbot.github.io/ggspatial/) to add a base map to each map.
+All the functions in sfhotspot work on an SF data frame or tibble in which each row in the data represents a single point (e.g. the location of an event). In this introduction we will use the built-in `memphis_robberies` dataset to show how each of the `hotspot_*()` family of functions works. `memphis_robberies` contains details of `r format(nrow(memphis_robberies), big.mark = ",")` robberies in Memphis, Tennessee, in 2019.
 
 ```{r, echo=FALSE}
 knitr::kable(
@@ -42,7 +41,6 @@ We can plot this raw data, but the resulting plot is not very informative (even 
 
 ```{r}
 ggplot(memphis_robberies) + 
-  annotation_map_tile(type = "cartolight", zoomin = 0, quiet = TRUE) +
   geom_sf(alpha = 0.1) + 
   theme_minimal()
 ```
@@ -63,7 +61,6 @@ We can then plot that grid of cells.
 
 ```{r}
 ggplot() +
-  annotation_map_tile(type = "cartolight", zoomin = 0, quiet = TRUE) +
   geom_sf(
     mapping = aes(fill = n),
     data = point_counts,
@@ -104,7 +101,6 @@ Again, we can plot the result.
 
 ```{r}
 ggplot() +
-  annotation_map_tile(type = "cartolight", zoomin = 0, quiet = TRUE) +
   geom_sf(
     mapping = aes(fill = kde),
     data = robbery_kde,
