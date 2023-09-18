@@ -11,7 +11,7 @@
 
 set_geometry_name <- function(x) {
 
-  if (methods::is(x, "sf")) {
+  if (inherits(x, "sf")) {
     sf::st_set_geometry(x, "geometry")
   } else {
     x
