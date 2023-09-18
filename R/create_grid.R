@@ -66,6 +66,25 @@ create_grid <- function(
     dist = cell_size / 2
   )
 
+  # Warn if there will be so many cells that the function will be very slow
+  hull_bbox <- sf::st_bbox(hull)
+  cells_n_x <- (hull_bbox$xmax - hull_bbox$xmin) / cell_size
+  cells_n_y <- (hull_bbox$ymax - hull_bbox$ymin) / cell_size
+  if (cells_n_x * cells_n_y > 100000 & quiet == FALSE) {
+    rlang::warn(
+      c(
+        "The grid will contain a large number of cells",
+        "!" = "This may cause other functions to run slowly or not work",
+        "i" = paste(
+          "Consider setting `cell_size` to a larger value or clipping your",
+          "data to a smaller area using `st_intersection()`"
+        )
+      ),
+      call = rlang::caller_env(),
+      use_cli_format = TRUE
+    )
+  }
+
   # Create grid
   grid <- sf::st_make_grid(
     hull,
@@ -102,23 +121,6 @@ create_grid <- function(
       call = rlang::caller_env(),
       use_cli_format = TRUE
     )
-
-  # Warn if the number of cells will be huge
-  if (nrow(result) > 100000 & quiet == FALSE) {
-    rlang::warn(
-      c(
-        paste(
-          "The grid contains",
-          format(nrow(result), big.mark = ","),
-          "cells"
-        ),
-        "!" = "This may cause other functions to run slowly.",
-        "i" = "Consider setting `cell_size` to a larger value"
-      ),
-      call = rlang::caller_env(),
-      use_cli_format = TRUE
-    )
-  }
 
   # Return result
   result
