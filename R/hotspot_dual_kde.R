@@ -195,14 +195,33 @@ hotspot_dual_kde <- function(
   if (rlang::is_bare_list(bandwidth, n = 2)) {
     validate_bandwidth(bandwidth = bandwidth[[1]], list = TRUE)
     validate_bandwidth(bandwidth = bandwidth[[2]], list = TRUE)
+    if (rlang::is_bare_list(bandwidth_adjust, n = 2)) {
+      validate_bandwidth(adjust = bandwidth_adjust[[1]], list = TRUE)
+      validate_bandwidth(adjust = bandwidth_adjust[[2]], list = TRUE)
+      bandwidth_adjust_x <- bandwidth_adjust[[1]]
+      bandwidth_adjust_y <- bandwidth_adjust[[2]]
+    } else {
+      validate_bandwidth(adjust = bandwidth_adjust)
+      bandwidth_adjust_x <- bandwidth_adjust_y <- bandwidth_adjust
+    }
     bandwidth_x <- ifelse(
       rlang::is_null(bandwidth[[1]]),
-      set_bandwidth(x, quiet = quiet, label = "for `x`"),
+      set_bandwidth(
+        x,
+        quiet = quiet,
+        adjust = bandwidth_adjust_x,
+        label = "for `x`"
+      ),
       bandwidth[[1]]
     )
     bandwidth_y <- ifelse(
       rlang::is_null(bandwidth[[2]]),
-      set_bandwidth(y, quiet = quiet, label = "for `y`"),
+      set_bandwidth(
+        y,
+        quiet = quiet,
+        adjust = bandwidth_adjust_y,
+        label = "for `y`"
+      ),
       bandwidth[[2]]
     )
   } else {
@@ -211,6 +230,7 @@ hotspot_dual_kde <- function(
       bandwidth_y <- bandwidth_x <- set_bandwidth(
         x,
         quiet = quiet,
+        adjust = bandwidth_adjust,
         label = "for `x` and `y`"
       )
     } else {

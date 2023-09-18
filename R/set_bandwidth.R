@@ -40,7 +40,8 @@ set_bandwidth <- function(data, adjust = 1, quiet = TRUE, label = "") {
   bandwidth <- bandwidth_nrd_sf(data)
 
   # Adjust bandwidth for reporting
-  adjusted_bandwidth <- ifelse(
+  bandwidth_report <- ifelse(bandwidth > 1000, round(bandwidth), bandwidth)
+  bandwidth_adjust <- ifelse(
     bandwidth * adjust > 1000,
     round(bandwidth * adjust),
     bandwidth * adjust
@@ -50,7 +51,15 @@ set_bandwidth <- function(data, adjust = 1, quiet = TRUE, label = "") {
     rlang::inform(paste0(
       ifelse(adjust != 1, "Adjusted bandwidth", "Bandwidth"),
       ifelse(label != "", paste0(" ", label), ""),
-      " set to ", format(adjusted_bandwidth, big.mark = ","), " ", unit_pl,
+      " set to ", format(bandwidth_adjust, big.mark = ","), " ", unit_pl,
+      ifelse(
+        adjust != 1,
+        paste0(
+          " (", adjust, " * ", format(bandwidth_report, big.mark = ","), " ",
+          unit_pl, ")"
+        ),
+        ""
+      ),
       " automatically based on rule of thumb"
     ))
   }

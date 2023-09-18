@@ -1,7 +1,7 @@
 data_sf <- head(memphis_robberies, 1000)
 counts <- count_points_in_polygons(
   points = data_sf,
-  polygons = create_grid(data_sf)
+  polygons = sf::st_set_geometry(create_grid(data_sf), "random_geom_column")
 )
 
 # To speed up the checking process, run the function with arguments that should
