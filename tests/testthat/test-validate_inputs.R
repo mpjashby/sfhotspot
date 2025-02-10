@@ -8,6 +8,10 @@ data_sf_empty <- data_sf
 data_sf_empty$geometry[1] <- sf::st_point()
 data_sf_zero <- data_sf
 data_sf_zero$geometry[1] <- sf::st_point(x = c(0, 0))
+non_overlapping_grid <- sf::st_point(x = c(0, 0)) |>
+  sf::st_sfc(crs = "EPSG:4326") |>
+  sf::st_buffer(1) |>
+  sf::st_as_sf()
 
 
 
@@ -20,36 +24,54 @@ data_sf_zero$geometry[1] <- sf::st_point(x = c(0, 0))
 ## Errors ----
 
 test_that("error if `data` or `grid` are not SF objects of the correct type", {
-  expect_error(validate_inputs(data = data_df, grid = grid, quiet = FALSE))
-  expect_error(validate_inputs(data = data_sf, grid = grid_df, quiet = FALSE))
+  expect_error(
+    validate_inputs(data = data_df, grid = grid, quiet = FALSE),
+    regexp = "must be an SF object"
+  )
+  expect_error(
+    validate_inputs(data = data_sf, grid = grid_df, quiet = FALSE),
+    regexp = "either an SF object or `NULL`"
+  )
   expect_error(
     validate_inputs(
       data = sf::st_cast(data_sf, "LINESTRING"),
       grid = grid,
       quiet = FALSE
-    )
+    ),
+    regexp = "SF object containing points"
   )
   expect_error(
     validate_inputs(
       data = data_sf,
       grid = sf::st_cast(grid, "LINESTRING"),
       quiet = FALSE
-    )
+    ),
+    regexp = "SF object containing polygons or multipolygons"
   )
 })
 
-test_that("Error if `data` contains empty geometries", {
+test_that("error if `data` contains empty geometries", {
   expect_error(
-    validate_inputs(data = data_sf_empty, grid = grid, quiet = FALSE)
+    validate_inputs(data = data_sf_empty, grid = grid, quiet = FALSE),
+    regexp = "contains empty geometries"
+  )
+})
+
+test_that("error if `data` and `grid` do not overlap", {
+  expect_error(
+    validate_inputs(data = data_sf, grid = non_overlapping_grid),
+    regexp = "must overlap"
   )
 })
 
 test_that("error if `quiet` is not a single `TRUE` or `FALSE` value", {
   expect_error(
-    validate_inputs(data = data_sf, grid = grid, quiet = character())
+    validate_inputs(data = data_sf, grid = grid, quiet = character()),
+    regexp = "`quiet` must be one of `TRUE` or `FALSE`"
   )
   expect_error(
-    validate_inputs(data = data_sf, grid = grid, quiet = c(TRUE, FALSE))
+    validate_inputs(data = data_sf, grid = grid, quiet = c(TRUE, FALSE)),
+    regexp = "`quiet` must be one of `TRUE` or `FALSE`"
   )
 })
 
