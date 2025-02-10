@@ -2,7 +2,10 @@ data_sf <- head(memphis_robberies, 10)
 data_sf_m <- sf::st_transform(data_sf, "EPSG:2843")
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 
-result <- create_grid(data = data_sf, cell_size = 0.1)
+result_pts <- create_grid(data = data_sf, cell_size = 0.1)
+result_ply <- create_grid(
+  data = sf::st_transform(memphis_precincts, "EPSG:2843")
+)
 
 
 
@@ -38,25 +41,50 @@ test_that("error if `quiet` is not `TRUE` or `FALSE`", {
 ## Correct outputs ----
 
 test_that("function produces an SF tibble", {
-  expect_s3_class(result, "sf")
-  expect_s3_class(result, "tbl_df")
+  expect_s3_class(result_pts, "sf")
   expect_s3_class(
     create_grid(data = data_sf, cell_size = 0.1, grid_type = "hex"),
     "sf"
   )
+  expect_s3_class(result_ply, "sf")
+  expect_s3_class(result_pts, "tbl_df")
+  expect_s3_class(
+    create_grid(data = data_sf, cell_size = 0.1, grid_type = "hex"),
+    "tbl_df"
+  )
+  expect_s3_class(result_ply, "tbl_df")
 })
 
 test_that("output object has the required column names", {
-  expect_equal(names(result), c("geometry"))
+  expect_equal(names(result_pts), c("geometry"))
+  expect_equal(names(result_ply), c("geometry"))
 })
 
 test_that("columns in output have the required types", {
-  expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
+  expect_true(sf::st_is(result_pts$geometry[[1]], "POLYGON"))
+  expect_true(sf::st_is(result_ply$geometry[[1]], "POLYGON"))
+})
+
+test_that("output grid covers input geometry", {
+  expect_true(
+    sf::st_covers(
+      sf::st_union(result_pts),
+    sf::st_convex_hull(sf::st_union(data_sf)),
+      sparse = FALSE
+    )
+  )
+  expect_true(
+    sf::st_covers(
+      sf::st_union(result_ply),
+      sf::st_union(sf::st_transform(memphis_precincts, "EPSG:2843")),
+      sparse = FALSE
+    )
+  )
 })
 
 
-## Warnings ----
+## Messages ----
 
 test_that("produces warning if grid has 100,000+ cells", {
-  expect_warning(create_grid(data_sf_m, cell_size = 40, quiet = FALSE))
+  expect_message(create_grid(data_sf_m, cell_size = 40, quiet = FALSE))
 })
