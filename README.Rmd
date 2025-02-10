@@ -123,19 +123,19 @@ library(tidyverse)
 
 # Transform data to UTM zone 15N so that we can think in metres, not decimal 
 # degrees
-memphis_robberies_utm <- st_transform(memphis_robberies, 32615)
+memphis_robberies_utm <- st_transform(memphis_robberies, "EPSG:32615")
 
 
 # Identify hotspots, set all the parameters automatically by not specifying cell 
 # size, bandwidth, etc.
-memphis_robberies_hotspots <- hotspot_gistar(memphis_robberies_utm)
+memphis_robberies_htspt <- hotspot_gistar(memphis_robberies_utm, quiet = TRUE)
 
 
 # Visualise the hotspots by showing only those cells that have significantly
 # more points than expected by chance. For those cells, show the estimated
 # density of robberies.
-memphis_robberies_hotspots %>% 
-  filter(gistar > 0, pvalue < 0.05) %>% 
+memphis_robberies_htspt |> 
+  filter(gistar > 0, pvalue < 0.05) |> 
   ggplot(aes(colour = kde, fill = kde)) +
   geom_sf() +
   scale_colour_distiller(aesthetics = c("colour", "fill"), direction = 1) +
