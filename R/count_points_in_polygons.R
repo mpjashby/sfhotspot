@@ -110,8 +110,11 @@ count_points_in_polygons <- function(points, polygons, weights = NULL) {
   }
 
   # Remove working columns and convert to SF object
+  # This also ensures that `geometry` is the last column, as is the convention
+  # for SF objects
+  result_names <- setdiff(names(counts), c("geometry", ".polygon_id", "x"))
   counts <- sf::st_as_sf(
-    tibble::as_tibble(counts[, !(names(counts) %in% c(".polygon_id", "x"))]),
+    tibble::as_tibble(counts[, c(result_names, "geometry")]),
     sf_column_name = "geometry"
   )
 
