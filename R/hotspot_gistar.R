@@ -180,8 +180,9 @@ hotspot_gistar <- function(
 
   # Set cell size if not specified (do this here because it is needed by both
   # `create_grid()` and `gistar()`)
-  if (rlang::is_null(cell_size))
+  if (rlang::is_null(cell_size) & rlang::is_null(grid)) {
     cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
+  }
 
   # Create grid
   if (rlang::is_null(grid)) {

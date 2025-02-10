@@ -30,6 +30,13 @@ test_that("message if `data` uses a geographic CRS and KDE not performed", {
   )
 })
 
+test_that("no message reporting cell size when grid is provided", {
+  expect_no_message(
+    hotspot_gistar(data_sf, grid = hotspot_grid(data_sf, cell_size = 1000)),
+    message = "Cell size set"
+  )
+})
+
 
 
 # CHECK OUTPUTS ----------------------------------------------------------------
