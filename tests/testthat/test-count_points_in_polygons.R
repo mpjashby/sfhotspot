@@ -4,10 +4,12 @@ data_sf <- suppressWarnings(
 data_sf$wt <- runif(nrow(data_sf), max = 1000)
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 
-polygons <- sf::st_set_geometry(
-  create_grid(data = data_sf, cell_size = 0.1),
-  "random_geom_column_name"
-)
+# Create polygons object with extra column (to check if it's kept) and unusual
+# geometry column name
+polygons <- create_grid(data = data_sf, cell_size = 0.1)
+polygons$extra_col <- TRUE
+polygons <- sf::st_set_geometry(polygons, "random_geom_column_name")
+
 result <- count_points_in_polygons(
   points = data_sf,
   polygons = polygons
@@ -51,6 +53,56 @@ test_that("error if `weights` is not NULL or the name of a colum in `points`", {
   ))
 })
 
+## Warnings ----
+
+test_that("warning if `polygons` includes column names used internally", {
+  polygons_warn <- polygons
+  expect_warning(
+    {
+      polygons_warn$n <- 1
+      count_points_in_polygons(points = data_sf, polygons = polygons_warn)
+      polygons_warn$n <- NULL
+    },
+    regexp = "Existing column 'n' will be overwritten."
+  )
+  expect_warning(
+    {
+      polygons_warn$`.polygon_id` <- 1
+      count_points_in_polygons(points = data_sf, polygons = polygons_warn)
+      polygons_warn$`.polygon_id` <- NULL
+    },
+    regexp = "Existing column '.polygon_id' will be removed."
+  )
+  expect_warning(
+    {
+      polygons_warn$sum <- 1
+      count_points_in_polygons(points = data_sf, polygons = polygons_warn)
+      polygons_warn$sum <- NULL
+    },
+    regexp = "Existing column 'sum' will be removed."
+  )
+  expect_warning(
+    {
+      polygons_warn$sum <- 1
+      count_points_in_polygons(
+        points = data_sf,
+        polygons = polygons_warn,
+        weights = "wt"
+      )
+      polygons_warn$sum <- NULL
+    },
+    regexp = "Existing column 'sum' will be overwritten."
+  )
+  expect_warning(
+    {
+      polygons_warn$x <- 1
+      count_points_in_polygons(points = data_sf, polygons = polygons_warn)
+      polygons_warn$x <- NULL
+    },
+    regexp = "Existing column 'x' will be removed."
+  )
+})
+
 
 
 # CHECK OUTPUTS ----------------------------------------------------------------
@@ -64,8 +116,8 @@ test_that("function produces an SF tibble", {
 })
 
 test_that("output object has the required column names", {
-  expect_equal(names(result), c("n", "geometry"))
-  expect_equal(
+  expect_contains(names(result), c("n", "geometry"))
+  expect_contains(
     names(count_points_in_polygons(
       points = data_sf,
       polygons = polygons,
@@ -73,6 +125,11 @@ test_that("output object has the required column names", {
     )),
     c("n", "sum", "geometry")
   )
+})
+
+test_that("output object does not have columns used internally", {
+  expect_false(".polygon_id" %in% names(result))
+  expect_false("x" %in% names(result))
 })
 
 test_that("columns in output have the required types", {

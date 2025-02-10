@@ -30,6 +30,38 @@ count_points_in_polygons <- function(points, polygons, weights = NULL) {
     }
   }
 
+  # Warn if polygons object contains column names used internally
+  if ("n" %in% names(polygons)) {
+    rlang::warn(c(
+      "Existing column 'n' will be overwritten.",
+      "i" = "Consider renaming the existing column first."
+    ))
+  }
+  if (".polygon_id" %in% names(polygons)) {
+    rlang::warn(c(
+      "Existing column '.polygon_id' will be removed.",
+      "i" = "Consider renaming the existing column first."
+    ))
+  }
+  if ("x" %in% names(polygons)) {
+    rlang::warn(c(
+      "Existing column 'x' will be removed.",
+      "i" = "Consider renaming the existing column first."
+    ))
+  }
+  if (!rlang::is_null(weights) & "sum" %in% names(polygons)) {
+    rlang::warn(c(
+      "Existing column 'sum' will be overwritten.",
+      "i" = "Consider renaming the existing column first."
+    ))
+  } else if ("sum" %in% names(polygons)) {
+    rlang::warn(c(
+      "Existing column 'sum' will be removed.",
+      "i" = "Consider renaming the existing column first."
+    ))
+  }
+  polygons$n <- polygons$x <- polygons$sum <- polygons$`.polygon_id` <- NULL
+
   # Replace name of geometry column in SF objects if necessary
   polygons <- set_geometry_name(polygons)
 
@@ -78,17 +110,10 @@ count_points_in_polygons <- function(points, polygons, weights = NULL) {
   }
 
   # Remove working columns and convert to SF object
-  if (!rlang::is_null(weights)) {
-    counts <- sf::st_as_sf(
-      tibble::as_tibble(counts[, c("n", "sum", "geometry")]),
-      sf_column_name = "geometry"
-    )
-  } else {
-    counts <- sf::st_as_sf(
-      tibble::as_tibble(counts[, c("n", "geometry")]),
-      sf_column_name = "geometry"
-    )
-  }
+  counts <- sf::st_as_sf(
+    tibble::as_tibble(counts[, !(names(counts) %in% c(".polygon_id", "x"))]),
+    sf_column_name = "geometry"
+  )
 
   counts
 
