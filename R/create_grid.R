@@ -61,17 +61,28 @@ create_grid <- function(
     cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
 
   # Create buffered convex hull around data
-  hull <- sf::st_buffer(
-    sf::st_convex_hull(sf::st_union(data)),
-    dist = cell_size / 2
-  )
+  geometry_types <- as.character(sf::st_geometry_type(data))
+  if (all(geometry_types %in% c("POLYGON", "MULTIPOLYGON"))) {
+    hull <- sf::st_buffer(
+      sf::st_cast(sf::st_boundary(sf::st_union(data)), "MULTIPOLYGON"),
+      dist = cell_size / 2
+    )
+  } else {
+    hull <- sf::st_buffer(
+      sf::st_convex_hull(sf::st_union(data)),
+      dist = cell_size / 2
+    )
+  }
 
   # Warn if there will be so many cells that the function will be very slow
   hull_bbox <- sf::st_bbox(hull)
   cells_n_x <- (hull_bbox$xmax - hull_bbox$xmin) / cell_size
   cells_n_y <- (hull_bbox$ymax - hull_bbox$ymin) / cell_size
   if (cells_n_x * cells_n_y > 100000 & quiet == FALSE) {
-    rlang::warn(
+    # Although this is a warning, warnings are only printed when a function
+    # finishes, which is no use. Messages are printed immediately, so this has
+    # to be a message. See https://github.com/mpjashby/sfhotspot/issues/33
+    rlang::inform(
       c(
         "The grid will contain a large number of cells",
         "!" = "This may cause other functions to run slowly or not work",

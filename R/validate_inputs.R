@@ -65,9 +65,12 @@ validate_inputs <- function(
   if (!rlang::is_null(grid)) {
     if (!inherits(grid, "sf"))
       rlang::abort("`grid` must be either an SF object or `NULL`.", call = call)
-    if (any(!sf::st_is(grid, "POLYGON")))
+    if (any(!sf::st_is(grid, c("POLYGON", "MULTIPOLYGON"))))
       rlang::abort(
-        "`grid` must be `NULL` or an SF object containing polygons.",
+        paste0(
+          "`grid` must be `NULL` or an SF object containing polygons or ",
+          "multipolygons."
+        ),
         call = call
       )
     if (any(sf::st_is_empty(grid))) {
@@ -115,6 +118,26 @@ validate_inputs <- function(
         ),
         call = call
       )
+  }
+
+  # Check that data and grid overlap
+  if (!rlang::is_null(grid)) {
+    check_overlap <- sf::st_intersects(
+      sf::st_union(data),
+      sf::st_union(grid),
+      sparse = FALSE
+    )
+    if (rlang::is_false(check_overlap[1, 1])) {
+      rlang::abort(
+        c(
+          "`data` and `grid` must overlap",
+          "i" = paste0(
+            "Check data (e.g. by mapping) to ensure inputs overlap in space."
+          )
+        ),
+        call = call
+      )
+    }
   }
 
   # Validate `quiet`

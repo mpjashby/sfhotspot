@@ -40,6 +40,10 @@ knitr::kable(
 We can plot this raw data, but the resulting plot is not very informative (even with the points made semi-transparent), since there are too many points to see clear patterns.
 
 ```{r}
+#| fig.alt: >
+#|   A very basic point map showing the locations of individual robberies in
+#|   Memphis, TN. Each robbery is reprsented as a small, semi-transparent dot.
+
 ggplot(memphis_robberies) + 
   geom_sf(alpha = 0.1) + 
   theme_minimal()
@@ -60,6 +64,11 @@ point_counts
 We can then plot that grid of cells.
 
 ```{r}
+#| fig.alt: >
+#|   A basic map showing the count of robberies in each cell in a grid covering
+#|   Memphis, TN. Grid cells with more robberies are shown in darker shades of
+#|   blue, while those with fewer robberies are shown in lighter shades.
+
 ggplot() +
   geom_sf(
     mapping = aes(fill = n),
@@ -100,6 +109,12 @@ robbery_kde
 Again, we can plot the result.
 
 ```{r}
+#| fig.alt: >
+#|   A hotspot map showing the density of robberies in each cell in a grid 
+#|   covering Memphis, TN. Grid cells with higher densitites of robberies are 
+#|   shown in darker shades of blue, while those with lower densities are shown 
+#|   in lighter shades.
+
 ggplot() +
   geom_sf(
     mapping = aes(fill = kde),

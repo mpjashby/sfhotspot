@@ -21,7 +21,7 @@
 #'   counts in neighbouring cells when calculating the values of
 #'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}
 #'   (if \code{include_self = TRUE}, the default) or
-#'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}}
+#'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub>}}{\eqn{G_i}}
 #'   (if \code{include_self = FALSE}) values? You are unlikely to want to change
 #'   the default value.
 #' @param p_adjust_method The method to be used to adjust \emph{p}-values for
@@ -33,12 +33,12 @@
 #'   \code{TRUE}.
 #' @return An \code{\link[sf]{sf}} tibble of regular grid cells with
 #'   corresponding point counts,
-#'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}} or
+#'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub>}}{\eqn{G_i}} or
 #'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}
 #'   values for each cell. Values greater than zero indicate more points than
 #'   would be expected for randomly distributed points and values less than zero
 #'   indicate fewer points. Critical values of
-#'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}} and
+#'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub>}}{\eqn{G_i}} and
 #'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}
 #'   are given in the manual page for \code{\link[spdep]{localG}}.
 #' @noRd
@@ -92,15 +92,27 @@ gistar <- function(
   # Replace name of geometry column in SF objects if necessary
   counts <- set_geometry_name(counts)
 
-  # Set cell size if not specified
-  if (rlang::is_null(nb_dist) & rlang::is_null(cell_size))
-    cell_size <- set_cell_size(counts, round = TRUE, quiet = quiet)
+  # Get centroids
+  centroids <- suppressWarnings(sf::st_centroid(counts))
 
   # Set neighbour distance if not specified
-  if (rlang::is_null(nb_dist)) nb_dist <- cell_size * sqrt(2)
+  if (rlang::is_null(nb_dist)) {
+
+    # Derive cell size from grid cells if required
+    if (rlang::is_null(cell_size)) {
+      cell_size <- as.numeric(mean(sf::st_distance(
+        centroids,
+        centroids[sf::st_nearest_feature(centroids), ],
+        by_element = TRUE
+      )))
+    }
+
+    # Derive neighbour distance from cell size
+    nb_dist <- cell_size * sqrt(2)
+
+  }
 
   # Find neighbours
-  centroids <- suppressWarnings(sf::st_centroid(counts))
   nb <- spdep::dnearneigh(sf::st_coordinates(centroids), 0, nb_dist)
 
   # Determine if each cell should be treated as a neighbour of itself

@@ -1,3 +1,22 @@
+# sfhotspot 0.9.0
+
+* New dataset `memphis_precincts` showing Memphis Police Department precincts,
+  which is required to test the new functionality of `hotspot_grid()`.
+* `count_points_in_polygons()` now passes through columns in the original 
+  dataset, which makes `hotspot_count()` more useful (#41).
+* `hotspot_grid()` if provided with polygons now bases the grid on the
+  boundary of the polygons rather than the convex hull of the boundary (#42).
+* `hotspot_gistar()` now extracts nearest neighbour distance from provided grid
+  and does not wrongly rely on (and report) an automatically generated cell
+  size (#38).
+* Warnings about grids containing very large numbers of cells is now printed
+  before the cells are created, helping explain why code may be running slower
+  than expected (#33).
+* Improved error message produced when point data and provided grid do not
+  overlap (#39).
+* Suppressed progress bar previously included in README (#36).
+
+
 # sfhotspot 0.8.0
 
 * All functions can now handle SF objects in which the geometry column has a
