@@ -115,6 +115,10 @@ distributed randomly. In this example, the points represent the locations of
 personal robberies in Memphis, which is a dataset included with the package.
 
 ```{r example}
+#| fig.alt: >
+#|   A map showing hotspots of robbery in Memphis, TN created using the
+#|   `hotspot_gistar()` function in the sfhotspot package
+
 # Load packages
 library(sf)
 library(sfhotspot)

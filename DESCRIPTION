@@ -1,6 +1,6 @@
 Package: sfhotspot
 Title: Hot-Spot Analysis with Simple Features
-Version: 0.8.0
+Version: 0.9.0
 Authors@R: 
     person("Matt", "Ashby", , "matthew.ashby@ucl.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4201-9239"))
@@ -20,7 +20,7 @@ URL: http://pkgs.lesscrime.info/sfhotspot/
 BugReports: https://github.com/mpjashby/sfhotspot/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Imports:
     ggplot2,
     rlang,
@@ -29,7 +29,7 @@ Imports:
     spdep,
     tibble
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5)
 Suggests:
     testthat (>= 3.0.0),
     lubridate,

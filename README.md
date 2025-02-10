@@ -105,4 +105,4 @@ memphis_robberies_htspt |>
   theme_void()
 ```
 
-<img src="man/figures/README-example-1.png" width="100%" />
+<img src="man/figures/README-example-1.png" alt="A map showing hotspots of robbery in Memphis, TN created using the `hotspot_gistar()` function in the sfhotspot package" width="100%" />
