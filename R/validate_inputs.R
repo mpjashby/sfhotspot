@@ -158,6 +158,8 @@ validate_inputs <- function(
 #'   calculating kernel density estimates.
 #' @param adjust single positive \code{numeric} value by which the
 #'   value of \code{bandwidth} is multiplied.
+#' @param list whether multiple bandwidths are provided.
+#' @param call the environment in which the function is called.
 #'
 #' @noRd
 
@@ -165,9 +167,12 @@ validate_bandwidth <- function(
   bandwidth = NULL,
   adjust = 1,
   list = FALSE,
+  cell_size = NULL,
+  quiet = TRUE,
   call = rlang::caller_env()
 ) {
 
+  # Check bandwidth is numeric and strictly positive
   if (!rlang::is_null(bandwidth) & !rlang::is_double(bandwidth, n = 1))
     rlang::abort(paste(
       ifelse(list, "Each element of ", ""),
@@ -181,6 +186,8 @@ validate_bandwidth <- function(
       ))
     }
   }
+
+  # Check adjust is numeric and strictly positive
   if (!rlang::is_double(adjust, n = 1))
     rlang::abort(paste(
       ifelse(list, "Each element of ", ""),
@@ -192,6 +199,48 @@ validate_bandwidth <- function(
       "`bandwidth_adjust` must be greater than zero"
     ))
 
+  validate_cell_size(cell_size)
+
+  # Check bandwidth is larger than cell size
+  if (
+    !rlang::is_null(bandwidth) &
+    !rlang::is_null(cell_size) &
+    rlang::is_false(quiet)
+  ) {
+    if (bandwidth < cell_size) {
+      rlang::warn(c(
+        "Bandwidth is smaller than cell size",
+        "*" = paste0(
+          "If bandwidth is smaller than cell size, density estimates for each ",
+          "cell will be based on counts of few or no adjacent cells. This is ",
+          "unlikely to be what you want."
+        ),
+        "*" = paste0(
+          "Did you accidentally specify `bandwidth` instead of ",
+          "`bandwidth_adjust`?"
+        )
+      ))
+    }
+  }
+
   invisible(NULL)
+
+}
+
+
+
+#' Validate cell size
+#'
+#' @param cell_size Single numeric value to be used to create a grid of cells.
+#'
+#' @noRd
+
+validate_cell_size <- function(cell_size) {
+
+  if (!rlang::is_null(cell_size) & !rlang::is_double(cell_size, n = 1))
+    rlang::abort("`cell_size` must be `NULL` or a single numeric value")
+  if (!rlang::is_null(cell_size)) {
+    if (cell_size <= 0) rlang::abort("`cell_size` must be greater than zero")
+  }
 
 }

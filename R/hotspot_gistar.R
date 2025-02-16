@@ -178,20 +178,30 @@ hotspot_gistar <- function(
     }
   }
 
-  # Set cell size if not specified (do this here because it is needed by both
-  # `create_grid()` and `gistar()`)
-  if (rlang::is_null(cell_size) & rlang::is_null(grid)) {
-    cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
-  }
+  # If the user has provided a grid then we extract the approximate cell size
+  # based on the mean distance between the centroids of nearest neighbours. If
+  # the user has provided a cell size, we create a grid based on that. If the
+  # user has provided neither, we determine an appropriate cell size and then
+  # use that as the basis for creating the grid.
+  if (!rlang::is_null(grid)) {
 
-  # Create grid
-  if (rlang::is_null(grid)) {
+    # Extract cell size from grid
+    cell_size <- get_cell_size(grid)
+
+  } else {
+
+    # Set cell size
+    if (rlang::is_null(cell_size))
+      cell_size <- set_cell_size(data, quiet = quiet)
+
+    # Create grid
     grid <- create_grid(
       data,
       cell_size = cell_size,
       grid_type = grid_type,
       quiet = quiet
     )
+
   }
 
   # Count points and calculate KDE
@@ -203,6 +213,7 @@ hotspot_gistar <- function(
         grid,
         bandwidth = bandwidth,
         bandwidth_adjust = bandwidth_adjust,
+        cell_size = cell_size,
         quiet = quiet,
         ...
       )
@@ -216,6 +227,7 @@ hotspot_gistar <- function(
         bandwidth = bandwidth,
         bandwidth_adjust = bandwidth_adjust,
         weights = weights,
+        cell_size = cell_size,
         quiet = quiet,
         ...
       )

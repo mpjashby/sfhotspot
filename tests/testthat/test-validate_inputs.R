@@ -76,7 +76,7 @@ test_that("error if `quiet` is not a single `TRUE` or `FALSE` value", {
 })
 
 test_that(
-  "error if `bandwidth` or `bandwidth_adjust` are of the wrong type or length",
+  "error if `bandwidth`/`bandwidth_adjust`/`cell_size` are wrong type/length",
   {
     expect_error(validate_bandwidth(bandwidth = "blah"))
     expect_error(validate_bandwidth(bandwidth = c(2, 3)))
@@ -84,6 +84,9 @@ test_that(
     expect_error(validate_bandwidth(adjust = "blah"))
     expect_error(validate_bandwidth(adjust = c(2, 3)))
     expect_error(validate_bandwidth(adjust = -1))
+    expect_error(validate_cell_size(cell_size = "blah"))
+    expect_error(validate_cell_size(cell_size = c(2, 3)))
+    expect_error(validate_cell_size(cell_size = -1))
   }
 )
 
@@ -93,6 +96,13 @@ test_that(
 test_that("Warning if `data` contain zero co-ordinates", {
   expect_warning(
     validate_inputs(data = data_sf_zero, grid = grid, quiet = FALSE)
+  )
+})
+
+test_that("Warning if `bandwidth` is smaller than `cell_size` (#29)", {
+  expect_warning(
+    validate_bandwidth(bandwidth = 1, cell_size = 10, quiet = FALSE),
+    "Bandwidth is smaller than cell size"
   )
 })
 
@@ -108,4 +118,6 @@ test_that("Result is an invisible `NULL` value", {
   expect_null(validate_inputs(data = data_sf, grid = grid, quiet = FALSE))
   expect_invisible(validate_bandwidth(bandwidth = 1))
   expect_null(validate_bandwidth(bandwidth = 1))
+  expect_invisible(validate_cell_size(cell_size = 1))
+  expect_null(validate_cell_size(cell_size = 1))
 })

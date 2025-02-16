@@ -7,7 +7,7 @@ result_ply <- create_grid(
   data = sf::st_transform(memphis_precincts, "EPSG:2843")
 )
 
-nc <- st_read(system.file("shape/nc.shp", package = "sf"))
+nc <- sf::read_sf(system.file("shape/nc.shp", package = "sf"))
 
 
 

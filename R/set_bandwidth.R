@@ -1,4 +1,4 @@
-#' Automatically determine a suitable cell size for a two-dimensional grid
+#' Automatically determine a suitable bandwidth for a two-dimensional grid
 #'
 #' @param data \code{\link[sf]{sf}} data frame containing points.
 #' @param adjust single positive \code{numeric} value by which the returned

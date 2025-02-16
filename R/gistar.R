@@ -63,11 +63,7 @@ gistar <- function(
     rlang::abort("`n` must be the name of a column in the `counts` object")
   if (!rlang::is_double(counts[[n]]))
     rlang::abort("The column specified in `n` must be numeric")
-  if (!rlang::is_null(cell_size) & !rlang::is_double(cell_size, n = 1))
-    rlang::abort("`cell_size` must be `NULL` or a single numeric value")
-  if (!rlang::is_null(cell_size)) {
-    if (cell_size <= 0) rlang::abort("`cell_size` must be greater than zero")
-  }
+  validate_cell_size(cell_size)
   if (!rlang::is_null(nb_dist) & !rlang::is_double(nb_dist, n = 1))
     rlang::abort("`nb_dist` must be `NULL` or a single numeric value")
   if (!rlang::is_null(nb_dist))

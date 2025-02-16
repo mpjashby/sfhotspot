@@ -49,11 +49,7 @@ create_grid <- function(
   # Check inputs
   if (!inherits(data, "sf"))
     rlang::abort("`data` must be an SF object")
-  if (!rlang::is_null(cell_size) & !rlang::is_double(cell_size, n = 1))
-    rlang::abort("`cell_size` must be `NULL` or a single numeric value")
-  if (!rlang::is_null(cell_size)) {
-    if (cell_size <= 0) rlang::abort("`cell_size` must be greater than zero")
-  }
+  validate_cell_size(cell_size)
   rlang::arg_match(grid_type, c("rect", "hex"))
 
   # Set cell size if not specified

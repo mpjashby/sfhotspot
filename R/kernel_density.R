@@ -27,6 +27,7 @@ kernel_density <- function(
   bandwidth = NULL,
   bandwidth_adjust = 1,
   weights = NULL,
+  cell_size = NULL,
   quiet = TRUE,
   ...
 ) {
@@ -55,7 +56,11 @@ kernel_density <- function(
       "i" = "Transform `grid` to use a projected CRS"
     ))
   }
-  validate_bandwidth(bandwidth = bandwidth, adjust = bandwidth_adjust)
+  validate_bandwidth(
+    bandwidth = bandwidth,
+    adjust = bandwidth_adjust,
+    cell_size = cell_size
+  )
   if (!rlang::is_null(weights)) {
     if (!weights %in% names(data) | !rlang::is_character(weights, n = 1))
       rlang::abort("`weights` must be `NULL` or the name of a single column.")
