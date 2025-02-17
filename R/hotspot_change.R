@@ -117,55 +117,52 @@ hotspot_change <- function(
   # Check inputs that are not checked in a helper function
   validate_inputs(data = data, grid = grid, quiet = quiet)
   if (!rlang::is_false(time) & !time %in% names(data))
-    rlang::abort(
-      "`time` must be `NULL` or the name of a column in the `data` object"
+    cli::cli_abort(
+      "{.arg time} must be NULL or the name of a column in {.var data}."
     )
-  if (!rlang::is_false(time)) {
-    if (!rlang::inherits_any(data[[time]], c("Date", "POSIXt"))) {
-      rlang::abort(paste(
-        "`time` must be `NULL` or the name of a column of dates or date-times",
-        "in `data`"
-      ))
-    }
-  }
   if (
     !rlang::is_null(boundary) &
     !rlang::inherits_any(boundary, c("Date", "POSIXt"))
   ) {
-    rlang::abort("`boundary` must be `NULL` or a single Date or POSIXt value")
+    cli::cli_abort(paste0(
+      "{.arg boundary} must be NULL or a single ",
+      "{.cls {c('Date', 'POSIXt')}} value."
+    ))
   }
   if (!rlang::is_null(boundary)) {
     if (length(boundary) != 1)
-      rlang::abort("`boundary` must be `NULL` or a single Date or POSIXt value")
+      cli::cli_abort(paste0(
+        "{.arg boundary} must be NULL or a single ",
+        "{.cls {c('Date', 'POSIXt')}} value."
+      ))
   }
   if (!rlang::is_false(groups) & !groups %in% names(data))
-    rlang::abort(c(
-      "`groups` must be `NULL` or the name of a column in the `data` object"
-    ))
+    cli::cli_abort(
+      "{.arg groups} must be NULL or the name of a column in {.var data}."
+    )
+
+  # Further checks on arguments that are column names
+  if (!rlang::is_false(time)) {
+    if (!rlang::inherits_any(data[[time]], c("Date", "POSIXt"))) {
+      cli::cli_abort(paste0(
+        "{.var time} must be NULL or the name of a column of type ",
+        "{.cls {c('Date', 'POSIXt')}} in {.var data}."
+      ))
+    }
+  }
   if (!rlang::is_false(groups)) {
     unique_groups <- sort(unique(stats::na.omit(data[[groups]])))
     if (length(unique_groups) != 2) {
-      rlang::abort(c(
+
+      cli::cli_abort(c(
         paste(
-          "`groups` must be `NULL` or the name of a column in `data`",
-          "containing exactly two unique non-missing values"
+          "{.arg groups} must be NULL or the name of a column in {.var data}",
+          "containing exactly *two* unique non-missing values."
         ),
         "i" = ifelse(
           length(unique_groups) == 0,
-          "`groups` currently has no non-missing values",
-          ifelse(
-            length(unique_groups) > 4,
-            paste0(
-              "Current values of `groups`: '",
-              paste(utils::head(unique_groups, 4), collapse = "', '"),
-              "' and ", length(unique_groups) - 4, " other values"
-            ),
-            paste0(
-              "Current values of `groups`: '",
-              paste(unique_groups, collapse = "', '"),
-              "'"
-            )
-          )
+          "{.arg groups} currently has no non-missing values.",
+          "Current values of {.arg groups}: {unique_groups}."
         )
       ))
     }
@@ -180,12 +177,17 @@ hotspot_change <- function(
       unlist(lapply(data, rlang::inherits_any, c("Date", "POSIXt")))
     )
     if (length(date_cols) > 1) {
-      rlang::abort(c(
-        "More than one column in `data` contains date or date-time values",
-        "i" = "specify in `time` argument which column to use"
+      cli::cli_abort(c(
+        paste0(
+          "More than one column in {.var data} contains ",
+          "{.cls {c('Date', 'POSIXt')}} values."
+        ),
+        "i" = "Specify in {.arg time} argument which column to use."
       ))
     } else if (length(date_cols) == 0) {
-      rlang::abort("No columns in `data` contain date or date-time values")
+      cli::cli_abort(
+        "No columns in {.var data} contain {.cls {c('Date', 'POSIXt')}} values."
+      )
     } else {
       time <- names(data)[date_cols[1]]
     }
@@ -195,14 +197,14 @@ hotspot_change <- function(
   if (rlang::is_null(boundary) & rlang::is_false(groups)) {
     b <- min(data[[time]]) + (max(data[[time]]) - min(data[[time]])) / 2
     if (rlang::is_false(quiet)) {
-      rlang::inform(paste(
-        "Boundary point set as",
+      cli::cli_inform(paste0(
+        "Boundary point set as ",
         ifelse(
           inherits(b, "Date"),
           format(b, "%d %B %Y"),
           format(b, "%H:%M hours on %d %B %Y")
         ),
-        "automatically"
+        " automatically"
       ))
     }
   } else {
@@ -212,9 +214,9 @@ hotspot_change <- function(
   # Error if boundary date is not within range of dates in data
   if (rlang::is_false(groups)) {
     if (b < min(data[[time]]) | b > max(data[[time]])) {
-      rlang::abort(paste(
-        "`boundary` must be a single Date or POSIXt value within the range of",
-        "values in `data`"
+      cli::cli_abort(paste0(
+        "{.arg boundary} must be a single {.cls {c('Date', 'POSIXt')}} value ",
+        "within the range of values in {.var data}."
       ))
     }
   }
@@ -225,15 +227,15 @@ hotspot_change <- function(
     data_before <- data[data[[groups]] == data_groups[1], ]
     data_after <- data[data[[groups]] == data_groups[2], ]
     if (rlang::is_false(quiet) & !is.factor(data_groups[1])) {
-      rlang::inform(c(
-        paste0("Comparing periods based on values of `", groups, "`:"),
+      cli::cli_inform(c(
+        "Comparing periods based on values of {.var {groups}}:",
         "*" = paste0(
-          "Rows with `", groups, " == ", rlang::expr_text(data_groups[1]),
-          "` used as the 'before' period"
+          "Rows with {.code {groups} == {rlang::expr_text(data_groups[1])}} ",
+          "used as 'before' period"
         ),
         "*" = paste0(
-          "Rows with `", groups, " == ", rlang::expr_text(data_groups[2]),
-          "` used as the 'after' period"
+          "Rows with {.code {groups} == {rlang::expr_text(data_groups[2])}} ",
+          "used as 'after' period"
         )
       ))
     }
@@ -244,15 +246,9 @@ hotspot_change <- function(
 
   # Error if there are no points in before/after periods
   if (nrow(data_before) < 1)
-    rlang::abort(paste(
-      "There are no points in the data before the date/time specified in",
-      "`boundary`"
-    ))
-  if (nrow(data_before) < 1)
-    rlang::abort(paste(
-      "There are no points in the data after the date/time specified in",
-      "`boundary`"
-    ))
+    cli::cli_abort("No rows in {.var data} in 'before' period")
+  if (nrow(data_after) < 1)
+    cli::cli_abort("No rows in {.var data} in 'after' period")
 
   # Create grid
   if (rlang::is_null(grid)) {

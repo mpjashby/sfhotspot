@@ -164,9 +164,10 @@ hotspot_dual_kde <- function(
     weights_name_error <- TRUE
   }
   if (weights_name_error) {
-    rlang::abort(paste(
-      "`weights` must be `NULL` or a vector of two names, the first a column",
-      "in `x` and the second a column in `y`"
+    cli::cli_abort(paste0(
+      "{.arg weights} must be NULL or a vector of two names.",
+      "i" = "First name in {.arg weights} should be column in {.arg x}.",
+      "i" = "Second name in {.arg weights} should be column in {.arg y}."
     ))
   }
 
@@ -177,7 +178,10 @@ hotspot_dual_kde <- function(
   # `arg_match()` throws an uninformative error if `method` has length 0, so
   # first test if `method` is a character vector of length 1
   if (!rlang::is_character(method, n = 1))
-    rlang::abort('`method` must be one of "ratio", "log", "diff", or "sum"')
+    cli::cli_abort(paste0(
+      "{.arg method} must be one of ",
+      "{.or {.val c('ratio', 'log', 'diff', 'sum')}}."
+    ))
   rlang::arg_match(method, c("ratio", "log", "diff", "sum"), multiple = FALSE)
 
 
@@ -264,14 +268,12 @@ hotspot_dual_kde <- function(
     validate_bandwidth(
       bandwidth_x,
       adjust = bandwidth_adjust_x,
-      cell_size = cell_size,
-      label = "for `x`"
+      cell_size = cell_size
     )
     validate_bandwidth(
       bandwidth_y,
       adjust = bandwidth_adjust_y,
-      cell_size = cell_size,
-      label = "for `x`"
+      cell_size = cell_size
     )
   } else {
     validate_bandwidth(

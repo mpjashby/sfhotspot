@@ -9,10 +9,12 @@
 get_cell_size <- function(grid) {
 
   # Validate inputs
-  if (!inherits(grid, "sf"))
-    rlang::abort("`grid` must be an SF object")
-  if (any(!sf::st_is(grid, "POLYGON")))
-    rlang::abort("`grid` must be an SF object containing polygons")
+  validate_sf(
+    grid,
+    label = "grid",
+    type = c("POLYGON", "MULTIPOLYGON"),
+    call = rlang::caller_env()
+  )
 
   # Extract cell size from grid
   centroids <- suppressWarnings(sf::st_centroid(grid))

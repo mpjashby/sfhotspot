@@ -20,70 +20,17 @@ validate_inputs <- function(
   call = rlang::caller_env()
 ) {
 
-  # Validate `data`
-  if (!inherits(data, "sf"))
-    rlang::abort(
-      paste0("`", name_data, "` must be an SF object."),
-      call = call
-    )
-  if (any(!sf::st_is(data, "POINT")))
-    rlang::abort(
-      paste0("`", name_data, "` must be an SF object containing points."),
-      call = call
-    )
-  if (any(sf::st_is_empty(data))) {
-    rlang::abort(
-      c(
-        paste0("`", name_data, "` contains empty geometries."),
-        "i" = paste(
-          "Identify and remove empty geometries, e.g. using `st_is_empty()`."
-        )
-      ),
-      call = call
-    )
-  }
-
-  # Check for co-ordinates at Null Island or local equivalents
-  coords <- as.data.frame(sf::st_coordinates(data))
-  coords$is_zero <- coords$X == 0 & coords$Y == 0
-  if (any(coords$is_zero) & rlang::is_false(quiet)) {
-    rlang::warn(c(
-      paste0(
-        "`",
-        name_data,
-        "` contains points with co-ordinates at position `0, 0`."
-      ),
-      "i" = paste(
-        "These co-ordinates can indicate a problem with the data, e.g. an",
-        "error during data recording or preparation."
-      ),
-      "i" = "Check data (e.g. by mapping) to ensure co-ordinates are correct."
-    ))
-  }
-
-  # Validate `grid`
+  # Validate `data` and `grid`
+  validate_sf(data, label = "data", type = "POINT", quiet = quiet, call = call)
   if (!rlang::is_null(grid)) {
-    if (!inherits(grid, "sf"))
-      rlang::abort("`grid` must be either an SF object or `NULL`.", call = call)
-    if (any(!sf::st_is(grid, c("POLYGON", "MULTIPOLYGON"))))
-      rlang::abort(
-        paste0(
-          "`grid` must be `NULL` or an SF object containing polygons or ",
-          "multipolygons."
-        ),
-        call = call
-      )
-    if (any(sf::st_is_empty(grid))) {
-      rlang::abort(
-        c(
-          "`grid` contains empty geometries.",
-          "i" = paste(
-            "Identify and remove empty geometries, e.g. using `st_is_empty()`."
-          )
-        ),
-        call = call
-      )
-    }
+    validate_sf(
+      grid,
+      label = "grid",
+      type = c("POLYGON", "MULTIPOLYGON"),
+      allow_null = TRUE,
+      quiet = quiet,
+      call = call
+    )
   }
 
   # Check `data` and `grid` use the same CRS
@@ -92,28 +39,19 @@ validate_inputs <- function(
   # more helpful error message
   if (!rlang::is_null(grid)) {
     if (sf::st_crs(data) != sf::st_crs(grid))
-      rlang::abort(
+      cli::cli_abort(
         c(
           paste0(
-            "`",
-            name_data,
-            "` and `grid` must use the same co-ordinate reference system (CRS)"
+            "{.var {name_data}} and {.var grid} must use the same co-ordinate ",
+            "reference system (CRS)."
           ),
           "i" = paste0(
-            "`",
-            name_data,
-            "` uses the CRS '",
-            format(sf::st_crs(data)),
-            "' (",
-            sf::st_crs(data, parameters = TRUE)$srid,
-            ")"
+            "{.var {name_data}} uses CRS {.q {format(sf::st_crs(data))}} ",
+            "({sf::st_crs(data, parameters = TRUE)$srid})."
           ),
           "i" = paste0(
-            "`grid` uses the CRS '",
-            format(sf::st_crs(grid)),
-            "' (",
-            sf::st_crs(grid, parameters = TRUE)$srid,
-            ")"
+            "{.var grid} uses CRS {.q {format(sf::st_crs(grid))}} ",
+            "({sf::st_crs(grid, parameters = TRUE)$srid})."
           )
         ),
         call = call
@@ -128,12 +66,10 @@ validate_inputs <- function(
       sparse = FALSE
     )
     if (rlang::is_false(check_overlap[1, 1])) {
-      rlang::abort(
+      cli::cli_abort(
         c(
-          "`data` and `grid` must overlap",
-          "i" = paste0(
-            "Check data (e.g. by mapping) to ensure inputs overlap in space."
-          )
+          "{.var {name_data}} and {.var grid} must overlap.",
+          "i" = "Check co-ordinates are correct (e.g. by mapping them)."
         ),
         call = call
       )
@@ -142,7 +78,10 @@ validate_inputs <- function(
 
   # Validate `quiet`
   if (!rlang::is_logical(quiet, n = 1))
-    rlang::abort("`quiet` must be one of `TRUE` or `FALSE`.", call = call)
+    cli::cli_abort(
+      "{.var quiet} must be one of {.code TRUE} or {.code FALSE}.",
+      call = call
+    )
 
   invisible(NULL)
 
@@ -172,32 +111,36 @@ validate_bandwidth <- function(
   call = rlang::caller_env()
 ) {
 
+  list_str <- ifelse(list, "Each element of ", "")
+
   # Check bandwidth is numeric and strictly positive
   if (!rlang::is_null(bandwidth) & !rlang::is_double(bandwidth, n = 1))
-    rlang::abort(paste(
-      ifelse(list, "Each element of ", ""),
-      "`bandwidth` must be NULL or a single numeric value"
-    ))
+    cli::cli_abort(
+      "{list_str}{.var bandwidth} must be a single numeric value or NULL.",
+      call = call
+    )
   if (!rlang::is_null(bandwidth)) {
     if (bandwidth <= 0) {
-      rlang::abort(paste(
-        ifelse(list, "Every element of ", ""),
-        "`bandwidth` must be greater than zero"
-      ))
+      cli::cli_abort(
+        "{list_str}{.var bandwidth} must be greater than zero.",
+        call = call
+      )
     }
   }
 
   # Check adjust is numeric and strictly positive
-  if (!rlang::is_double(adjust, n = 1))
-    rlang::abort(paste(
-      ifelse(list, "Each element of ", ""),
-      "`bandwidth_adjust` must be a single numeric value"
-    ))
-  if (adjust <= 0)
-    rlang::abort(paste(
-      ifelse(list, "Every element of ", ""),
-      "`bandwidth_adjust` must be greater than zero"
-    ))
+  if (!rlang::is_double(adjust, n = 1)) {
+    cli::cli_abort(
+      "{list_str}{.var bandwidth_adjust} must be a single numeric value.",
+      call = call
+    )
+  }
+  if (adjust <= 0) {
+    cli::cli_abort(
+      "{list_str}{.var bandwidth_adjust} must be greater than zero.",
+      call = call
+    )
+  }
 
   validate_cell_size(cell_size)
 
@@ -208,18 +151,21 @@ validate_bandwidth <- function(
     rlang::is_false(quiet)
   ) {
     if (bandwidth < cell_size) {
-      rlang::warn(c(
-        "Bandwidth is smaller than cell size",
-        "*" = paste0(
-          "If bandwidth is smaller than cell size, density estimates for each ",
-          "cell will be based on counts of few or no adjacent cells. This is ",
-          "unlikely to be what you want."
+      cli::cli_warn(
+        c(
+          "Bandwidth is smaller than cell size",
+          "i" = paste0(
+            "If bandwidth is smaller than cell size, density estimates for ",
+            "each cell will be based on counts of few or no adjacent cells. ",
+            "This is unlikely to be what you want."
+          ),
+          "i" = paste0(
+            "Did you accidentally specify {.var bandwidth} instead of ",
+            "{.var bandwidth_adjust}?"
+          )
         ),
-        "*" = paste0(
-          "Did you accidentally specify `bandwidth` instead of ",
-          "`bandwidth_adjust`?"
-        )
-      ))
+        call = call
+      )
     }
   }
 
@@ -235,12 +181,130 @@ validate_bandwidth <- function(
 #'
 #' @noRd
 
-validate_cell_size <- function(cell_size) {
+validate_cell_size <- function(cell_size, call = rlang::caller_env()) {
 
   if (!rlang::is_null(cell_size) & !rlang::is_double(cell_size, n = 1))
-    rlang::abort("`cell_size` must be `NULL` or a single numeric value")
+    cli::cli_abort(
+      "{.var cell_size} must be a single numeric value or NULL.",
+      call = call
+    )
   if (!rlang::is_null(cell_size)) {
-    if (cell_size <= 0) rlang::abort("`cell_size` must be greater than zero")
+    if (cell_size <= 0)
+      cli::cli_abort("{.var cell_size} must be greater than zero.", call = call)
   }
+
+}
+
+
+
+#' Validate SF objects
+#'
+#' @param obj object to be tested.
+#' @param label name of object, which will be used in error labels.
+#' @param type geometry type.
+#'
+#' @noRd
+
+validate_sf <- function(
+    obj,
+    label = "data",
+    type = NULL,
+    allow_null = FALSE,
+    quiet = TRUE,
+    call = rlang::caller_env()
+  ) {
+
+  or_null <- ifelse(allow_null, " or NULL", "")
+
+  # Check obj is an SF object
+  inherit_error <- FALSE
+  if (allow_null) {
+    if (!inherits(obj, "sf") & !rlang::is_null(obj)) inherit_error <- TRUE
+  } else {
+    if (!inherits(obj, "sf")) inherit_error <- TRUE
+  }
+  if (inherit_error) {
+    cli::cli_abort(
+      c(
+        "{.var {label}} must be an SF object{or_null}.",
+        "x" = "You have supplied {.obj_type_friendly {obj}}."
+      ),
+      call = call
+    )
+  }
+
+  # Check obj has no empty geometries
+  empty <- sf::st_is_empty(obj)
+
+  if (sum(empty) > 0) {
+
+    if (sum(empty) == nrow(obj)) {
+      msg <- c("x" = "All rows have missing geometry.")
+    } else {
+      fe <- which(empty)[1]
+      msg <- c(
+        "x" = "{sum(empty)} row{?s} contain{?s/} incorrect missing geometry.",
+        "x" = "First problem: row {fe} has missing geometry."
+      )
+    }
+
+    cli::cli_abort(
+      c("{.var {label}} contains rows with missing geometry.", msg),
+      call = call
+    )
+
+  }
+
+  # Check obj has correct geometry type
+  if (!rlang::is_null(type)) {
+
+    wrong <- !sf::st_is(obj, type)
+
+    if (sum(wrong) > 0) {
+
+      gtypes <- length(unique(sf::st_geometry_type(obj)))
+
+      if (sum(wrong) == nrow(obj) & gtypes == 1) {
+        msg <- c("x" = "All rows have {sf::st_geometry_type(obj)[1]} geometry.")
+      } else {
+        fw <- which(wrong)[1]
+        msg <- c(
+          "x" = "{sum(wrong)} row{?s} contain{?s/} incorrect geometry type.",
+          "x" = paste0(
+            "First problem: row {fw} has {sf::st_geometry_type(obj[fw, ])} ",
+            "geometry."
+          )
+        )
+      }
+
+      cli::cli_abort(
+        c(
+          "{.var {label}} must be an SF object with {.or {type}} geometry.",
+          msg
+        ),
+        call = call
+      )
+
+    }
+
+  }
+
+  # Check for co-ordinates at Null Island or local equivalents
+  if (all(sf::st_is(obj, "POINT"))) {
+    coords <- as.data.frame(sf::st_coordinates(obj))
+    coords$is_zero <- coords$X == 0 & coords$Y == 0
+    if (any(coords$is_zero) & rlang::is_false(quiet)) {
+      cli::cli_warn(
+        c(
+          "{.var {label}} has points with the co-ordinates {.q 0, 0}.",
+          "i" = "This usually indicates a problem with the data.",
+          "i" = "Check co-ordinates are correct (e.g. by mapping them)."
+        ),
+        call = call
+      )
+    }
+  }
+
+  invisible(NULL)
 
 }

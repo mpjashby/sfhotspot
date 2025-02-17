@@ -165,15 +165,18 @@ hotspot_gistar <- function(
       # we can solve the problem by setting `kde = FALSE` whereas the
       # recommendation in the error produced by `kernel_density()` is to
       # transform the data, which may not be necessary
-      rlang::abort(c(
-        "KDE values cannot be calculated for lon/lat data",
-        "i" = "Transform `data` to use a projected CRS or set `kde = FALSE`"
+      cli::cli_abort(c(
+        "KDE values cannot be calculated for lon/lat data.",
+        "i" = paste0(
+          "Transform {.var data} to use a projected CRS or set ",
+          "{.code kde = FALSE}."
+        )
       ))
     } else if (rlang::is_false(quiet)) {
-      rlang::inform(c(
-        "The co-ordinates in `data` are latitudes and longitudes",
-        "i" = "`cell_size` and `bandwidth` will be in decimal degrees",
-        "i" = "Consider transforming `data` to use a projected CRS"
+      cli::cli_inform(c(
+        "The co-ordinates in {.var data} are latitudes and longitudes.",
+        "i" = "{.arg cell_size}/{.arg bandwidth} will be in decimal degrees.",
+        "i" = "Consider transforming {.var data} to use a projected CRS."
       ))
     }
   }

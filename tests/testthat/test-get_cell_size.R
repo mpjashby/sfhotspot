@@ -10,7 +10,7 @@ data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 
 test_that("error if `grid` is not an SF object containing polygons", {
   expect_error(get_cell_size(data_df), "must be an SF object")
-  expect_error(get_cell_size(data_sf), "SF object containing polygons")
+  expect_error(get_cell_size(data_sf), "must be an SF object with")
 })
 
 

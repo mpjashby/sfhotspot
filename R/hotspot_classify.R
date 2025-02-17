@@ -133,36 +133,39 @@ hotspot_classify <- function(
   # Check inputs that are not checked in a helper function
   validate_inputs(data = data, grid = grid, quiet = quiet)
   if (!rlang::is_false(time) & !time %in% names(data))
-    rlang::abort(
-      "`time` must be `NULL` or the name of a column in the `data` object"
+    cli::cli_abort(
+      "{.arg time} must be NULL or the name of a column in {.var data}."
     )
   if (!rlang::is_false(time)) {
     if (!rlang::inherits_any(data[[time]], c("Date", "POSIXt"))) {
-      rlang::abort(paste(
-        "`time` must be `NULL` or the name of a column of dates or date-times",
-        "in `data`"
+      cli::cli_abort(paste0(
+        "{.var time} must be NULL or the name of a column of type ",
+        "{.cls {c('Date', 'POSIXt')}} in {.var data}."
       ))
     }
   }
   if (!rlang::is_null(period) & !rlang::is_character(period, n = 1))
-    rlang::abort("`period` must be `NULL` or a single character value")
+    cli::cli_abort("{.arg period} must be NULL or a single character value.")
   if (
     !rlang::is_null(start) &
     !(rlang::inherits_any(start, c("Date", "POSIXt")) & length(start) == 1)
   ) {
-    rlang::abort("`start` must be `NULL` or a single `Date` or `POSIX` value")
+    cli::cli_abort(paste0(
+      "{.arg start} must be NULL or a single {.cls {c('Date', 'POSIXt')}} ",
+      "value."
+    ))
   }
   if (!rlang::is_logical(collapse, n = 1))
-    rlang::abort("`collapse` must be `TRUE` or `FALSE`")
+    cli::cli_abort("{.arg collapse} must be {.q TRUE} or {.q FALSE}")
   if (!rlang::is_bare_list(params))
-    rlang::abort(c(
-      "`params` must be a list",
-      "i" = "use `hotspot_classify_params()` to construct the `params` argument"
+    cli::cli_abort(c(
+      "{.arg params} must be a list.",
+      "i" = "use {.fn hotspot_classify_params()} to construct {.arg params}."
     ))
   if (!all(names(rlang::fn_fmls(hotspot_classify_params)) %in% names(params)))
-    rlang::abort(c(
-      "`params` must be a list containing all the required parameters",
-      "i" = "use `hotspot_classify_params()` to construct the `params` argument"
+    cli::cli_abort(c(
+      "{.arg params} must be a list containing all the required parameters.",
+      "i" = "use {.fn hotspot_classify_params()} to construct {.arg params}."
     ))
 
   # Replace name of geometry column in SF objects if necessary
@@ -175,11 +178,16 @@ hotspot_classify <- function(
     )
     if (length(date_cols) > 1) {
       rlang::abort(c(
-        "More than one column in `data` contains date or date-time values",
-        "i" = "specify in `time` argument which column to use"
+        paste0(
+          "More than one column in {.var data} contains ",
+          "{.cls {c('Date', 'POSIXt')}} values."
+        ),
+        "i" = "Specify in {.arg time} argument which column to use."
       ))
     } else if (length(date_cols) == 0) {
-      rlang::abort("No columns in `data` contain date or date-time values")
+      cli::cli_abort(
+        "No columns in {.var data} contain {.cls {c('Date', 'POSIXt')}} values."
+      )
     } else {
       time <- names(data)[date_cols[1]]
     }
@@ -188,7 +196,9 @@ hotspot_classify <- function(
   # Error if start date is before first time in data
   if (!rlang::is_null(start)) {
     if (start > min(data[[time]]))
-      rlang::abort("`start` must be before the first time present in the data")
+      cli::cli_abort(
+        "{.arg start} must be before the first date/time in ","{.var data}."
+      )
   }
 
   # Set start date if not specified
@@ -213,15 +223,15 @@ hotspot_classify <- function(
 
     # If no number or unit was found in time_unit, throw an error
     if (rlang::is_na(periods) | rlang::is_na(unit))
-      rlang::abort(c(
-        paste(
-          "`period` must be `NULL` or a character value containing a number",
-          "followed by a unit of time"
+      cli::cli_abort(c(
+        paste0(
+          "{.arg period} must be NULL or a character value containing a ",
+          "number followed by a unit of time."
         ),
-        "i" = "for example, \"12 months\" or \"3.5 days\"",
-        "i" = paste(
-          "valid units of time are second, minute, hour, day, week, month,",
-          "quarter and year"
+        "i" = 'Example: "12 months" or "3.5 days".',
+        "i" = paste0(
+          "Valid units of time are second, minute, hour, day, week, month, ",
+          "quarter and year."
         )
       ))
 
@@ -269,7 +279,7 @@ hotspot_classify <- function(
     }
 
     if (rlang::is_false(quiet)) {
-      rlang::inform(paste("`period` set to", periods, unit, "automatically"))
+      cli::cli_inform("{.arg period} set to {periods} {unit} automatically.")
     }
 
   }
@@ -300,29 +310,25 @@ hotspot_classify <- function(
       dates <- dates[1:(length(dates) - 1)]
 
       if (rlang::is_false(quiet)) {
-        rlang::inform(c(
-          paste(
-            "The range of dates in the data is not a multiple of the chosen",
-            "period"
-          ),
-          "i" = paste(
-            "The final period of", format(period_remainder, digits = 1), unit,
-            "will be collapsed into the penultimate period"
+        cli::cli_inform(c(
+          "Date range in data is not a multiple of chosen period.",
+          "i" = paste0(
+            "Final period of {format(period_remainder, digits = 1)} {unit} ",
+            "will be collapsed into penultimate period."
           )
         ))
       }
 
     } else if (rlang::is_false(quiet)) {
 
-      rlang::inform(c(
-        "The range of dates in the data is not a multiple of the chosen period",
-        "i" = paste(
-          "The final period contains only",
-          format(period_remainder, digits = 1), unit
+      cli::cli_inform(c(
+        "Date range data is not a multiple of chosen period.",
+        "i" = paste0(
+          "Final period contains {format(period_remainder, digits = 1)} {unit}."
         ),
-        "i" = paste(
-          "Set `collapse = TRUE` to collapse this period into the penultimate",
-          "period"
+        "i" = paste0(
+          "Set {.code collapse = TRUE} to collapse that period into ",
+          "penultimate period."
         )
       ))
 
@@ -383,16 +389,10 @@ hotspot_classify <- function(
         counted <- grid
         counted$n <- 0
 
-        rlang::warn(c(
-          paste("Zero points relate to the period beginning", y),
-          "i" = paste(
-            "This period will be excluded from the classification of hot-spots"
-          ),
-          "i" = paste(
-            "Consider changing the period using the `period` argument or the",
-            "starting point for calculating the periods using the `start`",
-            "argument"
-          )
+        cli::cli_warn(c(
+          "Zero points relate to the period beginning {y}.",
+          "i" = "This period will be excluded from classification.",
+          "i" = "Consider changing {.arg period} or {.arg start}."
         ))
       } else {
         counted <- count_points_in_polygons(x, polygons = grid)
@@ -485,13 +485,13 @@ hotspot_classify <- function(
     recent_warn <- TRUE
   }
   if (ncol(ch) - recent_periods < 1) {
-    rlang::abort(c(
-      "Zero periods identified as being non-recent",
-      "i" = "There must be at least one recent and one non-recent period",
-      "i" = paste(
-        "Specify a shorter period to generate at least one non-recent period,",
-        "or specify a smaller proportion of periods to be treated as recent",
-        "using `hotspot_classify_params()`"
+    cli::cli_abort(c(
+      "Zero periods identified as being non-recent.",
+      "i" = "There must be at least one recent and one non-recent period.",
+      "i" = paste0(
+        "Specify a shorter period to generate at least one non-recent period ",
+        "or specify smaller proportion of periods to be treated as recent ",
+        "using {.fn hotspot_classify_params()}."
       )
     ))
   }
@@ -499,12 +499,12 @@ hotspot_classify <- function(
     # Warn here, rather than above, so that if both recent periods and
     # non-recent periods are zero then the above error will happen before this
     # warning
-    rlang::warn(c(
-      "Zero periods identified as being recent",
-      "i" = "The final period will be treated as being recent",
-      "i" = paste(
-        "Specify a larger proportion of periods to be treated as recent using",
-        "`hotspot_classify_params()`"
+    cli::cli_warn(c(
+      "Zero periods identified as being recent.",
+      "i" = "The final period will be treated as being recent.",
+      "i" = paste0(
+        "Specify larger proportion of periods to be treated as recent using ",
+        "{.fn hotspot_classify_params()}."
       )
     ))
   }
