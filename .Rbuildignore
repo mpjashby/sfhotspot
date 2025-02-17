@@ -9,9 +9,11 @@
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
 ^R/st_transform_auto\.R$
+^tests/testthat/test-st_transform_auto.R$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
 ^original_data$
 ^doc$
 ^Meta$
+^rosm.cache
