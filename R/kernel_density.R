@@ -27,46 +27,49 @@ kernel_density <- function(
   bandwidth = NULL,
   bandwidth_adjust = 1,
   weights = NULL,
+  cell_size = NULL,
   quiet = TRUE,
   ...
 ) {
 
   # Check inputs
-  if (
-    sf::st_is_longlat(data) |
-    rlang::is_empty(sf::st_crs(data, parameters = TRUE))
-  ) {
-    rlang::abort(c(
-      paste(
-        "KDE values cannot be calculated for lon/lat data or data without a",
-        "co-ordinate reference system"
-      ),
-      "i" = "Check projection of `data` using st_crs()",
-      "i" = "Transform `data` to use a projected CRS"
+  if (rlang::is_empty(sf::st_crs(data, parameters = TRUE))) {
+    cli::cli_abort(c(
+      "Co-ordinate reference system for {.var data} is missing.",
+      "i" = "Cannot calculate KDE values from datasets with a missing CRS.",
+      "i" = "Check CRS of {.var data} using {.fn st_crs()}."
     ))
   }
-  if (!inherits(grid, "sf"))
-    rlang::abort("`grid` must be an SF object")
-  if (any(!sf::st_is(grid, "POLYGON")))
-    rlang::abort("`grid` must be an SF object containing polygons")
-  if (sf::st_is_longlat(grid)) {
-    rlang::abort(c(
-      "KDE values cannot be calculated for lon/lat data",
-      "i" = "Transform `grid` to use a projected CRS"
+  if (sf::st_is_longlat(data)) {
+    cli::cli_abort(c(
+      "Cannot calculate KDE values for lon/lat data.",
+      "i" = "Transform {.var data} to use a projected CRS."
     ))
   }
-  validate_bandwidth(bandwidth = bandwidth, adjust = bandwidth_adjust)
+  validate_sf(
+    grid,
+    label = "grid",
+    type = c("POLYGON", "MULTIPOLYGON"),
+    quiet = quiet
+  )
+  validate_bandwidth(
+    bandwidth = bandwidth,
+    adjust = bandwidth_adjust,
+    cell_size = cell_size
+  )
   if (!rlang::is_null(weights)) {
     if (!weights %in% names(data) | !rlang::is_character(weights, n = 1))
-      rlang::abort("`weights` must be `NULL` or the name of a single column.")
+      cli::cli_abort(
+        "{.arg weights} must be NULL or the name of a single column."
+      )
     if (!rlang::is_bare_numeric(data[[weights]])) {
-      rlang::abort(
-        "`weights` must be `NULL` or the name of a column of numeric values."
+      cli::cli_abort(
+        "{.arg weights} must be NULL or the name of a column of numeric values."
       )
     }
   }
   if (!rlang::is_logical(quiet, n = 1))
-    rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
+    cli::cli_abort("{.arg quiet} must be one of {.q TRUE} or {.q FALSE}.")
 
   # Replace name of geometry column in SF objects if necessary
   grid <- set_geometry_name(grid)

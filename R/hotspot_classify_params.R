@@ -52,29 +52,27 @@ hotspot_classify_params <- function(
     function(x) {
       arg_name <- rlang::as_label(rlang::quo(x))
       if (!rlang::is_double(x) | length(x) != 1)
-        rlang::abort(paste0("`", arg_name, "` must be a single numeric value"))
+        cli::cli_abort("{.arg {arg_name}} must be a single numeric value")
       if (x >= 1 | x <= 0)
-        rlang::abort(
-          paste0("`", arg_name, "` must be greater than 0 and less than 1")
-        )
+        cli::cli_abort("{.arg {arg_name} must be >0 and <1")
     }
   )
   if (!rlang::is_null(nb_dist) & !rlang::is_double(nb_dist, n = 1))
-    rlang::abort("`nb_dist` must be `NULL` or a single numeric value")
+    cli::cli_abort("{.arg nb_dist} must be NULL or a single numeric value")
   if (!rlang::is_null(nb_dist))
-    if (nb_dist <= 0) rlang::abort("`nb_dist` must be greater than zero")
+    if (nb_dist <= 0) cli::cli_abort("{.arg nb_dist} must be greater than zero")
   if (!rlang::is_logical(include_self, n = 1))
-    rlang::abort("`include_self` must be `TRUE` or `FALSE`")
+    cli::cli_abort("{.arg include_self} must be {.q TRUE} or {.q FALSE}")
   if (!rlang::is_null(p_adjust_method)) {
     if (length(p_adjust_method) != 1)
-      rlang::abort(paste0(
-        "`p_adjust_method` must be either `NULL` or one of \"",
-        paste(stats::p.adjust.methods, collapse = "\", \""), "\""
+      cli::cli_abort(paste0(
+        "{.arg p_adjust_method} must be NULL or one of ",
+        "{.or {.val {stats::p.adjust.methods}}}"
       ))
     if (!p_adjust_method %in% stats::p.adjust.methods)
-      rlang::abort(paste0(
-        "`p_adjust_method` must be either `NULL` or one of \"",
-        paste(stats::p.adjust.methods, collapse = "\", \""), "\""
+      cli::cli_abort(paste0(
+        "{.arg p_adjust_method} must be NULL or one of ",
+        "{.or {.val {stats::p.adjust.methods}}}"
       ))
   }
 

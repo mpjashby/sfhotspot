@@ -103,14 +103,30 @@ hotspot_kde <- function(
   # Check inputs that are not checked in a helper function
   validate_inputs(data = data, grid = grid, quiet = quiet)
 
-  # Create grid
-  if (rlang::is_null(grid)) {
+  # If the user has provided a grid then we extract the approximate cell size
+  # based on the mean distance between the centroids of nearest neighbours. If
+  # the user has provided a cell size, we create a grid based on that. If the
+  # user has provided neither, we determine an appropriate cell size and then
+  # use that as the basis for creating the grid.
+  if (!rlang::is_null(grid)) {
+
+    # Extract cell size from grid
+    cell_size <- get_cell_size(grid)
+
+  } else {
+
+    # Set cell size
+    if (rlang::is_null(cell_size))
+      cell_size <- set_cell_size(data, quiet = quiet)
+
+    # Create grid
     grid <- create_grid(
       data,
       cell_size = cell_size,
       grid_type = grid_type,
       quiet = quiet
     )
+
   }
 
   # Count points and calculate KDE
@@ -121,6 +137,7 @@ hotspot_kde <- function(
       grid,
       bandwidth = bandwidth,
       bandwidth_adjust = bandwidth_adjust,
+      cell_size = cell_size,
       quiet = quiet,
       ...
     )
@@ -132,6 +149,7 @@ hotspot_kde <- function(
       bandwidth = bandwidth,
       bandwidth_adjust = bandwidth_adjust,
       weights = weights,
+      cell_size = cell_size,
       quiet = quiet,
       ...
     )

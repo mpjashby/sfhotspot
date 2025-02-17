@@ -43,11 +43,11 @@ autoplot.hspt_n <- function(object, ...) {
 autolayer.hspt_n <- function(object, ...) {
 
   # Validate inputs
-  if (!inherits(object, "sf")) rlang::abort("`object` must be an SF object")
+  validate_sf(object, label = "object", quiet = TRUE)
   if (!rlang::has_name(object, "n"))
-    rlang::abort("`object` must contain a column called `n`")
+    cli::cli_abort("{.var object} must contain a column called {.var n}")
   if (!rlang::is_double(object$n))
-    rlang::abort("The `n` column in `object` must be numeric")
+    cli::cli_abort("The {.var n} column in {.var object} must be numeric")
 
   # Create layer
   ggplot2::geom_sf(
@@ -107,11 +107,11 @@ autoplot.hspt_k <- function(object, ...) {
 autolayer.hspt_k <- function(object, ...) {
 
   # Validate inputs
-  if (!inherits(object, "sf")) rlang::abort("`object` must be an SF object")
+  validate_sf(object, label = "object", quiet = TRUE)
   if (!rlang::has_name(object, "kde"))
-    rlang::abort("`object` must contain a column called `kde`")
+    cli::cli_abort("{.var object} must contain a column called {.var kde}")
   if (!rlang::is_double(object$kde))
-    rlang::abort("The `kde` column in `object` must be numeric")
+    cli::cli_abort("The {.var kde} column in {.var object} must be numeric")
 
   # Create layer
   ggplot2::geom_sf(
@@ -146,9 +146,11 @@ autolayer.hspt_k <- function(object, ...) {
 autoplot.hspt_c <- function(object, ...) {
 
   # Validate inputs
-  if (!inherits(object, "sf")) rlang::abort("`object` must be an SF object")
+  validate_sf(object, label = "object", quiet = TRUE)
   if (!rlang::has_name(object, "hotspot_category"))
-    rlang::abort("`object` must contain a column called `hotspot_category`")
+    cli::cli_abort(
+      "{.var object} must contain a column called {.var hotspot_category}"
+    )
 
   # Create plot
   ggplot2::ggplot() +
@@ -200,11 +202,11 @@ autoplot.hspt_c <- function(object, ...) {
 autoplot.hspt_d <- function(object, ...) {
 
   # Validate inputs
-  if (!inherits(object, "sf")) rlang::abort("`object` must be an SF object")
+  validate_sf(object, label = "object", quiet = TRUE)
   if (!rlang::has_name(object, "change"))
-    rlang::abort("`object` must contain a column called `change`")
+    cli::cli_abort("{.var object} must contain a column called {.var change}")
   if (!rlang::is_double(object$change))
-    rlang::abort("The `change` column in `object` must be numeric")
+    cli::cli_abort("The {.var change} column in {.var object} must be numeric")
 
   # Create plot
   ggplot2::ggplot() +
@@ -226,11 +228,11 @@ autoplot.hspt_d <- function(object, ...) {
 autolayer.hspt_d <- function(object, ...) {
 
   # Validate inputs
-  if (!inherits(object, "sf")) rlang::abort("`object` must be an SF object")
+  validate_sf(object, label = "object", quiet = TRUE)
   if (!rlang::has_name(object, "change"))
-    rlang::abort("`object` must contain a column called `change`")
+    cli::cli_abort("{.var object} must contain a column called {.var change}")
   if (!rlang::is_double(object$change))
-    rlang::abort("The `change` column in `object` must be numeric")
+    cli::cli_abort("The {.var change} column in {.var object} must be numeric")
 
   # Create layer
   ggplot2::geom_sf(

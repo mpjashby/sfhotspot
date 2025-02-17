@@ -11,7 +11,7 @@ between two periods (before and after a specified date) or in two groups
 
     <a class="navbar-brand me-2" href="../index.html">sfhotspot</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -171,7 +171,7 @@ represent and underlying continuous distribution.</p></div>
 <span class="r-in"><span><span class="co"># counts from the second half</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu">hotspot_change</span><span class="op">(</span><span class="va">memphis_robberies</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Boundary point set as 09:30 hours on 02 July 2019 automatically</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Boundary point set as 11:30 hours on 02 July 2019 automatically</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Cell size set to 0.00524 degrees automatically</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 2926 features and 3 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: POLYGON</span>
@@ -201,8 +201,8 @@ represent and underlying continuous distribution.</p></div>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/weekday.POSIXt.html" class="external-link">weekdays</a></span><span class="op">(</span><span class="va">memphis_robberies</span><span class="op">$</span><span class="va">date</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Saturday"</span>, <span class="st">"Sunday"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">hotspot_change</span><span class="op">(</span><span class="va">memphis_robberies</span>, groups <span class="op">=</span> <span class="va">weekend</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Comparing periods based on values of `weekend`:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Rows with `weekend == FALSE` used as the 'before' period</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Rows with `weekend == TRUE` used as the 'after' period</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Rows with `weekend == FALSE` used as 'before' period</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Rows with `weekend == TRUE` used as 'after' period</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Cell size set to 0.00524 degrees automatically</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 2926 features and 3 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: POLYGON</span>

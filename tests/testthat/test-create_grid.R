@@ -7,6 +7,8 @@ result_ply <- create_grid(
   data = sf::st_transform(memphis_precincts, "EPSG:2843")
 )
 
+nc <- sf::read_sf(system.file("shape/nc.shp", package = "sf"))
+
 
 
 # CHECK INPUTS -----------------------------------------------------------------
@@ -18,7 +20,7 @@ test_that("error if `data` is not an SF object", {
   expect_error(create_grid(data = data_df))
 })
 
-test_that("error if `cell_size` is not `NULL` or or a single positive number", {
+test_that("error if `cell_size` is not `NULL` or a single positive number", {
   expect_error(create_grid(data = data_sf, cell_size = character()))
   expect_error(create_grid(data = data_sf, cell_size = 1:2))
   expect_error(create_grid(data = data_sf, cell_size = -1))
@@ -69,7 +71,7 @@ test_that("output grid covers input geometry", {
   expect_true(
     sf::st_covers(
       sf::st_union(result_pts),
-    sf::st_convex_hull(sf::st_union(data_sf)),
+      sf::st_convex_hull(sf::st_union(data_sf)),
       sparse = FALSE
     )
   )
@@ -80,6 +82,13 @@ test_that("output grid covers input geometry", {
       sparse = FALSE
     )
   )
+})
+
+test_that("no error if non-multipolygon geometry provided (#46)", {
+  # Polygon input geometry
+  expect_no_error(hotspot_grid(memphis_precincts[1, ], quiet = TRUE))
+  # Multipolygon input geometry
+  expect_no_error(hotspot_grid(memphis_precincts[2, ], quiet = TRUE))
 })
 
 

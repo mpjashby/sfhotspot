@@ -35,7 +35,18 @@ test_that("output is a single numeric value", {
 ## Messages ----
 
 test_that("message advising of calculated bandwidth", {
-  expect_message(set_bandwidth(data = data_sf, quiet = FALSE))
+  expect_message(
+    set_bandwidth(data = data_sf, quiet = FALSE),
+    "Bandwidth set automatically based on rule of thumb"
+  )
+  expect_message(
+    set_bandwidth(data = data_sf, label = "for `x`", quiet = FALSE),
+    "Bandwidth set automatically based on rule of thumb"
+  )
+  expect_message(
+    set_bandwidth(data = data_sf, adjust = 0.5, quiet = FALSE),
+    "Adjusted bandwidth"
+  )
 })
 
 

@@ -3,6 +3,7 @@ data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 data_sf$no_groups <- NA_real_
 data_sf$bad_groups <- data_sf$date < min(data_sf$date)
 data_sf$multi_groups <- cut(data_sf$date, breaks = 5)
+data_sf$good_groups <- as.character(cut(data_sf$date, breaks = 2))
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
@@ -24,6 +25,31 @@ test_that("error if inputs have wrong type", {
 
 test_that("error if inputs have the wrong length", {
   expect_error(hotspot_change(data_sf, boundary = c(Sys.Date(), Sys.time())))
+})
+
+test_that("error if specified time/groups column not present", {
+  expect_error(
+    hotspot_change(data_sf, time = blah),
+    "NULL or the name of a column"
+  )
+  expect_error(
+    hotspot_change(data_sf, groups = blah),
+    "NULL or the name of a column"
+  )
+})
+
+test_that("error if specified time column has wrong type", {
+  expect_error(
+    hotspot_change(data_sf, time = offense_type),
+    "name of a column of type"
+  )
+})
+
+test_that("error if there are no date/time columns", {
+  expect_error(
+    hotspot_change(data_sf[, "geometry"]),
+    "No columns in `data` contain <Date/POSIXt> values"
+  )
 })
 
 test_that("error if there are multiple date/time columns", {
@@ -68,4 +94,18 @@ test_that("columns in output have the required types", {
   expect_type(result$n_after, "double")
   expect_type(result$change, "double")
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
+})
+
+
+## Messages ----
+
+test_that("boundary point is reported if not specified", {
+  expect_message(hotspot_change(data_sf), "Boundary point set as")
+})
+
+test_that("summary message if groups specified and not factor", {
+  expect_message(
+    hotspot_change(data_sf, groups = good_groups),
+    "Comparing periods based on values"
+  )
 })

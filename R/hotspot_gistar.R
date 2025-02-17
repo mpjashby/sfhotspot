@@ -165,33 +165,46 @@ hotspot_gistar <- function(
       # we can solve the problem by setting `kde = FALSE` whereas the
       # recommendation in the error produced by `kernel_density()` is to
       # transform the data, which may not be necessary
-      rlang::abort(c(
-        "KDE values cannot be calculated for lon/lat data",
-        "i" = "Transform `data` to use a projected CRS or set `kde = FALSE`"
+      cli::cli_abort(c(
+        "KDE values cannot be calculated for lon/lat data.",
+        "i" = paste0(
+          "Transform {.var data} to use a projected CRS or set ",
+          "{.code kde = FALSE}."
+        )
       ))
     } else if (rlang::is_false(quiet)) {
-      rlang::inform(c(
-        "The co-ordinates in `data` are latitudes and longitudes",
-        "i" = "`cell_size` and `bandwidth` will be in decimal degrees",
-        "i" = "Consider transforming `data` to use a projected CRS"
+      cli::cli_inform(c(
+        "The co-ordinates in {.var data} are latitudes and longitudes.",
+        "i" = "{.arg cell_size}/{.arg bandwidth} will be in decimal degrees.",
+        "i" = "Consider transforming {.var data} to use a projected CRS."
       ))
     }
   }
 
-  # Set cell size if not specified (do this here because it is needed by both
-  # `create_grid()` and `gistar()`)
-  if (rlang::is_null(cell_size) & rlang::is_null(grid)) {
-    cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
-  }
+  # If the user has provided a grid then we extract the approximate cell size
+  # based on the mean distance between the centroids of nearest neighbours. If
+  # the user has provided a cell size, we create a grid based on that. If the
+  # user has provided neither, we determine an appropriate cell size and then
+  # use that as the basis for creating the grid.
+  if (!rlang::is_null(grid)) {
 
-  # Create grid
-  if (rlang::is_null(grid)) {
+    # Extract cell size from grid
+    cell_size <- get_cell_size(grid)
+
+  } else {
+
+    # Set cell size
+    if (rlang::is_null(cell_size))
+      cell_size <- set_cell_size(data, quiet = quiet)
+
+    # Create grid
     grid <- create_grid(
       data,
       cell_size = cell_size,
       grid_type = grid_type,
       quiet = quiet
     )
+
   }
 
   # Count points and calculate KDE
@@ -203,6 +216,7 @@ hotspot_gistar <- function(
         grid,
         bandwidth = bandwidth,
         bandwidth_adjust = bandwidth_adjust,
+        cell_size = cell_size,
         quiet = quiet,
         ...
       )
@@ -216,6 +230,7 @@ hotspot_gistar <- function(
         bandwidth = bandwidth,
         bandwidth_adjust = bandwidth_adjust,
         weights = weights,
+        cell_size = cell_size,
         quiet = quiet,
         ...
       )

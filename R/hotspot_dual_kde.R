@@ -164,9 +164,10 @@ hotspot_dual_kde <- function(
     weights_name_error <- TRUE
   }
   if (weights_name_error) {
-    rlang::abort(paste(
-      "`weights` must be `NULL` or a vector of two names, the first a column",
-      "in `x` and the second a column in `y`"
+    cli::cli_abort(paste0(
+      "{.arg weights} must be NULL or a vector of two names.",
+      "i" = "First name in {.arg weights} should be column in {.arg x}.",
+      "i" = "Second name in {.arg weights} should be column in {.arg y}."
     ))
   }
 
@@ -177,77 +178,115 @@ hotspot_dual_kde <- function(
   # `arg_match()` throws an uninformative error if `method` has length 0, so
   # first test if `method` is a character vector of length 1
   if (!rlang::is_character(method, n = 1))
-    rlang::abort('`method` must be one of "ratio", "log", "diff", or "sum"')
+    cli::cli_abort(paste0(
+      "{.arg method} must be one of ",
+      "{.or {.val c('ratio', 'log', 'diff', 'sum')}}."
+    ))
   rlang::arg_match(method, c("ratio", "log", "diff", "sum"), multiple = FALSE)
 
-  # Create grid
-  if (rlang::is_null(grid)) {
+
+
+  # CELL SIZE ------------------------------------------------------------------
+
+  # If the user has provided a grid then we extract the approximate cell size
+  # based on the mean distance between the centroids of nearest neighbours. If
+  # the user has provided a cell size, we create a grid based on that. If the
+  # user has provided neither, we determine an appropriate cell size and then
+  # use that as the basis for creating the grid.
+  if (!rlang::is_null(grid)) {
+
+    # Extract cell size from grid
+    cell_size <- get_cell_size(grid)
+
+  } else {
+
+    # Set cell size
+    if (rlang::is_null(cell_size))
+      cell_size <- set_cell_size(x, quiet = quiet)
+
+    # Create grid
     grid <- create_grid(
       x,
       cell_size = cell_size,
       grid_type = grid_type,
       quiet = quiet
     )
+
   }
 
-  # Extract bandwidth values for each layer
-  # These need to be validated here to prevent duplicate messages
+
+
+  # BANDWIDTH ------------------------------------------------------------------
+
+
+  # Bandwidth 1: check provided input and assign to internal objects ----
+
   if (rlang::is_bare_list(bandwidth, n = 2)) {
-    validate_bandwidth(bandwidth = bandwidth[[1]], list = TRUE)
-    validate_bandwidth(bandwidth = bandwidth[[2]], list = TRUE)
-    if (rlang::is_bare_list(bandwidth_adjust, n = 2)) {
-      validate_bandwidth(adjust = bandwidth_adjust[[1]], list = TRUE)
-      validate_bandwidth(adjust = bandwidth_adjust[[2]], list = TRUE)
-      bandwidth_adjust_x <- bandwidth_adjust[[1]]
-      bandwidth_adjust_y <- bandwidth_adjust[[2]]
-    } else {
-      validate_bandwidth(adjust = bandwidth_adjust)
-      bandwidth_adjust_x <- bandwidth_adjust_y <- bandwidth_adjust
-    }
-    bandwidth_x <- ifelse(
-      rlang::is_null(bandwidth[[1]]),
-      set_bandwidth(
-        x,
-        quiet = quiet,
-        adjust = bandwidth_adjust_x,
-        label = "for `x`"
-      ),
-      bandwidth[[1]]
-    )
-    bandwidth_y <- ifelse(
-      rlang::is_null(bandwidth[[2]]),
-      set_bandwidth(
-        y,
-        quiet = quiet,
-        adjust = bandwidth_adjust_y,
-        label = "for `y`"
-      ),
-      bandwidth[[2]]
-    )
+    validate_bandwidth(bandwidth[[1]], list = TRUE)
+    validate_bandwidth(bandwidth[[2]], list = TRUE)
+    bandwidth_x <- bandwidth[[1]]
+    bandwidth_y <- bandwidth[[2]]
   } else {
-    validate_bandwidth(bandwidth = bandwidth)
-    if (rlang::is_null(bandwidth)) {
-      bandwidth_y <- bandwidth_x <- set_bandwidth(
-        x,
-        quiet = quiet,
-        adjust = bandwidth_adjust,
-        label = "for `x` and `y`"
-      )
-    } else {
-      bandwidth_y <- bandwidth_x <- bandwidth
-    }
+    validate_bandwidth(bandwidth)
+    bandwidth_y <- bandwidth_x <- bandwidth
   }
+
   if (rlang::is_bare_list(bandwidth_adjust, n = 2)) {
-    validate_bandwidth(adjust = bandwidth_adjust[[1]], list = TRUE)
-    validate_bandwidth(adjust = bandwidth_adjust[[2]], list = TRUE)
+    validate_bandwidth(bandwidth_adjust[[1]], list = TRUE)
+    validate_bandwidth(bandwidth_adjust[[2]], list = TRUE)
     bandwidth_adjust_x <- bandwidth_adjust[[1]]
     bandwidth_adjust_y <- bandwidth_adjust[[2]]
   } else {
-    validate_bandwidth(adjust = bandwidth_adjust)
+    validate_bandwidth(bandwidth_adjust)
     bandwidth_adjust_x <- bandwidth_adjust_y <- bandwidth_adjust
   }
 
-  # Count points
+
+  # Bandwidth 2: set values automatically if not provided ----
+
+  if (rlang::is_null(bandwidth_x)) {
+    bandwidth_x <- set_bandwidth(
+      x,
+      adjust = bandwidth_adjust_x,
+      quiet = quiet,
+      label = "for `x`"
+    )
+  }
+
+  if (rlang::is_null(bandwidth_y)) {
+    bandwidth_y <- set_bandwidth(
+      y,
+      adjust = bandwidth_adjust_y,
+      quiet = quiet,
+      label = "for `y`"
+    )
+  }
+
+
+  # Bandwidth 3: check bandwidth makes sense relative to cell size ----
+  if (bandwidth_x != bandwidth_y) {
+    validate_bandwidth(
+      bandwidth_x,
+      adjust = bandwidth_adjust_x,
+      cell_size = cell_size
+    )
+    validate_bandwidth(
+      bandwidth_y,
+      adjust = bandwidth_adjust_y,
+      cell_size = cell_size
+    )
+  } else {
+    validate_bandwidth(
+      bandwidth_x,
+      adjust = bandwidth_adjust_x,
+      cell_size = cell_size
+    )
+  }
+
+
+
+  # COUNT POINTS ---------------------------------------------------------------
+
   if (rlang::is_chr_na(weights_x)) {
     counts <- count_points_in_polygons(x, grid)
   } else {
@@ -257,7 +296,11 @@ hotspot_dual_kde <- function(
   # Check if any points in `y` were not counted in polygons because the polygons
   # (which are based on the bounding box of `x`) do not cover all the points
 
-  # Calculate KDE for `x`
+
+
+  # CALCULATE KDE --------------------------------------------------------------
+
+  # Calculate KDE for `x` ----
   if (rlang::is_chr_na(weights_x)) {
     kde_x <- kernel_density(
       x,
@@ -279,7 +322,7 @@ hotspot_dual_kde <- function(
     )
   }
 
-  # Calculate KDE for `y`
+  # Calculate KDE for `y` ----
   if (rlang::is_chr_na(weights_y)) {
     kde_y <- kernel_density(
       y,
@@ -300,6 +343,10 @@ hotspot_dual_kde <- function(
       ...
     )
   }
+
+
+
+  # FORMAT RESULT --------------------------------------------------------------
 
   # Combine layers
   kde <- kde_x[, "geometry"]

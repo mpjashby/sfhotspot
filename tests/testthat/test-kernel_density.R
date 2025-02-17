@@ -17,6 +17,12 @@ grid <- sf::st_set_geometry(
   "random_geom_column_name"
 )
 result <- kernel_density(data = data_sf, grid = grid, bandwidth = 10000)
+result_wt <- kernel_density(
+  data = data_sf,
+  grid = grid,
+  bandwidth = 10000,
+  weights = "wt"
+)
 
 
 
@@ -29,19 +35,25 @@ result <- kernel_density(data = data_sf, grid = grid, bandwidth = 10000)
 ## Errors ----
 
 test_that("error if `data` has lon/lat co-ordinates", {
-  expect_error(kernel_density(
-    data = sf::st_transform(data_sf, 4326),
-    grid = grid,
-    bandwidth = 10000
-  ))
+  expect_error(
+    kernel_density(
+      data = sf::st_transform(data_sf, 4326),
+      grid = grid,
+      bandwidth = 10000
+    ),
+    "Cannot calculate KDE values for lon/lat data"
+  )
 })
 
 test_that("error if `data` has no CRS", {
-  expect_error(kernel_density(
-    data = data_missing_crs,
-    grid = grid,
-    bandwidth = 10000
-  ))
+  expect_error(
+    kernel_density(
+      data = data_missing_crs,
+      grid = grid,
+      bandwidth = 10000
+    ),
+    "is missing"
+  )
 })
 
 test_that("error if `grid` is not an SF object containing polygons", {
@@ -88,9 +100,17 @@ test_that("error if `bandwidth_adjust` is not a single positive number", {
 })
 
 test_that("error if `weights` is not the name of a column in the data", {
-  expect_error(kernel_density(data = data_sf, grid = grid, weights = "blah"))
-  expect_error(kernel_density(data = data_sf, grid = grid, weights = wts))
-  expect_error(kernel_density(data = data_sf, grid = grid, weights = date))
+  expect_error(
+    kernel_density(data = data_sf, grid = grid, weights = "blah"),
+    "`weights` must be NULL or the name of a single column"
+  )
+})
+
+test_that("error if `weights` is not numeric", {
+  expect_error(
+    kernel_density(data = data_sf, grid = grid, weights = "date"),
+    "name of a column of numeric values"
+  )
 })
 
 test_that("error if `quiet` is not `TRUE` or `FALSE`", {
@@ -112,12 +132,23 @@ test_that("error if `quiet` is not `TRUE` or `FALSE`", {
 test_that("output is an SF tibble", {
   # Multiple tests are needed here to get 100% coverage for this function
   expect_s3_class(result, "sf")
+  expect_s3_class(result_wt, "sf")
   expect_s3_class(kernel_density(data = data_sf, grid = grid), "sf")
   expect_s3_class(
     kernel_density(
       data = data_sf,
       grid = grid,
       bandwidth = 10000,
+      quiet = FALSE
+    ),
+    "sf"
+  )
+  expect_s3_class(
+    kernel_density(
+      data = data_sf,
+      grid = grid,
+      bandwidth = 10000,
+      weights = "wt",
       quiet = FALSE
     ),
     "sf"

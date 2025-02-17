@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">sfhotspot</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,12 +36,23 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.9.0" id="sfhotspot-090">sfhotspot 0.9.0<a class="anchor" aria-label="anchor" href="#sfhotspot-090"></a></h2>
-<ul><li>New dataset <code>memphis_precincts</code> showing Memphis Police Department precincts, which is required to test the new functionality of <code><a href="../reference/hotspot_grid.html">hotspot_grid()</a></code>.</li>
-<li>Fixed bug where columns present in polygons objects provided to <code>count_points_in_polygons()</code> (e.g. by <code><a href="../reference/hotspot_count.html">hotspot_count()</a></code>) were removed, which made <code><a href="../reference/hotspot_count.html">hotspot_count()</a></code> less useful for counting points in polygons with names or other attributes stored in the original polygon object (<a href="https://github.com/mpjashby/sfhotspot/issues/41" class="external-link">#41</a>).</li>
-<li>Fixed bug where <code><a href="../reference/hotspot_grid.html">hotspot_grid()</a></code> created a grid based on the convex hull of the input geometry even if the input was a polygon rather than points (<a href="https://github.com/mpjashby/sfhotspot/issues/42" class="external-link">#42</a>).</li>
-<li>Fixed bug where warning about grids with very large numbers of cells was printed only after the grid was (slowly) created (<a href="https://github.com/mpjashby/sfhotspot/issues/33" class="external-link">#33</a>).</li>
-<li>Fixed bug where <code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> erroneously reported an automatically generated cell size even when a grid was supplied (<a href="https://github.com/mpjashby/sfhotspot/issues/38" class="external-link">#38</a>).</li>
+<h2 class="pkg-version" data-toc-text="0.9.1" id="sfhotspot-091">sfhotspot 0.9.1<a class="anchor" aria-label="anchor" href="#sfhotspot-091"></a></h2>
+<ul><li>
+<code><a href="../reference/hotspot_grid.html">hotspot_grid()</a></code> handles non-multipolygon input geometries (<a href="https://github.com/mpjashby/sfhotspot/issues/46" class="external-link">#46</a>).</li>
+<li>
+<code><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde()</a></code>, <code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> and <code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code> now warn if KDE bandwidth is smaller than cell size (<a href="https://github.com/mpjashby/sfhotspot/issues/29" class="external-link">#29</a>).</li>
+<li>Conditions now formatted with the cli package and following the Tidyverse Style Guide for errors (<a href="https://github.com/mpjashby/sfhotspot/issues/47" class="external-link">#47</a>).</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.9.0" id="sfhotspot-090">sfhotspot 0.9.0<a class="anchor" aria-label="anchor" href="#sfhotspot-090"></a></h2><p class="text-muted">CRAN release: 2025-02-10</p>
+<ul><li>
+<code>count_points_in_polygons()</code> now passes through columns in the original dataset, which makes <code><a href="../reference/hotspot_count.html">hotspot_count()</a></code> more useful (<a href="https://github.com/mpjashby/sfhotspot/issues/41" class="external-link">#41</a>).</li>
+<li>
+<code><a href="../reference/hotspot_grid.html">hotspot_grid()</a></code> if provided with polygons now bases the grid on the boundary of the polygons rather than the convex hull of the boundary (<a href="https://github.com/mpjashby/sfhotspot/issues/42" class="external-link">#42</a>).</li>
+<li>New dataset <code>memphis_precincts</code> showing Memphis Police Department precincts, which is required to test the new functionality of <code><a href="../reference/hotspot_grid.html">hotspot_grid()</a></code>.</li>
+<li>
+<code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> now extracts nearest neighbour distance from provided grid and does not wrongly rely on (and report) an automatically generated cell size (<a href="https://github.com/mpjashby/sfhotspot/issues/38" class="external-link">#38</a>).</li>
+<li>Warnings about grids containing very large numbers of cells is now printed before the cells are created, helping explain why code may be running slower than expected (<a href="https://github.com/mpjashby/sfhotspot/issues/33" class="external-link">#33</a>).</li>
 <li>Improved error message produced when point data and provided grid do not overlap (<a href="https://github.com/mpjashby/sfhotspot/issues/39" class="external-link">#39</a>).</li>
 <li>Suppressed progress bar previously included in README (<a href="https://github.com/mpjashby/sfhotspot/issues/36" class="external-link">#36</a>).</li>
 </ul></div>

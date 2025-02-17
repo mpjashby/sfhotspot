@@ -47,13 +47,13 @@ create_grid <- function(
 ) {
 
   # Check inputs
-  if (!inherits(data, "sf"))
-    rlang::abort("`data` must be an SF object")
-  if (!rlang::is_null(cell_size) & !rlang::is_double(cell_size, n = 1))
-    rlang::abort("`cell_size` must be `NULL` or a single numeric value")
-  if (!rlang::is_null(cell_size)) {
-    if (cell_size <= 0) rlang::abort("`cell_size` must be greater than zero")
-  }
+  validate_sf(
+    data,
+    allow_null = TRUE,
+    quiet = quiet,
+    call = rlang::caller_env()
+  )
+  validate_cell_size(cell_size, call = rlang::caller_env())
   rlang::arg_match(grid_type, c("rect", "hex"))
 
   # Set cell size if not specified
@@ -63,8 +63,9 @@ create_grid <- function(
   # Create buffered convex hull around data
   geometry_types <- as.character(sf::st_geometry_type(data))
   if (all(geometry_types %in% c("POLYGON", "MULTIPOLYGON"))) {
+    input_boundary <- sf::st_boundary(sf::st_union(data))
     hull <- sf::st_buffer(
-      sf::st_cast(sf::st_boundary(sf::st_union(data)), "MULTIPOLYGON"),
+      sf::st_cast(sf::st_cast(input_boundary, "POLYGON"), "MULTIPOLYGON"),
       dist = cell_size / 2
     )
   } else {
@@ -82,17 +83,16 @@ create_grid <- function(
     # Although this is a warning, warnings are only printed when a function
     # finishes, which is no use. Messages are printed immediately, so this has
     # to be a message. See https://github.com/mpjashby/sfhotspot/issues/33
-    rlang::inform(
+    cli::cli_inform(
       c(
-        "The grid will contain a large number of cells",
-        "!" = "This may cause other functions to run slowly or not work",
-        "i" = paste(
-          "Consider setting `cell_size` to a larger value or clipping your",
-          "data to a smaller area using `st_intersection()`"
+        "!" = "The grid will contain a large number of cells",
+        "i" = "This may cause other functions to run slowly or not work",
+        "i" = paste0(
+          "Use larger {.arg cell_size} or clip {.var data} to a smaller area ",
+          "using {.fn st_intersection()}"
         )
       ),
-      call = rlang::caller_env(),
-      use_cli_format = TRUE
+      call = rlang::caller_env()
     )
   }
 
@@ -121,16 +121,15 @@ create_grid <- function(
 
   # Error if there are no valid rows in the data
   if (nrow(result) == 0 | !inherits(result, "sf"))
-    rlang::abort(
+    cli::cli_abort(
       c(
-        "Could not create a grid of cells from the supplied point data",
+        "Could not create a grid of cells from supplied point data.",
         "i" = paste(
-          "try plotting `data` to check the points it contains can be",
-          "meaningfully covered by a grid"
+          "Try plotting {.var data} to check the points it contains can be",
+          "meaningfully covered by a grid."
         )
       ),
-      call = rlang::caller_env(),
-      use_cli_format = TRUE
+      call = rlang::caller_env()
     )
 
   # Return result

@@ -11,7 +11,7 @@ distributed randomly."><meta property="og:image" content="http://pkgs.lesscrime.
 
     <a class="navbar-brand me-2" href="../index.html">sfhotspot</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -226,7 +226,8 @@ doi:<a href="https://doi.org/10.1111/j.1538-4632.1992.tb00261.x" class="external
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu">hotspot_gistar</span><span class="op">(</span><span class="va">memphis_robberies_utm</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Cell size set to 500 metres automatically</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Bandwidth set to 8,877 metres automatically based on rule of thumb</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Bandwidth set automatically based on rule of thumb.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Bandwidth = 8,877 metres.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 2715 features and 4 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: POLYGON</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
@@ -253,7 +254,8 @@ doi:<a href="https://doi.org/10.1111/j.1538-4632.1992.tb00261.x" class="external
 <span class="r-in"><span><span class="co"># specified in metres</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu">hotspot_gistar</span><span class="op">(</span><span class="va">memphis_robberies_utm</span>, cell_size <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Bandwidth set to 8,877 metres automatically based on rule of thumb</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Bandwidth set automatically based on rule of thumb.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Bandwidth = 8,877 metres.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 16133 features and 4 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: POLYGON</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
@@ -281,9 +283,9 @@ doi:<a href="https://doi.org/10.1111/j.1538-4632.1992.tb00261.x" class="external
 <span class="r-in"><span><span class="co"># underlying function.</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu">hotspot_gistar</span><span class="op">(</span><span class="va">memphis_robberies</span>, kde <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The co-ordinates in `data` are latitudes and longitudes</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> `cell_size` and `bandwidth` will be in decimal degrees</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">ℹ</span> Consider transforming `data` to use a projected CRS</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The co-ordinates in `data` are latitudes and longitudes.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> `cell_size`/`bandwidth` will be in decimal degrees.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Consider transforming `data` to use a projected CRS.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Cell size set to 0.00524 degrees automatically</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 2926 features and 3 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: POLYGON</span>

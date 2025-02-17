@@ -11,8 +11,6 @@ status](https://www.r-pkg.org/badges/version/sfhotspot)](https://CRAN.R-project.
 checks](https://badges.cranchecks.info/worst/sfhotspot.svg)](https://cran.r-project.org/web/checks/check_results_sfhotspot.html)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-[![Codecov test
-coverage](https://codecov.io/gh/mpjashby/sfhotspot/graph/badge.svg)](https://app.codecov.io/gh/mpjashby/sfhotspot)
 <!-- badges: end -->
 
 sfhotspot provides functions to identify and understand clusters of
@@ -78,7 +76,7 @@ library(tidyverse)
 #> ✔ forcats   1.0.0     ✔ stringr   1.5.1
 #> ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
 #> ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-#> ✔ purrr     1.0.2
+#> ✔ purrr     1.0.4
 #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 #> ✖ dplyr::filter() masks stats::filter()
 #> ✖ dplyr::lag()    masks stats::lag()

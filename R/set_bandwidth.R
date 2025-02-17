@@ -1,4 +1,4 @@
-#' Automatically determine a suitable cell size for a two-dimensional grid
+#' Automatically determine a suitable bandwidth for a two-dimensional grid
 #'
 #' @param data \code{\link[sf]{sf}} data frame containing points.
 #' @param adjust single positive \code{numeric} value by which the returned
@@ -48,19 +48,20 @@ set_bandwidth <- function(data, adjust = 1, quiet = TRUE, label = "") {
   )
 
   if (rlang::is_false(quiet)) {
-    rlang::inform(paste0(
-      ifelse(adjust != 1, "Adjusted bandwidth", "Bandwidth"),
-      ifelse(label != "", paste0(" ", label), ""),
-      " set to ", format(bandwidth_adjust, big.mark = ","), " ", unit_pl,
-      ifelse(
-        adjust != 1,
-        paste0(
-          " (", adjust, " * ", format(bandwidth_report, big.mark = ","), " ",
-          unit_pl, ")"
-        ),
-        ""
-      ),
-      " automatically based on rule of thumb"
+    if (adjust != 1) {
+      adj_msg <- cli::format_inline(
+        " ({adjust} * {format(bandwidth_adjust, big.mark = ',')} {unit_pl})"
+      )
+    } else {
+      adj_msg <- ""
+    }
+    if (label != "") label <- paste0(" ", label)
+    cli::cli_inform(c(
+      "Bandwidth set automatically based on rule of thumb.",
+      "i" = paste0(
+        "{ifelse(adjust != 1, 'Adjusted bandwidth', 'Bandwidth')}{label} = ",
+        "{format(bandwidth_adjust, big.mark = ',')} {unit_pl}{adj_msg}."
+      )
     ))
   }
 

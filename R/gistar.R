@@ -57,37 +57,33 @@ gistar <- function(
   n <- rlang::as_name(rlang::enquo(n))
 
   # Check inputs
-  if (!inherits(counts, "sf"))
-    rlang::abort("`counts` must be an SF object")
+  validate_sf(counts, "counts", quiet = quiet, call = rlang::caller_env())
   if (!n %in% names(counts))
-    rlang::abort("`n` must be the name of a column in the `counts` object")
+    cli::cli_abort(
+      "{.var n} must be the name of a column in the {.var counts} object"
+    )
   if (!rlang::is_double(counts[[n]]))
-    rlang::abort("The column specified in `n` must be numeric")
-  if (!rlang::is_null(cell_size) & !rlang::is_double(cell_size, n = 1))
-    rlang::abort("`cell_size` must be `NULL` or a single numeric value")
-  if (!rlang::is_null(cell_size)) {
-    if (cell_size <= 0) rlang::abort("`cell_size` must be greater than zero")
-  }
+    cli::cli_abort("The column specified in {.var n} must be numeric")
+  validate_cell_size(cell_size)
   if (!rlang::is_null(nb_dist) & !rlang::is_double(nb_dist, n = 1))
-    rlang::abort("`nb_dist` must be `NULL` or a single numeric value")
+    cli::cli_abort("{.var nb_dist} must be a single numeric value or NULL")
   if (!rlang::is_null(nb_dist))
-    if (nb_dist <= 0) rlang::abort("`nb_dist` must be greater than zero")
+    if (nb_dist <= 0) cli::cli_abort("{.var nb_dist} must be greater than zero")
   if (!rlang::is_logical(include_self, n = 1))
-    rlang::abort("`include_self` must be `TRUE` or `FALSE`")
+    cli::cli_abort("{.arg include_self} must be {.q TRUE} or {.q FALSE}")
   if (!rlang::is_null(p_adjust_method)) {
-    if (length(p_adjust_method) != 1)
-      rlang::abort(paste0(
-        "`p_adjust_method` must be either `NULL` or one of \"",
-        paste(stats::p.adjust.methods, collapse = "\", \""), "\""
+    if (
+      length(p_adjust_method) != 1 |
+      !p_adjust_method %in% stats::p.adjust.methods
+    ) {
+      cli::cli_abort(paste0(
+        "{.arg p_adjust_method} must be NULL or one of ",
+        "{.or {.val {stats::p.adjust.methods}}}"
       ))
-    if (!p_adjust_method %in% stats::p.adjust.methods)
-      rlang::abort(paste0(
-        "`p_adjust_method` must be either `NULL` or one of \"",
-        paste(stats::p.adjust.methods, collapse = "\", \""), "\""
-      ))
+    }
   }
   if (!rlang::is_logical(quiet, n = 1))
-    rlang::abort("`quiet` must be one of `TRUE` or `FALSE`")
+    cli::cli_abort("{.arg quiet} must be one of {.q TRUE} or {.q FALSE}")
 
   # Replace name of geometry column in SF objects if necessary
   counts <- set_geometry_name(counts)

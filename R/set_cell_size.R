@@ -27,12 +27,11 @@
 set_cell_size <- function(data, round = TRUE, quiet = TRUE) {
 
   # Check inputs
-  if (!inherits(data, "sf"))
-    rlang::abort("`data` must be an SF object")
+  validate_sf(data, quiet = quiet, call = rlang::caller_env())
   if (!rlang::is_logical(round))
-    rlang::abort("`round` must be `TRUE` or `FALSE`")
+    cli::cli_abort("{.arg round} must be one of {.q TRUE} or {.q FALSE}")
   if (!rlang::is_logical(quiet))
-    rlang::abort("`quiet` must be `TRUE` or `FALSE`")
+    cli::cli_abort("{.arg quiet} must be one of {.q TRUE} or {.q FALSE}")
 
   # Set constants
   num_cells <- 50
@@ -43,7 +42,7 @@ set_cell_size <- function(data, round = TRUE, quiet = TRUE) {
 
   # Replace empty unit to prevent the error described at
   # https://github.com/mpjashby/sfhotspot/issues/9
-  if (rlang::is_empty(unit)) unit <- "unknown"
+  if (rlang::is_empty(unit) | rlang::is_null(unit)) unit <- "unknown"
 
   # Find plural form of unit
   unit_pl <- ifelse(
@@ -84,17 +83,12 @@ set_cell_size <- function(data, round = TRUE, quiet = TRUE) {
   }
 
   if (rlang::is_false(quiet)) {
-    rlang::inform(
-      c(
-        paste(
-          "Cell size set to",
-          format(cell_size, big.mark = ","),
-          unit_pl,
-          "automatically"
-        )
+    cli::cli_inform(
+      paste0(
+        "Cell size set to {format(cell_size, big.mark = ',')} {unit_pl} ",
+        "automatically"
       ),
-      call = rlang::caller_env(),
-      use_cli_format = TRUE
+      call = rlang::caller_env()
     )
   }
 

@@ -54,3 +54,17 @@ test_that("columns in output have the required types", {
   expect_type(result$kde, "double")
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
 })
+
+test_that("no issues if cell size extracted from grid", {
+  expect_no_condition(
+    hotspot_kde(
+      data_sf,
+      grid = hotspot_grid(data_sf, cell_size = 1000),
+      bandwidth = 10000
+    )
+  )
+})
+
+test_that("no issues if cell size is set automatically", {
+  expect_message(hotspot_kde(data_sf, bandwidth = 10000), "Cell size set to")
+})
