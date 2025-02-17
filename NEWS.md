@@ -1,11 +1,20 @@
+# sfhotspot 0.9.1
+
+* `hotspot_grid()` handles non-multipolygon input geometries (#46).
+* `hotspot_dual_kde()`, `hotspot_gistar()` and `hotspot_kde()` now warn if 
+  KDE bandwidth is smaller than cell size (#29).
+* Conditions now formatted with the cli package and following the Tidyverse
+  Style Guide for errors (#47).
+
+
 # sfhotspot 0.9.0
 
-* New dataset `memphis_precincts` showing Memphis Police Department precincts,
-  which is required to test the new functionality of `hotspot_grid()`.
 * `count_points_in_polygons()` now passes through columns in the original 
   dataset, which makes `hotspot_count()` more useful (#41).
 * `hotspot_grid()` if provided with polygons now bases the grid on the
   boundary of the polygons rather than the convex hull of the boundary (#42).
+* New dataset `memphis_precincts` showing Memphis Police Department precincts,
+  which is required to test the new functionality of `hotspot_grid()`.
 * `hotspot_gistar()` now extracts nearest neighbour distance from provided grid
   and does not wrongly rely on (and report) an automatically generated cell
   size (#38).

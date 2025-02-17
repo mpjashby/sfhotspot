@@ -177,7 +177,7 @@ hotspot_classify <- function(
       unlist(lapply(data, rlang::inherits_any, c("Date", "POSIXt")))
     )
     if (length(date_cols) > 1) {
-      rlang::abort(c(
+      cli::cli_abort(c(
         paste0(
           "More than one column in {.var data} contains ",
           "{.cls {c('Date', 'POSIXt')}} values."
