@@ -3,6 +3,8 @@
 * `hotspot_grid()` handles non-multipolygon input geometries (#46).
 * `hotspot_dual_kde()`, `hotspot_gistar()` and `hotspot_kde()` now warn if 
   KDE bandwidth is smaller than cell size (#29).
+* `count_points_in_polygons()` (which is used internally to count points in
+  all the `hotspot_*()` family of functions) now respects `quiet = TRUE` (#52).
 * Conditions now formatted with the cli package and following the Tidyverse
   Style Guide for errors (#47).
 

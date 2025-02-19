@@ -288,9 +288,14 @@ hotspot_dual_kde <- function(
   # COUNT POINTS ---------------------------------------------------------------
 
   if (rlang::is_chr_na(weights_x)) {
-    counts <- count_points_in_polygons(x, grid)
+    counts <- count_points_in_polygons(x, grid, quiet = quiet)
   } else {
-    counts <- count_points_in_polygons(x, grid, weights = weights_x)
+    counts <- count_points_in_polygons(
+      x,
+      grid,
+      weights = weights_x,
+      quiet = quiet
+    )
   }
 
   # Check if any points in `y` were not counted in polygons because the polygons

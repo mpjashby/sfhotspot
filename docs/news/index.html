@@ -41,6 +41,8 @@
 <code><a href="../reference/hotspot_grid.html">hotspot_grid()</a></code> handles non-multipolygon input geometries (<a href="https://github.com/mpjashby/sfhotspot/issues/46" class="external-link">#46</a>).</li>
 <li>
 <code><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde()</a></code>, <code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> and <code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code> now warn if KDE bandwidth is smaller than cell size (<a href="https://github.com/mpjashby/sfhotspot/issues/29" class="external-link">#29</a>).</li>
+<li>
+<code>count_points_in_polygons()</code> (which is used internally to count points in all the <code>hotspot_*()</code> family of functions) now respects <code>quiet = TRUE</code> (<a href="https://github.com/mpjashby/sfhotspot/issues/52" class="external-link">#52</a>).</li>
 <li>Conditions now formatted with the cli package and following the Tidyverse Style Guide for errors (<a href="https://github.com/mpjashby/sfhotspot/issues/47" class="external-link">#47</a>).</li>
 </ul></div>
     <div class="section level2">

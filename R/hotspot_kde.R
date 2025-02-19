@@ -131,7 +131,7 @@ hotspot_kde <- function(
 
   # Count points and calculate KDE
   if (rlang::is_chr_na(weights)) {
-    counts <- count_points_in_polygons(data, grid)
+    counts <- count_points_in_polygons(data, grid, quiet = quiet)
     kde_val <- kernel_density(
       data,
       grid,
@@ -142,7 +142,12 @@ hotspot_kde <- function(
       ...
     )
   } else {
-    counts <- count_points_in_polygons(data, grid, weights = weights)
+    counts <- count_points_in_polygons(
+      data,
+      grid,
+      weights = weights,
+      quiet = quiet
+    )
     kde_val <- kernel_density(
       data,
       grid,

@@ -86,9 +86,14 @@ hotspot_count <- function(
 
   # Count points
   if (rlang::is_chr_na(weights)) {
-    counts <- count_points_in_polygons(data, grid)
+    counts <- count_points_in_polygons(data, grid, quiet = quiet)
   } else {
-    counts <- count_points_in_polygons(data, grid, weights = weights)
+    counts <- count_points_in_polygons(
+      data,
+      grid,
+      weights = weights,
+      quiet = quiet
+    )
   }
 
   # Return result
