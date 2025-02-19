@@ -395,7 +395,7 @@ hotspot_classify <- function(
           "i" = "Consider changing {.arg period} or {.arg start}."
         ))
       } else {
-        counted <- count_points_in_polygons(x, polygons = grid)
+        counted <- count_points_in_polygons(x, polygons = grid, quiet = quiet)
       }
 
       # Return result

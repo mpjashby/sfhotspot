@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   introduction: introduction.html
-last_built: 2025-02-17T14:17Z
+last_built: 2025-02-19T17:04Z
 urls:
   reference: http://pkgs.lesscrime.info/sfhotspot/reference
   article: http://pkgs.lesscrime.info/sfhotspot/articles

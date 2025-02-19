@@ -261,8 +261,8 @@ hotspot_change <- function(
   }
 
   # Count points in before/after periods
-  points_before <- count_points_in_polygons(data_before, grid)
-  points_after <- count_points_in_polygons(data_after, grid)
+  points_before <- count_points_in_polygons(data_before, grid, quiet = quiet)
+  points_after <- count_points_in_polygons(data_after, grid, quiet = quiet)
 
   # Construct final object
   grid$n_before <- points_before$n

@@ -9,7 +9,12 @@
 #'
 #' @noRd
 
-count_points_in_polygons <- function(points, polygons, weights = NULL) {
+count_points_in_polygons <- function(
+    points,
+    polygons,
+    weights = NULL,
+    quiet = TRUE
+  ) {
 
   # Check inputs
   validate_sf(points, label = "points", type = "POINT")
@@ -25,30 +30,34 @@ count_points_in_polygons <- function(points, polygons, weights = NULL) {
   }
 
   # Warn if polygons object contains column names used internally
-  if ("n" %in% names(polygons)) {
+  if ("n" %in% names(polygons) & rlang::is_false(quiet)) {
     cli::cli_warn(c(
       "Existing column {.var n} will be overwritten.",
       "i" = "Consider renaming the existing column first."
     ))
   }
-  if (".polygon_id" %in% names(polygons)) {
+  if (".polygon_id" %in% names(polygons) & rlang::is_false(quiet)) {
     cli::cli_warn(c(
       "Existing column {.var .polygon_id} will be removed.",
       "i" = "Consider renaming the existing column first."
     ))
   }
-  if ("x" %in% names(polygons)) {
+  if ("x" %in% names(polygons) & rlang::is_false(quiet)) {
     cli::cli_warn(c(
       "Existing column {.var x} will be removed.",
       "i" = "Consider renaming the existing column first."
     ))
   }
-  if (!rlang::is_null(weights) & "sum" %in% names(polygons)) {
+  if (
+    !rlang::is_null(weights) &
+    "sum" %in% names(polygons) &
+    rlang::is_false(quiet)
+  ) {
     cli::cli_warn(c(
       "Existing column {.var sum} will be overwritten.",
       "i" = "Consider renaming the existing column first."
     ))
-  } else if ("sum" %in% names(polygons)) {
+  } else if ("sum" %in% names(polygons) & rlang::is_false(quiet)) {
     cli::cli_warn(c(
       "Existing column {.var sum} will be removed.",
       "i" = "Consider renaming the existing column first."
@@ -93,7 +102,7 @@ count_points_in_polygons <- function(points, polygons, weights = NULL) {
 
   # Check if any points were not counted in polygons (e.g. because the polygons
   # do not cover all the points)
-  if (nrow(points) > sum(counts$n)) {
+  if (nrow(points) > sum(counts$n) & rlang::is_false(quiet)) {
     cli::cli_warn(
       paste0(
         "{format(nrow(points) - sum(counts$n), big.mark = ',')} point{?s} ",

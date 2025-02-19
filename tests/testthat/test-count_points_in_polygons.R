@@ -59,8 +59,18 @@ test_that("error if `weights` is not NULL or the name of a colum in `points`", {
 
 test_that("warning if some points outside polygons", {
   expect_warning(
-    count_points_in_polygons(points_outside, polygons = polygons),
+    count_points_in_polygons(
+      points_outside,
+      polygons = polygons,
+      quiet = FALSE
+    ),
     "outside the area covered by the supplied polygons"
+  )
+})
+
+test_that("no warning if points outside polygons but `quiet = TRUE` (#52)", {
+  expect_no_warning(
+    count_points_in_polygons(points_outside, polygons = polygons, quiet = TRUE)
   )
 })
 
@@ -69,7 +79,11 @@ test_that("warning if `polygons` includes column names used internally", {
   expect_warning(
     {
       polygons_warn$n <- 1
-      count_points_in_polygons(points = data_sf, polygons = polygons_warn)
+      count_points_in_polygons(
+        points = data_sf,
+        polygons = polygons_warn,
+        quiet = FALSE
+      )
       polygons_warn$n <- NULL
     },
     regexp = "Existing column `n` will be overwritten."
@@ -77,7 +91,11 @@ test_that("warning if `polygons` includes column names used internally", {
   expect_warning(
     {
       polygons_warn$`.polygon_id` <- 1
-      count_points_in_polygons(points = data_sf, polygons = polygons_warn)
+      count_points_in_polygons(
+        points = data_sf,
+        polygons = polygons_warn,
+        quiet = FALSE
+      )
       polygons_warn$`.polygon_id` <- NULL
     },
     regexp = "Existing column `.polygon_id` will be removed."
@@ -85,7 +103,11 @@ test_that("warning if `polygons` includes column names used internally", {
   expect_warning(
     {
       polygons_warn$sum <- 1
-      count_points_in_polygons(points = data_sf, polygons = polygons_warn)
+      count_points_in_polygons(
+        points = data_sf,
+        polygons = polygons_warn,
+        quiet = FALSE
+      )
       polygons_warn$sum <- NULL
     },
     regexp = "Existing column `sum` will be removed."
@@ -96,7 +118,8 @@ test_that("warning if `polygons` includes column names used internally", {
       count_points_in_polygons(
         points = data_sf,
         polygons = polygons_warn,
-        weights = "wt"
+        weights = "wt",
+        quiet = FALSE
       )
       polygons_warn$sum <- NULL
     },
@@ -105,7 +128,11 @@ test_that("warning if `polygons` includes column names used internally", {
   expect_warning(
     {
       polygons_warn$x <- 1
-      count_points_in_polygons(points = data_sf, polygons = polygons_warn)
+      count_points_in_polygons(
+        points = data_sf,
+        polygons = polygons_warn,
+        quiet = FALSE
+      )
       polygons_warn$x <- NULL
     },
     regexp = "Existing column `x` will be removed."
