@@ -2,10 +2,12 @@
 
 0 errors | 0 warnings | 0 notes
 
-Apologies for the release one week after the previous one, but v0.9.0 introduced
-a bug that is now fixed in v0.9.1.
+Apologies for the submission one week after the previous one, but v0.9.0 
+introduced a bug (#46) that is now fixed in v0.9.1.
 
-Checks at https://cran.r-project.org/web/checks/check_results_sfhotspot.html
-currently show an error on r-devel-macos-arm64 due to the package terra not
-being found. I cannot replicate this locally and looking at other packages it 
-appears to be a transient issue with packages on that platform.
+CRAN currently shows an error "there is no package called 'terra'" for sfhotspot 
+on r-devel-macos-arm64. terra is a second-order dependency via SpatialKDE, but
+the current CRAN checks page for SpatialKDE and terra show no errors on 
+r-devel-macos-arm64 and I cannot replicate the error on macOS locally, so I
+suspect the error shown on CRAN checks is a configuration issue on the test
+server. There are no errors on any other systems.
