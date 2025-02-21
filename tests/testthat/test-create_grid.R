@@ -7,6 +7,11 @@ result_ply <- create_grid(
   data = sf::st_transform(memphis_precincts, "EPSG:2843")
 )
 
+precinct_40th <- sf::st_transform(
+  sf::read_sf(testthat::test_path("40th_precinct.gpkg")),
+  "EPSG:6538"
+)
+
 nc <- sf::read_sf(system.file("shape/nc.shp", package = "sf"))
 
 
@@ -79,6 +84,14 @@ test_that("output grid covers input geometry", {
     sf::st_covers(
       sf::st_union(result_ply),
       sf::st_union(sf::st_transform(memphis_precincts, "EPSG:2843")),
+      sparse = FALSE
+    )
+  )
+  expect_true(
+    # This test checks if #54 is fixed
+    sf::st_covers(
+      sf::st_union(hotspot_grid(precinct_40th, quiet = TRUE)),
+      sf::st_union(precinct_40th),
       sparse = FALSE
     )
   )

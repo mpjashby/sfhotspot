@@ -63,11 +63,7 @@ create_grid <- function(
   # Create buffered convex hull around data
   geometry_types <- as.character(sf::st_geometry_type(data))
   if (all(geometry_types %in% c("POLYGON", "MULTIPOLYGON"))) {
-    input_boundary <- sf::st_boundary(sf::st_union(data))
-    hull <- sf::st_buffer(
-      sf::st_cast(sf::st_cast(input_boundary, "POLYGON"), "MULTIPOLYGON"),
-      dist = cell_size / 2
-    )
+    hull <- sf::st_buffer(sf::st_union(data), dist = cell_size / 2)
   } else {
     hull <- sf::st_buffer(
       sf::st_convex_hull(sf::st_union(data)),
