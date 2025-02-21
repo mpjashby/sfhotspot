@@ -1,3 +1,8 @@
+# sfhotspot 0.9.2
+
+* `hotspot_grid()` handles certain invalid polygon geometries (#54).
+
+
 # sfhotspot 0.9.1
 
 * `hotspot_grid()` handles non-multipolygon input geometries (#46).
