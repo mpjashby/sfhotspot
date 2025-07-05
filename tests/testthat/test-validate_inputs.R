@@ -4,6 +4,7 @@ data_sf <- head(memphis_robberies, 10)
 grid <- hotspot_grid(data_sf, quiet = TRUE)
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
 grid_df <- as.data.frame(sf::st_drop_geometry(grid))
+data_sf_zero_rows <- data_sf[data_sf$offense_type == "non-existent",]
 data_sf_wrong_geo <- data_sf_all_empty <- data_sf_empty <- data_sf
 data_sf_empty$geometry[1] <- sf::st_point()
 data_sf_all_empty$geometry <- sf::st_sfc(sf::st_point())
@@ -56,6 +57,17 @@ test_that("error if `data` or `grid` are not SF objects of the correct type", {
       quiet = FALSE
     ),
     regexp = "must be an SF object with POLYGON or MULTIPOLYGON geometry"
+  )
+})
+
+test_that("`data` or `grid` have zero rows", {
+  expect_error(
+    validate_inputs(data = data_sf_zero_rows, quiet = FALSE),
+    regexp = "contains zero rows"
+  )
+  expect_error(
+    validate_inputs(data = data_sf, grid = data_sf_zero_rows, quiet = FALSE),
+    regexp = "contains zero rows"
   )
 })
 
