@@ -1,3 +1,8 @@
+# sfhotspot 1.0.0
+
+* Functions now return useful error if provided with an empty dataset (#58).
+
+
 # sfhotspot 0.9.2
 
 * `hotspot_grid()` handles certain invalid polygon geometries (#54).

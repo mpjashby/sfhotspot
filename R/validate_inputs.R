@@ -233,6 +233,19 @@ validate_sf <- function(
     )
   }
 
+  # Check that object has more than zero rows
+  if (nrow(obj) <= 0) {
+
+    cli::cli_abort(
+      c(
+        "{.var {label}} contains zero rows of data.",
+        "i" = "Has a previous line of code unexpectedly removed all rows?"
+      ),
+      call = call
+    )
+    
+  }
+
   # Check obj has no empty geometries
   empty <- sf::st_is_empty(obj)
 
