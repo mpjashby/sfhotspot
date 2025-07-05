@@ -49,6 +49,17 @@ test_that("message advising of calculated bandwidth", {
   )
 })
 
+test_that("adjusted bandwidth correctly reported", {
+  expect_message(
+    set_bandwidth(
+      st_transform_auto(data_sf, quiet = TRUE), 
+      adjust = 0.1, 
+      quiet = FALSE
+    ),
+    "1,195 metres"
+  )
+})
+
 
 
 # CHECK HELPER FUNCTIONS -------------------------------------------------------

@@ -50,7 +50,7 @@ set_bandwidth <- function(data, adjust = 1, quiet = TRUE, label = "") {
   if (rlang::is_false(quiet)) {
     if (adjust != 1) {
       adj_msg <- cli::format_inline(
-        " ({adjust} * {format(bandwidth_adjust, big.mark = ',')} {unit_pl})"
+        " ({adjust} * {format(bandwidth_report, big.mark = ',')} {unit_pl})"
       )
     } else {
       adj_msg <- ""
