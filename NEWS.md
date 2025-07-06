@@ -1,6 +1,9 @@
 # sfhotspot 1.0.0
 
+* New function `hotspot_clip()` added to extract points from an SF object inside 
+  the boundary of a polygon (#57).
 * Functions now return useful error if provided with an empty dataset (#58).
+* Adjusted bandwidth now reported accurately (#56).
 
 
 # sfhotspot 0.9.2
