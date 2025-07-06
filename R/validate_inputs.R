@@ -17,15 +17,22 @@ validate_inputs <- function(
   grid = NULL,
   quiet = TRUE,
   name_data = "data",
+  name_grid = "grid",
   call = rlang::caller_env()
 ) {
 
   # Validate `data` and `grid`
-  validate_sf(data, label = "data", type = "POINT", quiet = quiet, call = call)
+  validate_sf(
+    data, 
+    label = name_data, 
+    type = "POINT", 
+    quiet = quiet, 
+    call = call
+  )
   if (!rlang::is_null(grid)) {
     validate_sf(
       grid,
-      label = "grid",
+      label = name_grid,
       type = c("POLYGON", "MULTIPOLYGON"),
       allow_null = TRUE,
       quiet = quiet,
@@ -42,15 +49,15 @@ validate_inputs <- function(
       cli::cli_abort(
         c(
           paste0(
-            "{.var {name_data}} and {.var grid} must use the same co-ordinate ",
-            "reference system (CRS)."
+            "{.var {name_data}} and {.var {name_grid}} must use the same ",
+            "co-ordinate reference system (CRS)."
           ),
           "i" = paste0(
             "{.var {name_data}} uses CRS {.q {format(sf::st_crs(data))}} ",
             "({sf::st_crs(data, parameters = TRUE)$srid})."
           ),
           "i" = paste0(
-            "{.var grid} uses CRS {.q {format(sf::st_crs(grid))}} ",
+            "{.var {name_grid}} uses CRS {.q {format(sf::st_crs(grid))}} ",
             "({sf::st_crs(grid, parameters = TRUE)$srid})."
           )
         ),
@@ -68,7 +75,7 @@ validate_inputs <- function(
     if (rlang::is_false(check_overlap[1, 1])) {
       cli::cli_abort(
         c(
-          "{.var {name_data}} and {.var grid} must overlap.",
+          "{.var {name_data}} and {.var {name_grid}} must overlap.",
           "i" = "Check co-ordinates are correct (e.g. by mapping them)."
         ),
         call = call
