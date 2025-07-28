@@ -39,8 +39,6 @@ vignettes/*.pdf
 .Renviron
 .Rproj.user
 
-R/st_transform_auto.R
-
 /original_data/
 inst/doc
 /doc/
