@@ -44,6 +44,14 @@
 #'   multiple comparisons. \code{NULL} (the default) uses the default method
 #'   used by \code{\link[stats]{p.adjust}}, but any of the character values in
 #'   \code{stats::p.adjust.methods} may be specified.
+#' @param transform the underlying SpatialKDE package cannot calculate kernel
+#'   density for lon/lat data, so this must be transformed to use a projected
+#'   co-ordinate reference system. If this argument is \code{TRUE} (the 
+#'   default) and \code{sf::st_is_longlat(data)} is \code{TRUE}, \code{data} 
+#'   (and \code{grid} if provided) will be transformed automatically using 
+#'   \code{link{st_transform_auto}} before the kernel density is estimated and
+#'   transformed back afterwards. Set this argument to \code{FALSE} to suppress 
+#'   automatic transformation of the data.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{FALSE}.
@@ -143,6 +151,7 @@ hotspot_gistar <- function(
   nb_dist = NULL,
   include_self = TRUE,
   p_adjust_method = NULL,
+  transform = TRUE,
   quiet = FALSE,
   ...
 ) {
@@ -217,6 +226,7 @@ hotspot_gistar <- function(
         bandwidth = bandwidth,
         bandwidth_adjust = bandwidth_adjust,
         cell_size = cell_size,
+        transform = transform,
         quiet = quiet,
         ...
       )
@@ -236,6 +246,7 @@ hotspot_gistar <- function(
         bandwidth_adjust = bandwidth_adjust,
         weights = weights,
         cell_size = cell_size,
+        transform = transform,
         quiet = quiet,
         ...
       )

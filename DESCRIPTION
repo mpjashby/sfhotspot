@@ -1,6 +1,6 @@
 Package: sfhotspot
 Title: Hot-Spot Analysis with Simple Features
-Version: 0.9.2
+Version: 1.0.0
 Authors@R: 
     person("Matt", "Ashby", , "matthew.ashby@ucl.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4201-9239"))
@@ -34,9 +34,9 @@ Depends:
 Suggests:
     testthat (>= 3.0.0),
     lubridate,
-    knitr,
-    rmarkdown,
+    quarto,
     ggspatial
 LazyData: true
 Config/testthat/edition: 3
-VignetteBuilder: knitr
+VignetteBuilder: 
+  quarto

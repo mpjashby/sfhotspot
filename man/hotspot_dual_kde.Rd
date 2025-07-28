@@ -14,6 +14,7 @@ hotspot_dual_kde(
   method = "ratio",
   grid = NULL,
   weights = NULL,
+  transform = TRUE,
   quiet = FALSE,
   ...
 )
@@ -68,6 +69,15 @@ be used as the grid for which densities are estimated.}
 \item{weights}{\code{NULL} (the default) or a vector of length two giving
 either \code{NULL} or the name of a column in each of \code{x} and
 \code{y} to be used as weights for weighted counts and KDE values.}
+
+\item{transform}{the underlying SpatialKDE package cannot calculate kernel
+density for lon/lat data, so this must be transformed to use a projected
+co-ordinate reference system. If this argument is \code{TRUE} (the
+default) and \code{sf::st_is_longlat(x)} is \code{TRUE}, \code{x}, \code{y}
+and \code{grid} (if provided) will be transformed automatically using
+\code{link{st_transform_auto}} before the kernel density is estimated and
+transformed back afterwards. Set this argument to \code{FALSE} to suppress
+automatic transformation of the data.}
 
 \item{quiet}{if set to \code{TRUE}, messages reporting the values of any
 parameters set automatically will be suppressed. The default is

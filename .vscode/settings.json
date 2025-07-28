@@ -16,5 +16,7 @@
     "sfhotspot",
     "srid",
     "Tidyverse"
-  ]
+  ],
+"editor.tabSize": 4,
+"editor.codeActions.triggerOnFocusChange": false
 }

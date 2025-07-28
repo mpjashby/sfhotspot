@@ -1,40 +1,43 @@
 ---
 title: "Introduction to sfhotspot"
-output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to sfhotspot}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
+fig-align: center
+fig-asp: 0.7
+fig-width: 6
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.align = "center", 
-  fig.asp = 0.7,
-  fig.width = 6,
-  out.width = "80%"
-)
-```
+```{r}
+#| label: setup
+#| echo: false
+#| include: false
 
-```{r setup, echo=FALSE, include=FALSE}
 library(sf)
 library(sfhotspot)
 library(ggplot2)
 ```
 
-sfhotspot is a package for understanding patterns in data that represent points in space. You can use it to count points in different places, estimate the density of points, show changes in the distribution of points over time, identify places with more points than would be expected by chance, and classify areas based on the number of points in them during different periods.
+sfhotspot is a package for understanding patterns in data that represent points in space. You can use it to: 
+
+* count points in different places with `hotspot_count()`, 
+* estimate the density of points with `hotspot_kde()` and `hotspot_dual_kde()`, 
+* show changes in the distribution of points over time with `hotspot_change()`, 
+* identify places with more points than would be expected by chance with 
+  `hotspot_gistar()`, and 
+* classify areas based on the number of points in them during different periods 
+  with `hotspot_classify()`.
 
 The specific motivation for this package was to analyse the locations of crimes, but the functions should be useful for understanding patterns in points representing other features or events. The package is called sfhotspot because it works with (and -- where relevant -- produces) SF objects as produced by the [sf](https://r-spatial.github.io/sf/) package. sfhotspot also produces data that is [*tidy*](https://tidyr.tidyverse.org/articles/tidy-data.html), making it easy to use functions from packages such as [dplyr](https://dplyr.tidyverse.org/) to filter the results, etc. 
 
 All the functions in sfhotspot work on an SF data frame or tibble in which each row in the data represents a single point (e.g. the location of an event). In this introduction we will use the built-in `memphis_robberies` dataset to show how each of the `hotspot_*()` family of functions works. `memphis_robberies` contains details of `r format(nrow(memphis_robberies), big.mark = ",")` robberies in Memphis, Tennessee, in 2019.
 
-```{r, echo=FALSE}
-knitr::kable(
-  memphis_robberies[1:10, ], 
-  caption = "The included `memphis_robberies` dataset"
-)
+```{r}
+#| echo: false
+#| tbl-cap: "The included `memphis_robberies` dataset"
+
+memphis_robberies[1:10, ]
 ```
 
 We can plot this raw data, but the resulting plot is not very informative (even with the points made semi-transparent), since there are too many points to see clear patterns.
@@ -42,7 +45,7 @@ We can plot this raw data, but the resulting plot is not very informative (even 
 ```{r}
 #| fig.alt: >
 #|   A very basic point map showing the locations of individual robberies in
-#|   Memphis, TN. Each robbery is reprsented as a small, semi-transparent dot.
+#|   Memphis, TN. Each robbery is represented as a small, semi-transparent dot.
 
 ggplot(memphis_robberies) + 
   geom_sf(alpha = 0.1) + 
@@ -53,7 +56,7 @@ ggplot(memphis_robberies) +
 
 ## Counting points
 
-The `hotspot_count()` produces an SF object with counts for the number of points in (by default) each cell in a grid of cells. As with all the functions in the package, this can be customised in various ways -- see *Common arguments*, below.
+The `hotspot_count()` produces an SF object with counts for the number of points in (by default) each cell in a grid of cells. As with all the functions in the package, this can be customised in various ways -- see [*Common arguments*](#common-args), below.
 
 ```{r}
 point_counts <- hotspot_count(memphis_robberies)
@@ -83,28 +86,16 @@ ggplot() +
 
 ## Calculating kernel density
 
-The `hotspot_kde()` function can be used to calculate kernel density estimates for each cell in a grid. The kernel density estimation (KDE) can be customised using the `bandwidth` and `bandwidth_adjust` arguments. This function also accepts the argument explained in the *Common arguments* section, below.
+The `hotspot_kde()` function can be used to calculate kernel density estimates for each cell in a grid. The kernel density estimation (KDE) can be customised using the `bandwidth` and `bandwidth_adjust` arguments. This function also accepts the argument explained in the [*Common arguments*](#common-args) section, below.
 
-If you do not specify any optional arguments, `hotspot_kde()` will try to choose reasonable default values. The KDE algorithm requires projected co-ordinates (i.e. not longitudes and latitudes), so we must first transform the data to use an appropriate local projected co-ordinate system.
+If you do not specify any optional arguments, `hotspot_kde()` will try to choose reasonable default values.
 
-```r
-robbery_kde <- memphis_robberies |> 
-  st_transform("EPSG:2843") |> 
-  hotspot_kde()
+```{r}
+robbery_kde <- hotspot_kde(memphis_robberies)
 
 robbery_kde
 ```
 
-
-```{r, echo=FALSE, include=FALSE}
-robbery_kde <- memphis_robberies |> 
-  st_transform("EPSG:2843") |> 
-  hotspot_kde()
-```
-
-```{r echo=FALSE}
-robbery_kde
-```
 
 Again, we can plot the result.
 
@@ -129,14 +120,17 @@ We can adjust the appearance of the KDE layer on this map by specifying optional
 
 
 
-## Common arguments
+
+## Common arguments {#common-args}
 
 All the functions in this package work on a grid of cells, which can be customised using one or more of these common arguments:
 
   * `cell_size` specifies the size of each equally spaced grid cell, using the same units (metres, degrees, etc.) as used in the sf data frame given in the data argument. Ignored if `grid` is not `NULL`. If this argument and `grid` are both `NULL` (the default), the cell size will be calculated automatically.
   * `grid_type` specifies whether the grid should be made up of squares ("rect", the default) or hexagons ("hex"). Ignored if `grid` is not `NULL`.
   * `grid` specifies an `sf` data frame containing polygons, which will be used as the grid for which counts are made.
-  * `quiet` whether messages should be printed reporting the values of any parameters (such as `cell_size`) that have been set automatically.
+  * `quiet` whether messages/warnings should be printed, e.g. reporting the values of any parameters (such as `cell_size`) that have been set automatically.
+
+
 
 ### Automatic cell-size selection
 

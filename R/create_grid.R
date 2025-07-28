@@ -116,10 +116,19 @@ create_grid <- function(
   result <- result[sf::st_is(result$geometry, "POLYGON"), ]
 
   # Error if there are no valid rows in the data
-  if (nrow(result) == 0 | !inherits(result, "sf"))
+  if (nrow(result) == 0 | !inherits(result, "sf")) {
+    crs_name <- sf::st_crs(data)$Name
+    crs_code <- sf::st_crs(data)$epsg
+    crs_unit <- sf::st_crs(data)$units_gdal
+    if (is.numeric(crs_code)) crs_code <- paste0("EPSG:", crs_code)
     cli::cli_abort(
       c(
         "Could not create a grid of cells from supplied point data.",
+        "i" = paste(
+          "{.arg data} uses the {.val {crs_name}} co-ordinate system ",
+          "({.val {crs_code}})"
+        ),
+        "i" = "Unit of measurement for cell size: {.val {crs_unit}}.",
         "i" = paste(
           "Try plotting {.var data} to check the points it contains can be",
           "meaningfully covered by a grid."
@@ -127,7 +136,8 @@ create_grid <- function(
       ),
       call = rlang::caller_env()
     )
-
+  }
+  
   # Return result
   result
 

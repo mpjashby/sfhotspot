@@ -34,14 +34,23 @@ result_wt <- kernel_density(
 
 ## Errors ----
 
-test_that("error if `data` has lon/lat co-ordinates", {
+test_that("error if `data` has lon/lat co-ordinates and `transform = FALSE`", {
   expect_error(
     kernel_density(
-      data = sf::st_transform(data_sf, 4326),
+      data = sf::st_transform(data_sf, "EPSG:4326"),
       grid = grid,
-      bandwidth = 10000
+      bandwidth = 10000,
+      transform = FALSE
     ),
     "Cannot calculate KDE values for lon/lat data"
+  )
+  expect_no_error(
+    kernel_density(
+      data = sf::st_transform(data_sf, "EPSG:4326"),
+      grid = sf::st_transform(grid, "EPSG:4326"),
+      bandwidth = 10000,
+      transform = TRUE
+    )
   )
 })
 
@@ -69,9 +78,16 @@ test_that("error if `grid` is not an SF object containing polygons", {
   ))
 })
 
-test_that("error if `grid` has lon/lat co-ordinates", {
+test_that("error if `grid` has lon/lat co-ordinates and `transform = FALSE`", {
   expect_error(
     kernel_density(data = data_sf, grid = sf::st_transform(grid, 4326))
+  )
+  expect_no_error(
+    kernel_density(
+      data = sf::st_transform(data_sf, 4326), 
+      grid = sf::st_transform(grid, 4326), 
+      transform = TRUE
+    )
   )
 })
 
@@ -113,12 +129,40 @@ test_that("error if `weights` is not numeric", {
   )
 })
 
-test_that("error if `quiet` is not `TRUE` or `FALSE`", {
-  expect_error(kernel_density(
-    data = data_sf,
-    grid = grid,
-    bandwidth = 10000,
-    quiet = character())
+test_that("error if `transform` is not `TRUE`/`FALSE`", {
+  expect_error(
+    kernel_density(
+      data = data_sf,
+      grid = grid,
+      bandwidth = 10000,
+      transform = character()
+    )
+  )
+})
+
+test_that("error if `quiet` is not `TRUE`/`FALSE`", {
+  expect_error(
+    kernel_density(
+      data = data_sf,
+      grid = grid,
+      bandwidth = 10000,
+      quiet = character()
+    )
+  )
+})
+
+## Messages ----
+
+test_that("message if `data` has lon/lat co-ordinates", {
+  expect_message(
+    kernel_density(
+      data = sf::st_transform(data_sf, "EPSG:4326"),
+      grid = sf::st_transform(grid, "EPSG:4326"),
+      bandwidth = 10000,
+      transform = TRUE,
+      quiet = FALSE
+    ),
+    "Data transformed to"
   )
 })
 

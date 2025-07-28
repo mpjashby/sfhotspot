@@ -2,6 +2,11 @@
 
 * New function `hotspot_clip()` added to extract points from an SF object inside 
   the boundary of a polygon (#57).
+* By default lat/lon data is now transformed to use a projected co-ordinate
+  reference system before kernel density estimation and then transformed
+  back afterwards (previously trying to run KDE on lat/lon data resulted in an
+  error). Datasets can also be automatically transformed to/from lat/lon using 
+  `st_transform_auto()` (#48).
 * Functions now return useful error if provided with an empty dataset (#58).
 * Adjusted bandwidth now reported accurately (#56).
 

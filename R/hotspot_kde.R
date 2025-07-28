@@ -22,6 +22,14 @@
 #'   be used as the grid for which densities are estimated.
 #' @param weights \code{NULL} or the name of a column in \code{data} to be used
 #'   as weights for weighted counts and KDE values.
+#' @param transform the underlying SpatialKDE package cannot calculate kernel
+#'   density for lon/lat data, so this must be transformed to use a projected
+#'   co-ordinate reference system. If this argument is \code{TRUE} (the 
+#'   default) and \code{sf::st_is_longlat(data)} is \code{TRUE}, \code{data} 
+#'   (and \code{grid} if provided) will be transformed automatically using 
+#'   \code{link{st_transform_auto}} before the kernel density is estimated and
+#'   transformed back afterwards. Set this argument to \code{FALSE} to suppress 
+#'   automatic transformation of the data.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{FALSE}.
@@ -89,6 +97,7 @@ hotspot_kde <- function(
   bandwidth_adjust = 1,
   grid = NULL,
   weights = NULL,
+  transform = TRUE,
   quiet = FALSE,
   ...
 ) {
@@ -138,6 +147,7 @@ hotspot_kde <- function(
       bandwidth = bandwidth,
       bandwidth_adjust = bandwidth_adjust,
       cell_size = cell_size,
+      transform = transform,
       quiet = quiet,
       ...
     )
@@ -155,6 +165,7 @@ hotspot_kde <- function(
       bandwidth_adjust = bandwidth_adjust,
       weights = weights,
       cell_size = cell_size,
+      transform = transform,
       quiet = quiet,
       ...
     )

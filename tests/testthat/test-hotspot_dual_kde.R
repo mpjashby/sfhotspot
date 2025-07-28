@@ -167,3 +167,24 @@ test_that("message when bandwidth set automatically", {
     "Bandwidth set automatically based on rule of thumb"
   )
 })
+
+test_that("message when data were transformed", {
+  expect_message(
+    hotspot_dual_kde(
+      x = sf::st_transform(data_sf, "EPSG:4326"),
+      y = sf::st_transform(data_sf, "EPSG:4326"),
+      cell_size = 0.005,
+      bandwidth = 0.01
+    ),
+    "Data transformed to "
+  )
+  expect_no_message(
+    hotspot_dual_kde(
+      x = sf::st_transform(data_sf, "EPSG:4326"),
+      y = sf::st_transform(data_sf, "EPSG:4326"),
+      cell_size = 0.005,
+      bandwidth = 0.01,
+      quiet = TRUE
+    )
+  )
+})

@@ -13,6 +13,14 @@
 #'   relative to the default.
 #' @param weights character vector giving the name of a numeric column in
 #'   \code{data} representing weights for weighted KDE values.
+#' @param transform the underlying SpatialKDE package cannot calculate kernel
+#'   density for lon/lat data, so this must be transformed to use a projected
+#'   co-ordinate reference system. If this argument is \code{TRUE} (the 
+#'   default) and \code{sf::st_is_longlat(data)} is \code{TRUE}, \code{data} 
+#'   (and \code{grid} if provided) will be transformed automatically using 
+#'   \code{link{st_transform_auto}} before the kernel density is estimated and
+#'   transformed back afterwards. Set this argument to \code{FALSE} to suppress 
+#'   automatic transformation of the data.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{TRUE}.
@@ -28,6 +36,7 @@ kernel_density <- function(
   bandwidth_adjust = 1,
   weights = NULL,
   cell_size = NULL,
+  transform = FALSE,
   quiet = TRUE,
   ...
 ) {
@@ -38,12 +47,6 @@ kernel_density <- function(
       "Co-ordinate reference system for {.var data} is missing.",
       "i" = "Cannot calculate KDE values from datasets with a missing CRS.",
       "i" = "Check CRS of {.var data} using {.fn st_crs()}."
-    ))
-  }
-  if (sf::st_is_longlat(data)) {
-    cli::cli_abort(c(
-      "Cannot calculate KDE values for lon/lat data.",
-      "i" = "Transform {.var data} to use a projected CRS."
     ))
   }
   validate_sf(
@@ -68,8 +71,30 @@ kernel_density <- function(
       )
     }
   }
-  if (!rlang::is_logical(quiet, n = 1))
+  if (!rlang::is_logical(transform, n = 1)) {
+    cli::cli_abort("{.arg transform} must be one of {.q TRUE} or {.q FALSE}.")
+  }
+  if (!rlang::is_logical(quiet, n = 1)) {
     cli::cli_abort("{.arg quiet} must be one of {.q TRUE} or {.q FALSE}.")
+  }
+
+  # Transform CRS if required
+  is_transformed <- FALSE
+  if (sf::st_is_longlat(data)) {
+    if (rlang::is_true(transform)) {
+      data <- st_transform_auto(data, quiet = quiet)
+      grid <- st_transform_auto(grid, quiet = TRUE)
+      is_transformed <- TRUE
+    } else {
+      cli::cli_abort(c(
+        "Cannot calculate KDE values for lon/lat data. You can:",
+        "*" = paste0(
+          "set {.arg transform} to {.q TRUE} to allow auto-transformation or"
+        ),
+        "*" = "transform {.var data} manually to use a projected CRS."
+      ))  
+    }
+  }
 
   # Replace name of geometry column in SF objects if necessary
   grid <- set_geometry_name(grid)
@@ -130,6 +155,10 @@ kernel_density <- function(
   }
 
   # Return result
-  kde_val[, c("kde_value", "geometry")]
+  if (is_transformed) {
+    st_transform_auto(kde_val[, c("kde_value", "geometry")], quiet = TRUE)
+  } else {
+    kde_val[, c("kde_value", "geometry")]
+  }
 
 }

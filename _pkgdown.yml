@@ -4,7 +4,7 @@ template:
 
 reference:
 - title: "Analysing hotspots"
-- desc: "Tools for analysing hotspots."
+  desc: "Tools for analysing hotspots."
 - contents:
   - hotspot_count
   - hotspot_change
@@ -12,15 +12,23 @@ reference:
   - hotspot_dual_kde
   - hotspot_gistar
   - starts_with("hotspot_classify")
+- title: "Data wrangling"
+  desc: > 
+    Tools for working with data that is used to identify hotspots. Most data
+    wrangling is done automatically by the analysis functions listed above, but 
+    you can use the functions below to control in more detail how this is done.
+- contents: 
+  - hotspot_clip
   - hotspot_grid
+  - st_transform_auto
 - title: "Plotting results"
-- desc: >
+  desc: >
     These methods for the `autoplot()` function automatically produce charts
     that are tailored to displaying the results produced by one of the
     `hotspot_*()` family of functions.
 - contents:
   - starts_with("autoplot")
 - title: "Sample data"
-- desc: "Sample data that can be used with the functions in this package."
+  desc: "Sample data that can be used with the functions in this package."
 - contents:
   - starts_with("memphis_")
