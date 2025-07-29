@@ -41,6 +41,7 @@
 <li>By default lat/lon data is now transformed to use a projected co-ordinate reference system before kernel density estimation and then transformed back afterwards (previously trying to run KDE on lat/lon data resulted in an error). Datasets can also be automatically transformed to/from lat/lon using <code><a href="../reference/st_transform_auto.html">st_transform_auto()</a></code> (<a href="https://github.com/mpjashby/sfhotspot/issues/48" class="external-link">#48</a>).</li>
 <li>Functions now return useful error if provided with an empty dataset (<a href="https://github.com/mpjashby/sfhotspot/issues/58" class="external-link">#58</a>).</li>
 <li>Adjusted bandwidth now reported accurately (<a href="https://github.com/mpjashby/sfhotspot/issues/56" class="external-link">#56</a>).</li>
+<li>Removed dependency on the rmarkdown package in favour of using the quarto package to generate vignettes.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.2" id="sfhotspot-092">sfhotspot 0.9.2<a class="anchor" aria-label="anchor" href="#sfhotspot-092"></a></h2>

@@ -2,17 +2,7 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
-
+<!-- README.md is generated from README.qmd. Please edit that file -->
 
 
 # sfhotspot <img src='man/figures/logo.png' align="right" height="139">
@@ -21,7 +11,6 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/sfhotspot)](https://CRAN.R-project.org/package=sfhotspot)
 [![CRAN checks](https://badges.cranchecks.info/worst/sfhotspot.svg)](https://cran.r-project.org/web/checks/check_results_sfhotspot.html)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-[![R-CMD-check](https://github.com/mpjashby/sfhotspot/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mpjashby/sfhotspot/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/mpjashby/sfhotspot/graph/badge.svg)](https://app.codecov.io/gh/mpjashby/sfhotspot)
 <!-- badges: end -->
 

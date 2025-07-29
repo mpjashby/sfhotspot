@@ -9,6 +9,8 @@
   `st_transform_auto()` (#48).
 * Functions now return useful error if provided with an empty dataset (#58).
 * Adjusted bandwidth now reported accurately (#56).
+* Removed dependency on the rmarkdown package in favour of using the quarto
+  package to generate vignettes.
 
 
 # sfhotspot 0.9.2

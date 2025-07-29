@@ -15,7 +15,10 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to sfhotspot">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="introduction_files/libs/quarto-html/popper.min.js"></script><script src="introduction_files/libs/quarto-html/tippy.umd.min.js"></script><link href="introduction_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="introduction_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to sfhotspot">
+<meta property="og:image" content="http://pkgs.lesscrime.info/sfhotspot/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -53,170 +56,105 @@
 
 
   </div>
-</nav><div class="container template-article">
-
-
-
-
+</nav><div class="container template-quarto">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Introduction to sfhotspot</h1>
-            
-      
-      <small class="dont-index">Source: <a href="https://github.com/mpjashby/sfhotspot/blob/HEAD/vignettes/introduction.Rmd" class="external-link"><code>vignettes/introduction.Rmd</code></a></small>
-      <div class="d-none name"><code>introduction.Rmd</code></div>
+
+
+
+
+      <small class="dont-index">Source: <a href="https://github.com/mpjashby/sfhotspot/blob/HEAD/vignettes/introduction.qmd" class="external-link"><code>vignettes/introduction.qmd</code></a></small>
+      <div class="d-none name"><code></code></div>
     </div>
 
-    
-    
-<p>sfhotspot is a package for understanding patterns in data that
-represent points in space. You can use it to:</p>
+
+
+
+
+
+    <p>sfhotspot is a package for understanding patterns in data that represent points in space. You can use it to:</p>
 <ul>
-<li>count points in different places with
-<code><a href="../reference/hotspot_count.html">hotspot_count()</a></code>,</li>
-<li>estimate the density of points with <code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code> and
-<code><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde()</a></code>,</li>
-<li>show changes in the distribution of points over time with
-<code><a href="../reference/hotspot_change.html">hotspot_change()</a></code>,</li>
-<li>identify places with more points than would be expected by chance
-with <code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code>, and</li>
-<li>classify areas based on the number of points in them during
-different periods with <code><a href="../reference/hotspot_classify.html">hotspot_classify()</a></code>.</li>
+<li>count points in different places with <code><a href="../reference/hotspot_count.html">hotspot_count()</a></code>,</li>
+<li>estimate the density of points with <code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code> and <code><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde()</a></code>,</li>
+<li>show changes in the distribution of points over time with <code><a href="../reference/hotspot_change.html">hotspot_change()</a></code>,</li>
+<li>identify places with more points than would be expected by chance with <code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code>, and</li>
+<li>classify areas based on the number of points in them during different periods with <code><a href="../reference/hotspot_classify.html">hotspot_classify()</a></code>.</li>
 </ul>
-<p>The specific motivation for this package was to analyse the locations
-of crimes, but the functions should be useful for understanding patterns
-in points representing other features or events. The package is called
-sfhotspot because it works with (and – where relevant – produces) SF
-objects as produced by the <a href="https://r-spatial.github.io/sf/" class="external-link">sf</a> package. sfhotspot also
-produces data that is <a href="https://tidyr.tidyverse.org/articles/tidy-data.html" class="external-link"><em>tidy</em></a>,
-making it easy to use functions from packages such as <a href="https://dplyr.tidyverse.org/" class="external-link">dplyr</a> to filter the results,
-etc.</p>
-<p>All the functions in sfhotspot work on an SF data frame or tibble in
-which each row in the data represents a single point (e.g. the location
-of an event). In this introduction we will use the built-in
-<code>memphis_robberies</code> dataset to show how each of the
-<code>hotspot_*()</code> family of functions works.
-<code>memphis_robberies</code> contains details of 2,245 robberies in
-Memphis, Tennessee, in 2019.</p>
-<table class="table">
-<caption>The included <code>memphis_robberies</code> dataset</caption>
-<colgroup>
-<col width="13%">
-<col width="24%">
-<col width="28%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="right">uid</th>
-<th align="left">offense_type</th>
-<th align="left">date</th>
-<th align="left">geometry</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">15213800</td>
-<td align="left">personal robbery</td>
-<td align="left">2019-01-01 01:30:00</td>
-<td align="left">POINT (-89.942 35.149)</td>
-</tr>
-<tr class="even">
-<td align="right">15214030</td>
-<td align="left">personal robbery</td>
-<td align="left">2019-01-01 20:00:00</td>
-<td align="left">POINT (-89.86 35.059)</td>
-</tr>
-<tr class="odd">
-<td align="right">15214042</td>
-<td align="left">personal robbery</td>
-<td align="left">2019-01-01 21:58:00</td>
-<td align="left">POINT (-89.929 35.058)</td>
-</tr>
-<tr class="even">
-<td align="right">15214050</td>
-<td align="left">personal robbery</td>
-<td align="left">2019-01-01 22:30:00</td>
-<td align="left">POINT (-90.018 35.201)</td>
-</tr>
-<tr class="odd">
-<td align="right">15214118</td>
-<td align="left">personal robbery</td>
-<td align="left">2019-01-02 09:38:00</td>
-<td align="left">POINT (-89.96 35.14)</td>
-</tr>
-<tr class="even">
-<td align="right">15214242</td>
-<td align="left">personal robbery</td>
-<td align="left">2019-01-02 18:50:00</td>
-<td align="left">POINT (-89.953 35.159)</td>
-</tr>
-<tr class="odd">
-<td align="right">15214290</td>
-<td align="left">personal robbery</td>
-<td align="left">2019-01-02 23:30:00</td>
-<td align="left">POINT (-89.95 35.026)</td>
-</tr>
-<tr class="even">
-<td align="right">15214295</td>
-<td align="left">personal robbery</td>
-<td align="left">2019-01-03 00:00:00</td>
-<td align="left">POINT (-89.932 35.076)</td>
-</tr>
-<tr class="odd">
-<td align="right">15214319</td>
-<td align="left">personal robbery</td>
-<td align="left">2019-01-03 03:00:00</td>
-<td align="left">POINT (-90.021 35.033)</td>
-</tr>
-<tr class="even">
-<td align="right">15214428</td>
-<td align="left">personal robbery</td>
-<td align="left">2019-01-03 14:45:00</td>
-<td align="left">POINT (-90.032 35.165)</td>
-</tr>
-</tbody>
-</table>
-<p>We can plot this raw data, but the resulting plot is not very
-informative (even with the points made semi-transparent), since there
-are too many points to see clear patterns.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<p>The specific motivation for this package was to analyse the locations of crimes, but the functions should be useful for understanding patterns in points representing other features or events. The package is called sfhotspot because it works with (and – where relevant – produces) SF objects as produced by the <a href="https://r-spatial.github.io/sf/" class="external-link">sf</a> package. sfhotspot also produces data that is <a href="https://tidyr.tidyverse.org/articles/tidy-data.html" class="external-link"><em>tidy</em></a>, making it easy to use functions from packages such as <a href="https://dplyr.tidyverse.org/" class="external-link">dplyr</a> to filter the results, etc.</p>
+<p>All the functions in sfhotspot work on an SF data frame or tibble in which each row in the data represents a single point (e.g. the location of an event). In this introduction we will use the built-in <code>memphis_robberies</code> dataset to show how each of the <code>hotspot_*()</code> family of functions works. <code>memphis_robberies</code> contains details of 2,245 robberies in Memphis, Tennessee, in 2019.</p>
+<div class="cell" data-tbl-cap="The included `memphis_robberies` dataset">
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 2245 features and 3 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: -90.125 ymin: 34.996 xmax: -89.733 ymax: 35.258
+Geodetic CRS:  WGS 84
+# A tibble: 2,245 × 4
+        uid offense_type     date                        geometry
+ *    &lt;int&gt; &lt;fct&gt;            &lt;dttm&gt;                   &lt;POINT [°]&gt;
+ 1 15213800 personal robbery 2019-01-01 01:30:00 (-89.942 35.149)
+ 2 15214030 personal robbery 2019-01-01 20:00:00  (-89.86 35.059)
+ 3 15214042 personal robbery 2019-01-01 21:58:00 (-89.929 35.058)
+ 4 15214050 personal robbery 2019-01-01 22:30:00 (-90.018 35.201)
+ 5 15214118 personal robbery 2019-01-02 09:38:00   (-89.96 35.14)
+ 6 15214242 personal robbery 2019-01-02 18:50:00 (-89.953 35.159)
+ 7 15214290 personal robbery 2019-01-02 23:30:00  (-89.95 35.026)
+ 8 15214295 personal robbery 2019-01-03 00:00:00 (-89.932 35.076)
+ 9 15214319 personal robbery 2019-01-03 03:00:00 (-90.021 35.033)
+10 15214428 personal robbery 2019-01-03 14:45:00 (-90.032 35.165)
+# ℹ 2,235 more rows</code></pre>
+</div>
+</div>
+<p>We can plot this raw data, but the resulting plot is not very informative (even with the points made semi-transparent), since there are too many points to see clear patterns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">memphis_robberies</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-2-1.png" alt="A very basic point map showing the locations of individual robberies in Memphis, TN. Each robbery is reprsented as a small, semi-transparent dot." width="700"></p>
-<div class="section level2">
-<h2 id="counting-points">Counting points<a class="anchor" aria-label="anchor" href="#counting-points"></a>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="introduction_files/figure-html/unnamed-chunk-2-1.png" alt="A very basic point map showing the locations of individual robberies in Memphis, TN. Each robbery is represented as a small, semi-transparent dot." width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<section class="level2"><h2 id="counting-points">Counting points<a class="anchor" aria-label="anchor" href="#counting-points"></a>
 </h2>
-<p>The <code><a href="../reference/hotspot_count.html">hotspot_count()</a></code> produces an SF object with counts
-for the number of points in (by default) each cell in a grid of cells.
-As with all the functions in the package, this can be customised in
-various ways – see <a href="#common-args"><em>Common arguments</em></a>,
-below.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<p>The <code><a href="../reference/hotspot_count.html">hotspot_count()</a></code> produces an SF object with counts for the number of points in (by default) each cell in a grid of cells. As with all the functions in the package, this can be customised in various ways – see <a href="#common-args"><em>Common arguments</em></a>, below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">point_counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hotspot_count.html">hotspot_count</a></span><span class="op">(</span><span class="va">memphis_robberies</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Cell size set to 0.00524 degrees automatically</span></span></code></pre>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="cell-output cell-output-stderr">
+<pre><code>Cell size set to 0.00524 degrees automatically</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">point_counts</span></span></code></pre></div>
-<pre><code><span><span class="co">## Simple feature collection with 2926 features and 1 field</span></span>
-<span><span class="co">## Geometry type: POLYGON</span></span>
-<span><span class="co">## Dimension:     XY</span></span>
-<span><span class="co">## Bounding box:  xmin: -90.1261 ymin: 34.99475 xmax: -89.72786 ymax: 35.26199</span></span>
-<span><span class="co">## Geodetic CRS:  WGS 84</span></span>
-<span><span class="co">## <span style="color: #949494;"># A tibble: 2,926 × 2</span></span></span>
-<span><span class="co">##        n                                                                geometry</span></span>
-<span><span class="co">##  <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                                                           <span style="color: #949494; font-style: italic;">&lt;POLYGON [°]&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0 ((-90.08418 34.99475, -90.07894 34.99475, -90.07894 34.99999, -90.0841…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0 ((-90.07894 34.99475, -90.0737 34.99475, -90.0737 34.99999, -90.07894 …</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0 ((-90.0737 34.99475, -90.06846 34.99475, -90.06846 34.99999, -90.0737 …</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0 ((-90.06846 34.99475, -90.06322 34.99475, -90.06322 34.99999, -90.0684…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0 ((-90.06322 34.99475, -90.05798 34.99475, -90.05798 34.99999, -90.0632…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0 ((-90.05798 34.99475, -90.05274 34.99475, -90.05274 34.99999, -90.0579…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0 ((-90.05274 34.99475, -90.0475 34.99475, -90.0475 34.99999, -90.05274 …</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0 ((-90.0475 34.99475, -90.04226 34.99475, -90.04226 34.99999, -90.0475 …</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0 ((-90.04226 34.99475, -90.03702 34.99475, -90.03702 34.99999, -90.0422…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0 ((-90.03702 34.99475, -90.03178 34.99475, -90.03178 34.99999, -90.0370…</span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 2,916 more rows</span></span></span></code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 2926 features and 1 field
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: -90.1261 ymin: 34.99475 xmax: -89.72786 ymax: 35.26199
+Geodetic CRS:  WGS 84
+# A tibble: 2,926 × 2
+       n                                                                geometry
+ * &lt;dbl&gt;                                                           &lt;POLYGON [°]&gt;
+ 1     0 ((-90.08418 34.99475, -90.07894 34.99475, -90.07894 34.99999, -90.0841…
+ 2     0 ((-90.07894 34.99475, -90.0737 34.99475, -90.0737 34.99999, -90.07894 …
+ 3     0 ((-90.0737 34.99475, -90.06846 34.99475, -90.06846 34.99999, -90.0737 …
+ 4     0 ((-90.06846 34.99475, -90.06322 34.99475, -90.06322 34.99999, -90.0684…
+ 5     0 ((-90.06322 34.99475, -90.05798 34.99475, -90.05798 34.99999, -90.0632…
+ 6     0 ((-90.05798 34.99475, -90.05274 34.99475, -90.05274 34.99999, -90.0579…
+ 7     0 ((-90.05274 34.99475, -90.0475 34.99475, -90.0475 34.99999, -90.05274 …
+ 8     0 ((-90.0475 34.99475, -90.04226 34.99475, -90.04226 34.99999, -90.0475 …
+ 9     0 ((-90.04226 34.99475, -90.03702 34.99475, -90.03702 34.99999, -90.0422…
+10     0 ((-90.03702 34.99475, -90.03178 34.99475, -90.03178 34.99999, -90.0370…
+# ℹ 2,916 more rows</code></pre>
+</div>
+</div>
 <p>We can then plot that grid of cells.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">n</span><span class="op">)</span>,</span>
@@ -225,51 +163,55 @@ below.</p>
 <span>    colour <span class="op">=</span> <span class="cn">NA</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span>direction <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-4-1.png" alt="A basic map showing the count of robberies in each cell in a grid covering Memphis, TN. Grid cells with more robberies are shown in darker shades of blue, while those with fewer robberies are shown in lighter shades." width="700"></p>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="introduction_files/figure-html/unnamed-chunk-4-1.png" alt="A basic map showing the count of robberies in each cell in a grid covering Memphis, TN. Grid cells with more robberies are shown in darker shades of blue, while those with fewer robberies are shown in lighter shades." width="576"></p>
+</figure>
 </div>
-<div class="section level2">
-<h2 id="calculating-kernel-density">Calculating kernel density<a class="anchor" aria-label="anchor" href="#calculating-kernel-density"></a>
+</div>
+</div>
+</section><section class="level2"><h2 id="calculating-kernel-density">Calculating kernel density<a class="anchor" aria-label="anchor" href="#calculating-kernel-density"></a>
 </h2>
-<p>The <code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code> function can be used to calculate
-kernel density estimates for each cell in a grid. The kernel density
-estimation (KDE) can be customised using the <code>bandwidth</code> and
-<code>bandwidth_adjust</code> arguments. This function also accepts the
-argument explained in the <a href="#common-args"><em>Common
-arguments</em></a> section, below.</p>
-<p>If you do not specify any optional arguments,
-<code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code> will try to choose reasonable default
-values.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p>The <code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code> function can be used to calculate kernel density estimates for each cell in a grid. The kernel density estimation (KDE) can be customised using the <code>bandwidth</code> and <code>bandwidth_adjust</code> arguments. This function also accepts the argument explained in the <a href="#common-args"><em>Common arguments</em></a> section, below.</p>
+<p>If you do not specify any optional arguments, <code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code> will try to choose reasonable default values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">robbery_kde</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hotspot_kde.html">hotspot_kde</a></span><span class="op">(</span><span class="va">memphis_robberies</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Cell size set to 0.00524 degrees automatically</span></span>
-<span><span class="co">## Data transformed to <span style="color: #0000BB;">"WGS 84 / UTM zone 16N"</span> co-ordinate system.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> CRS code: <span style="color: #0000BB;">"EPSG:32616"</span>.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Unit of measurement: metre.</span></span>
-<span><span class="co">## Bandwidth set automatically based on rule of thumb.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Bandwidth = 5,588 metres.</span></span></code></pre>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="cell-output cell-output-stderr">
+<pre><code>Cell size set to 0.00524 degrees automatically
+Data transformed to "WGS 84 / UTM zone 16N" co-ordinate system.
+ℹ CRS code: "EPSG:32616".
+ℹ Unit of measurement: metre.
+Bandwidth set automatically based on rule of thumb.
+ℹ Bandwidth = 5,588 metres.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">robbery_kde</span></span></code></pre></div>
-<pre><code><span><span class="co">## Simple feature collection with 2926 features and 2 fields</span></span>
-<span><span class="co">## Geometry type: POLYGON</span></span>
-<span><span class="co">## Dimension:     XY</span></span>
-<span><span class="co">## Bounding box:  xmin: -90.1261 ymin: 34.99475 xmax: -89.72786 ymax: 35.26199</span></span>
-<span><span class="co">## Geodetic CRS:  WGS 84</span></span>
-<span><span class="co">## <span style="color: #949494;"># A tibble: 2,926 × 3</span></span></span>
-<span><span class="co">##        n   kde                                                          geometry</span></span>
-<span><span class="co">##  <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                                                     <span style="color: #949494; font-style: italic;">&lt;POLYGON [°]&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0  15.7 ((-90.08418 34.99475, -90.07894 34.99475, -90.07894 34.99999, -9…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0  16.9 ((-90.07894 34.99475, -90.0737 34.99475, -90.0737 34.99999, -90.…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0  18.4 ((-90.0737 34.99475, -90.06846 34.99475, -90.06846 34.99999, -90…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0  20.1 ((-90.06846 34.99475, -90.06322 34.99475, -90.06322 34.99999, -9…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0  22.5 ((-90.06322 34.99475, -90.05798 34.99475, -90.05798 34.99999, -9…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0  26.3 ((-90.05798 34.99475, -90.05274 34.99475, -90.05274 34.99999, -9…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0  31.2 ((-90.05274 34.99475, -90.0475 34.99475, -90.0475 34.99999, -90.…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0  36.6 ((-90.0475 34.99475, -90.04226 34.99475, -90.04226 34.99999, -90…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0  42.1 ((-90.04226 34.99475, -90.03702 34.99475, -90.03702 34.99999, -9…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0  47.1 ((-90.03702 34.99475, -90.03178 34.99475, -90.03178 34.99999, -9…</span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 2,916 more rows</span></span></span></code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 2926 features and 2 fields
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: -90.1261 ymin: 34.99475 xmax: -89.72786 ymax: 35.26199
+Geodetic CRS:  WGS 84
+# A tibble: 2,926 × 3
+       n   kde                                                          geometry
+ * &lt;dbl&gt; &lt;dbl&gt;                                                     &lt;POLYGON [°]&gt;
+ 1     0  15.7 ((-90.08418 34.99475, -90.07894 34.99475, -90.07894 34.99999, -9…
+ 2     0  16.9 ((-90.07894 34.99475, -90.0737 34.99475, -90.0737 34.99999, -90.…
+ 3     0  18.4 ((-90.0737 34.99475, -90.06846 34.99475, -90.06846 34.99999, -90…
+ 4     0  20.1 ((-90.06846 34.99475, -90.06322 34.99475, -90.06322 34.99999, -9…
+ 5     0  22.5 ((-90.06322 34.99475, -90.05798 34.99475, -90.05798 34.99999, -9…
+ 6     0  26.3 ((-90.05798 34.99475, -90.05274 34.99475, -90.05274 34.99999, -9…
+ 7     0  31.2 ((-90.05274 34.99475, -90.0475 34.99475, -90.0475 34.99999, -90.…
+ 8     0  36.6 ((-90.0475 34.99475, -90.04226 34.99475, -90.04226 34.99999, -90…
+ 9     0  42.1 ((-90.04226 34.99475, -90.03702 34.99475, -90.03702 34.99999, -9…
+10     0  47.1 ((-90.03702 34.99475, -90.03178 34.99475, -90.03178 34.99999, -9…
+# ℹ 2,916 more rows</code></pre>
+</div>
+</div>
 <p>Again, we can plot the result.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span></span>
 <span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">kde</span><span class="op">)</span>,</span>
@@ -278,53 +220,137 @@ values.</p>
 <span>    colour <span class="op">=</span> <span class="cn">NA</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span>direction <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-6-1.png" alt="A hotspot map showing the density of robberies in each cell in a grid  covering Memphis, TN. Grid cells with higher densitites of robberies are  shown in darker shades of blue, while those with lower densities are shown  in lighter shades." width="700"></p>
-<p>We can adjust the appearance of the KDE layer on this map by
-specifying optional arguments to <code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code>. In
-particular, the <code>bandwidth_adjust</code> argument is useful for
-controlling the level of detail visible in the density layer – use
-values of <code>bandwidth_adjust</code> below 1 to show more detail, and
-values above 1 to show a smoother density surface.</p>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="introduction_files/figure-html/unnamed-chunk-6-1.png" alt="A hotspot map showing the density of robberies in each cell in a grid  covering Memphis, TN. Grid cells with higher densitites of robberies are  shown in darker shades of blue, while those with lower densities are shown  in lighter shades." width="576"></p>
+</figure>
 </div>
-<div class="section level2">
-<h2 id="common-args">Common arguments<a class="anchor" aria-label="anchor" href="#common-args"></a>
+</div>
+</div>
+<p>We can adjust the appearance of the KDE layer on this map by specifying optional arguments to <code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code>. In particular, the <code>bandwidth_adjust</code> argument is useful for controlling the level of detail visible in the density layer – use values of <code>bandwidth_adjust</code> below 1 to show more detail, and values above 1 to show a smoother density surface.</p>
+</section><section class="level2"><h2 id="common-args">Common arguments<a class="anchor" aria-label="anchor" href="#common-args"></a>
 </h2>
-<p>All the functions in this package work on a grid of cells, which can
-be customised using one or more of these common arguments:</p>
+<p>All the functions in this package work on a grid of cells, which can be customised using one or more of these common arguments:</p>
 <ul>
 <li>
-<code>cell_size</code> specifies the size of each equally spaced
-grid cell, using the same units (metres, degrees, etc.) as used in the
-sf data frame given in the data argument. Ignored if <code>grid</code>
-is not <code>NULL</code>. If this argument and <code>grid</code> are
-both <code>NULL</code> (the default), the cell size will be calculated
-automatically.</li>
+<code>cell_size</code> specifies the size of each equally spaced grid cell, using the same units (metres, degrees, etc.) as used in the sf data frame given in the data argument. Ignored if <code>grid</code> is not <code>NULL</code>. If this argument and <code>grid</code> are both <code>NULL</code> (the default), the cell size will be calculated automatically.</li>
 <li>
-<code>grid_type</code> specifies whether the grid should be made up
-of squares (“rect”, the default) or hexagons (“hex”). Ignored if
-<code>grid</code> is not <code>NULL</code>.</li>
+<code>grid_type</code> specifies whether the grid should be made up of squares (“rect”, the default) or hexagons (“hex”). Ignored if <code>grid</code> is not <code>NULL</code>.</li>
 <li>
-<code>grid</code> specifies an <code>sf</code> data frame containing
-polygons, which will be used as the grid for which counts are made.</li>
+<code>grid</code> specifies an <code>sf</code> data frame containing polygons, which will be used as the grid for which counts are made.</li>
 <li>
-<code>quiet</code> whether messages/warnings should be printed,
-e.g. reporting the values of any parameters (such as
-<code>cell_size</code>) that have been set automatically.</li>
+<code>quiet</code> whether messages/warnings should be printed, e.g. reporting the values of any parameters (such as <code>cell_size</code>) that have been set automatically.</li>
 </ul>
-<div class="section level3">
-<h3 id="automatic-cell-size-selection">Automatic cell-size selection<a class="anchor" aria-label="anchor" href="#automatic-cell-size-selection"></a>
+<section class="level3"><h3 id="automatic-cell-size-selection">Automatic cell-size selection<a class="anchor" aria-label="anchor" href="#automatic-cell-size-selection"></a>
 </h3>
-<p>If <code>grid</code> and <code>cell_size</code> are both
-<code>NULL</code>, the cell size will be set so that there are 50 cells
-on the shorter side of the grid. If the data SF object is projected in
-metres or feet, the number of cells will be adjusted upwards so that the
-cell size is a multiple of 100.</p>
-</div>
-</div>
-  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+<p>If <code>grid</code> and <code>cell_size</code> are both <code>NULL</code>, the cell size will be set so that there are 50 cells on the shorter side of the grid. If the data SF object is projected in metres or feet, the number of cells will be adjusted upwards so that the cell size is a multiple of 100.</p>
+</section></section><section class="level2"><h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
+</h2>
+<p>This vignette shows only the very basics of how to use this package. You can learn more about how to create effective hotspot maps with the free online textbook <a href="https://books.lesscrime.info/learncrimemapping/" class="external-link">Learn Crime Mapping with R</a>.</p>
+</section><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'light-border',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config);
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
-
 
 
     <footer><div class="pkgdown-footer-left">

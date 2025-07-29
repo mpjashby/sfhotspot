@@ -46,3 +46,5 @@ inst/doc
 
 # Cache directories
 /vignettes/rosm.cache/
+
+/.quarto/

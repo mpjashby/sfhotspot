@@ -37,7 +37,7 @@ All the functions in sfhotspot work on an SF data frame or tibble in which each 
 #| echo: false
 #| tbl-cap: "The included `memphis_robberies` dataset"
 
-memphis_robberies[1:10, ]
+memphis_robberies
 ```
 
 We can plot this raw data, but the resulting plot is not very informative (even with the points made semi-transparent), since there are too many points to see clear patterns.
@@ -135,3 +135,9 @@ All the functions in this package work on a grid of cells, which can be customis
 ### Automatic cell-size selection
 
 If `grid` and `cell_size` are both `NULL`, the cell size will be set so that there are 50 cells on the shorter side of the grid. If the data SF object is projected in metres or feet, the number of cells will be adjusted upwards so that the cell size is a multiple of 100.
+
+
+
+## Learn more
+
+This vignette shows only the very basics of how to use this package. You can learn more about how to create effective hotspot maps with the free online textbook [Learn Crime Mapping with R](https://books.lesscrime.info/learncrimemapping/).
