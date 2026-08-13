@@ -1,6 +1,6 @@
-#' Extract points inside polygon
+#' Extract spatial features inside a polygon
 #' 
-#' @param data \code{\link[sf]{sf}} data frame containing points.
+#' @param data \code{\link[sf]{sf}} data frame containing points or polygons.
 #' @param boundary \code{\link[sf]{sf}} data frame containing polygons.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
@@ -10,10 +10,10 @@
 #' @details
 #' 
 #' This function is a wrapper around \code{\link[sf]{st_intersection}} that
-#'   performs some additional checks and reports useful information.
+#' performs some additional checks and reports useful information.
 #' 
-#' @return an SF data frame containing those points that are covered by the
-#'   polygons.
+#' @return an SF data frame containing those spatial features that are covered
+#'   by the polygons.
 #' 
 #' @export 
 
@@ -24,6 +24,7 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
     data = data, 
     grid = boundary, 
     name_grid = "boundary", 
+    data_type = c("POINT", "POLYGON", "MULTIPOLYGON"),
     quiet = quiet
   )
 

@@ -1,3 +1,9 @@
+# sfhotspot 1.1.0
+
+* `hotspot_clip()` can now clip polygon results produced by the `hotspot_*()`
+  functions, as well as point data (#65).
+
+
 # sfhotspot 1.0.0
 
 * New function `hotspot_clip()` added to extract points from an SF object inside 

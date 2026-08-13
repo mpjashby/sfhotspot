@@ -51,6 +51,10 @@ test_that("error if `data` or `grid` are not SF objects of the correct type", {
     regexp = "must be an SF object with POINT geometry"
   )
   expect_error(
+    validate_inputs(data = grid, quiet = FALSE),
+    regexp = "must be an SF object with POINT geometry"
+  )
+  expect_error(
     validate_inputs(
       data = data_sf,
       grid = sf::st_cast(grid, "LINESTRING"),
@@ -152,4 +156,10 @@ test_that("Result is an invisible `NULL` value", {
   expect_null(validate_bandwidth(bandwidth = 1))
   expect_invisible(validate_cell_size(cell_size = 1))
   expect_null(validate_cell_size(cell_size = 1))
+})
+
+test_that("Allowed `data` geometry types can be specified", {
+  allowed_types <- c("POINT", "POLYGON", "MULTIPOLYGON")
+  expect_invisible(validate_inputs(data = grid, data_type = allowed_types))
+  expect_null(validate_inputs(data = grid, data_type = allowed_types))
 })
