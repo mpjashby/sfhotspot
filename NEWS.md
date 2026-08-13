@@ -9,6 +9,9 @@
 * `hotspot_gistar()` now calculates KDE values for longitude/latitude data by
   automatically transforming them to a projected co-ordinate reference system
   and transforming the results back afterwards (#68).
+* `hotspot_dual_kde()` now calculates valid KDE values for longitude/latitude
+  data while using a common automatically selected bandwidth for both layers,
+  and checks that both point layers overlap the analysis grid (#67).
 
 
 # sfhotspot 1.0.0
