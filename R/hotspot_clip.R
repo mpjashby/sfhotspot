@@ -10,7 +10,9 @@
 #' @details
 #' 
 #' This function is a wrapper around \code{\link[sf]{st_intersection}} that
-#' performs some additional checks and reports useful information.
+#' performs some additional checks and reports useful information. If
+#' \code{data} has a specialised result class produced by this package, that
+#' class is preserved in the clipped result.
 #' 
 #' @return an SF data frame containing those spatial features that are covered
 #'   by the polygons.
@@ -31,6 +33,13 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
   # Count number of rows in data
   initial_rows <- nrow(data)
 
+  # Record any package-specific result class, since `st_intersection()` does
+  # not preserve classes it does not recognise
+  result_class <- intersect(
+    class(data),
+    c("hspt_n", "hspt_k", "hspt_c", "hspt_d")
+  )
+
   # Get name of geometry column in boundary file
   geometry_column <- attr(boundary, "sf_column")
 
@@ -40,6 +49,11 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
 
   # Clip data
   clipped_data <- suppressWarnings(sf::st_intersection(data, boundary_outline))
+
+  # Restore any package-specific result class
+  if (length(result_class) > 0) {
+    class(clipped_data) <- c(result_class, class(clipped_data))
+  }
 
   # Report number of rows removed
   if (rlang::is_false(quiet)) {

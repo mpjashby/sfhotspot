@@ -52,6 +52,40 @@ test_that("polygon data can be clipped (#65)", {
   expect_true(all(sf::st_is(polygon_result, c("POLYGON", "MULTIPOLYGON"))))
 })
 
+test_that("package-specific result classes are preserved (#71)", {
+  result_classes <- c("hspt_n", "hspt_k", "hspt_c", "hspt_d")
+  base_classes <- setdiff(class(polygon_data_sf), result_classes)
+
+  for (result_class in result_classes) {
+    classed_data <- structure(
+      polygon_data_sf,
+      class = c(result_class, base_classes)
+    )
+    classed_result <- hotspot_clip(
+      classed_data,
+      memphis_precincts,
+      quiet = TRUE
+    )
+    expect_s3_class(classed_result, result_class)
+  }
+
+  expect_s3_class(autoplot(polygon_result), "ggplot")
+})
+
+test_that("unrelated classes are not preserved (#71)", {
+  unclassed_data <- structure(
+    polygon_data_sf,
+    class = c("unrelated_class", setdiff(class(polygon_data_sf), "hspt_n"))
+  )
+  unclassed_result <- hotspot_clip(
+    unclassed_data,
+    memphis_precincts,
+    quiet = TRUE
+  )
+
+  expect_false(inherits(unclassed_result, "unrelated_class"))
+})
+
 ## Messages ----
 
 test_that("function produces message summarising rows removed", {

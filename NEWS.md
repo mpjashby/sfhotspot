@@ -2,6 +2,8 @@
 
 * `hotspot_clip()` can now clip polygon results produced by the `hotspot_*()`
   functions, as well as point data (#65).
+* `hotspot_clip()` now preserves the specialised `hspt_*` class of results
+  produced by other package functions (#71).
 
 
 # sfhotspot 1.0.0

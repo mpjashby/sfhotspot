@@ -26,5 +26,7 @@ Extract spatial features inside a polygon
 }
 \details{
 This function is a wrapper around \code{\link[sf]{st_intersection}} that
-performs some additional checks and reports useful information.
+performs some additional checks and reports useful information. If
+\code{data} has a specialised result class produced by this package, that
+class is preserved in the clipped result.
 }
