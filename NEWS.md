@@ -6,6 +6,9 @@
   produced by other package functions (#71).
 * `hotspot_clip()` no longer reports that zero rows were removed when all input
   features fall within the clipping boundary (#66).
+* `hotspot_gistar()` now calculates KDE values for longitude/latitude data by
+  automatically transforming them to a projected co-ordinate reference system
+  and transforming the results back afterwards (#68).
 
 
 # sfhotspot 1.0.0

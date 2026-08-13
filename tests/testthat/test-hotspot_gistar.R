@@ -1,5 +1,6 @@
 data_sf <- sf::st_transform(head(memphis_robberies, 1000), 2843)
 data_sf$wt <- runif(nrow(data_sf), max = 1000)
+data_lonlat <- sf::st_transform(head(data_sf, 100), 4326)
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
@@ -16,8 +17,11 @@ result_wt <- hotspot_gistar(data_sf, weights = wt, quiet = TRUE)
 
 ## Errors ----
 
-test_that("error if `data` doesn't use a projected CRS", {
-  expect_error(hotspot_gistar(data = sf::st_transform(data_sf, 4326)))
+test_that("error for lon/lat `data` if `transform = FALSE`", {
+  expect_error(
+    hotspot_gistar(data_lonlat, transform = FALSE, quiet = TRUE),
+    "Cannot calculate KDE values for lon/lat data"
+  )
 })
 
 
@@ -26,7 +30,7 @@ test_that("error if `data` doesn't use a projected CRS", {
 
 test_that("message if `data` uses a geographic CRS and KDE not performed", {
   expect_message(
-    hotspot_gistar(data = sf::st_transform(data_sf, 4326), kde = FALSE)
+    hotspot_gistar(data_lonlat, kde = FALSE)
   )
 })
 
@@ -47,6 +51,14 @@ test_that("no message reporting cell size when grid is provided", {
 test_that("function produces an SF tibble", {
   expect_s3_class(result, "sf")
   expect_s3_class(result, "tbl_df")
+})
+
+test_that("function calculates KDE values for lon/lat data", {
+  result_lonlat <- hotspot_gistar(data_lonlat, quiet = TRUE)
+
+  expect_s3_class(result_lonlat, "sf")
+  expect_type(result_lonlat$kde, "double")
+  expect_equal(sf::st_crs(result_lonlat), sf::st_crs(data_lonlat))
 })
 
 test_that("output object has the required column names", {

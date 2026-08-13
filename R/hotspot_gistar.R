@@ -129,12 +129,11 @@
 #' hotspot_gistar(memphis_robberies_utm, cell_size = 200)
 #' }
 #'
-#' # Automatically set grid-cell size and bandwidth for lon/lat data, since it
-#' # is not intuitive to set these values manually in decimal degrees. To do
-#' # this it is necessary to not calculate KDEs due to a limitation in the
-#' # underlying function.
+#' # Automatically set grid-cell size and bandwidth for lon/lat data. The data
+#' # will be transformed automatically before KDE values are calculated and the
+#' # result will then be transformed back to the original CRS.
 #' \donttest{
-#' hotspot_gistar(memphis_robberies, kde = FALSE)
+#' hotspot_gistar(memphis_robberies)
 #' }
 #'
 #' @export
@@ -166,28 +165,18 @@ hotspot_gistar <- function(
   # Check inputs that are not checked in a helper function
   validate_inputs(data = data, grid = grid, quiet = quiet)
 
-  # Check whether `data` can be used to estimate KDE values
-  if (sf::st_is_longlat(data)) {
-    if (rlang::is_true(kde)) {
-      # `kernel_density()` checks this and throws an error as well, but it is
-      # useful to catch it in `hotspot_gistar()` because in `hotspot_gistar()`
-      # we can solve the problem by setting `kde = FALSE` whereas the
-      # recommendation in the error produced by `kernel_density()` is to
-      # transform the data, which may not be necessary
-      cli::cli_abort(c(
-        "KDE values cannot be calculated for lon/lat data.",
-        "i" = paste0(
-          "Transform {.var data} to use a projected CRS or set ",
-          "{.code kde = FALSE}."
-        )
-      ))
-    } else if (rlang::is_false(quiet)) {
-      cli::cli_inform(c(
-        "The co-ordinates in {.var data} are latitudes and longitudes.",
-        "i" = "{.arg cell_size}/{.arg bandwidth} will be in decimal degrees.",
-        "i" = "Consider transforming {.var data} to use a projected CRS."
-      ))
-    }
+  # Report units when KDE values are not calculated, since `kernel_density()`
+  # otherwise reports that lon/lat data have been transformed
+  if (
+    sf::st_is_longlat(data) &
+    rlang::is_false(kde) &
+    rlang::is_false(quiet)
+  ) {
+    cli::cli_inform(c(
+      "The co-ordinates in {.var data} are latitudes and longitudes.",
+      "i" = "{.arg cell_size}/{.arg bandwidth} will be in decimal degrees.",
+      "i" = "Consider transforming {.var data} to use a projected CRS."
+    ))
   }
 
   # If the user has provided a grid then we extract the approximate cell size

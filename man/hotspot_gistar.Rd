@@ -162,12 +162,11 @@ hotspot_gistar(memphis_robberies_utm)
 hotspot_gistar(memphis_robberies_utm, cell_size = 200)
 }
 
-# Automatically set grid-cell size and bandwidth for lon/lat data, since it
-# is not intuitive to set these values manually in decimal degrees. To do
-# this it is necessary to not calculate KDEs due to a limitation in the
-# underlying function.
+# Automatically set grid-cell size and bandwidth for lon/lat data. The data
+# will be transformed automatically before KDE values are calculated and the
+# result will then be transformed back to the original CRS.
 \donttest{
-hotspot_gistar(memphis_robberies, kde = FALSE)
+hotspot_gistar(memphis_robberies)
 }
 
 }
