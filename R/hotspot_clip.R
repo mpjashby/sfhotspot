@@ -61,13 +61,15 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
     final_rows <- nrow(clipped_data)
     rows_removed <- initial_rows - final_rows
 
-    cli::cli_inform(
-      paste0(
-        "Removed {format(rows_removed, big.mark = ',', scientific = FALSE)} ",
-        "rows ({sprintf('%0.1f%%', (rows_removed / initial_rows) * 100)} of ",
-        "original rows) from {.var data}"
+    if (rows_removed > 0) {
+      cli::cli_inform(
+        paste0(
+          "Removed {format(rows_removed, big.mark = ',', scientific = FALSE)} ",
+          "rows ({sprintf('%0.1f%%', (rows_removed / initial_rows) * 100)} of ",
+          "original rows) from {.var data}"
+        )
       )
-    )
+    }
 
   }
 

@@ -91,3 +91,7 @@ test_that("unrelated classes are not preserved (#71)", {
 test_that("function produces message summarising rows removed", {
   expect_message(hotspot_clip(data_sf, boundary_sf), "^Removed 185 rows")
 })
+
+test_that("function produces no message if no rows are removed (#66)", {
+  expect_no_message(hotspot_clip(data_sf, memphis_precincts))
+})

@@ -4,6 +4,8 @@
   functions, as well as point data (#65).
 * `hotspot_clip()` now preserves the specialised `hspt_*` class of results
   produced by other package functions (#71).
+* `hotspot_clip()` no longer reports that zero rows were removed when all input
+  features fall within the clipping boundary (#66).
 
 
 # sfhotspot 1.0.0
