@@ -32,7 +32,9 @@ These checks should be run **in this order** before submitting to CRAN. If any o
 ## Remote checks
 
 - [ ] Confirm GitHub `R CMD check` workflow passes
-- [ ] Run appropriate R-hub v2 checks with `rhub::rhub_check()` and inspect every result
+- [ ] Create PR and merge dev branch into main
+- [ ] Switch to main branch in Positron
+- [ ] `rhub::rhub_check(platforms = c("linux", "macos", "macos-arm64", "windows", "nosuggests", "donttest", "nosuggests", "ubuntu-release"))`
 - [ ] `devtools::check_win_devel()`
 - [ ] `devtools::check_mac_release()`
 - [ ] Confirm 0 errors, 0 warnings and no unexplained notes across the remote checks
