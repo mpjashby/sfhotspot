@@ -2,6 +2,10 @@ url: https://pkgs.lesscrime.info/sfhotspot
 template:
   bootstrap: 5
 
+authors:
+  Matt Ashby:
+    href: https://lesscrime.info
+
 reference:
 - title: "Analysing hotspots"
   desc: "Tools for analysing hotspots."

@@ -57,7 +57,7 @@ as weights for weighted counts and KDE values.}
 \item{nb_dist}{The distance around a cell that contains the neighbours of
 that cell, which are used in calculating the statistic. If this argument is
 \code{NULL} (the default), \code{nb_dist} is set as \code{cell_size *
-  sqrt(2)} so that only the cells immediately adjacent to each cell are
+sqrt(2)} so that only the cells immediately adjacent to each cell are
 treated as being its neighbours.}
 
 \item{include_self}{Should points in a given cell be counted as well as

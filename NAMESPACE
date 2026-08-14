@@ -19,6 +19,8 @@ export(hotspot_gistar)
 export(hotspot_grid)
 export(hotspot_kde)
 export(st_transform_auto)
-importFrom(ggplot2,autolayer)
-importFrom(ggplot2,autoplot)
+importFrom(ggplot2,
+  autolayer,
+  autoplot
+)
 importFrom(rlang,.data)

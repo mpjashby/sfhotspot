@@ -11,10 +11,12 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
-^original_data$
 ^doc$
 ^Meta$
 ^rosm.cache
 ^README.qmd
 ^.vscode
 ^vignettes/.quarto
+^\.posit$
+^README\.html$
+^README_files$
