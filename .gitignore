@@ -39,7 +39,6 @@ vignettes/*.pdf
 .Renviron
 .Rproj.user
 
-/original_data/
 inst/doc
 /doc/
 /Meta/
@@ -48,3 +47,6 @@ inst/doc
 /vignettes/rosm.cache/
 
 /.quarto/
+/.posit/
+/README.html
+/README_files/

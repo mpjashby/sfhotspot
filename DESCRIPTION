@@ -1,6 +1,6 @@
 Package: sfhotspot
 Title: Hot-Spot Analysis with Simple Features
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: 
     person("Matt", "Ashby", , "matthew.ashby@ucl.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4201-9239"))
@@ -16,11 +16,10 @@ Description: Identify and understand clusters of points (typically representing
     classification (Chainey (2020) ISBN:158948584X).
 License: MIT + file LICENSE
 Language: en-GB
-URL: http://pkgs.lesscrime.info/sfhotspot/
+URL: https://pkgs.lesscrime.info/sfhotspot/
 BugReports: https://github.com/mpjashby/sfhotspot/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
 Imports:
     cli,
     ggplot2,
@@ -41,3 +40,4 @@ LazyData: true
 Config/testthat/edition: 3
 VignetteBuilder: 
   quarto
+Config/roxygen2/version: 8.1.0

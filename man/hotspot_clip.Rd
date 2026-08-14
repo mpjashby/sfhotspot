@@ -2,12 +2,12 @@
 % Please edit documentation in R/hotspot_clip.R
 \name{hotspot_clip}
 \alias{hotspot_clip}
-\title{Extract points inside polygon}
+\title{Extract spatial features inside a polygon}
 \usage{
 hotspot_clip(data, boundary, quiet = FALSE, ...)
 }
 \arguments{
-\item{data}{\code{\link[sf]{sf}} data frame containing points.}
+\item{data}{\code{\link[sf]{sf}} data frame containing points or polygons.}
 
 \item{boundary}{\code{\link[sf]{sf}} data frame containing polygons.}
 
@@ -18,13 +18,15 @@ parameters set automatically will be suppressed. The default is
 \item{...}{Further arguments passed to \code{\link[sf]{st_intersection}}.}
 }
 \value{
-an SF data frame containing those points that are covered by the
-polygons.
+an SF data frame containing those spatial features that are covered
+by the polygons.
 }
 \description{
-Extract points inside polygon
+Extract spatial features inside a polygon
 }
 \details{
 This function is a wrapper around \code{\link[sf]{st_intersection}} that
-performs some additional checks and reports useful information.
+performs some additional checks and reports useful information. If
+\code{data} has a specialised result class produced by this package, that
+class is preserved in the clipped result.
 }

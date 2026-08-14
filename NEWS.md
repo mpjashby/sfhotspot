@@ -1,3 +1,19 @@
+# sfhotspot 1.1.0
+
+* `hotspot_clip()` can now clip polygon results produced by the `hotspot_*()`
+  functions, as well as point data (#65).
+* `hotspot_clip()` now preserves the specialised `hspt_*` class of results
+  produced by other package functions (#71).
+* `hotspot_clip()` no longer reports that zero rows were removed when all input
+  features fall within the clipping boundary (#66).
+* `hotspot_gistar()` now calculates KDE values for longitude/latitude data by
+  automatically transforming them to a projected co-ordinate reference system
+  and transforming the results back afterwards (#68).
+* `hotspot_dual_kde()` now calculates valid KDE values for longitude/latitude
+  data while using a common automatically selected bandwidth for both layers,
+  and checks that both point layers overlap the analysis grid (#67).
+
+
 # sfhotspot 1.0.0
 
 * New function `hotspot_clip()` added to extract points from an SF object inside 

@@ -8,6 +8,7 @@
 #' @param grid \code{\link[sf]{sf}} data frame containing polygons.
 #' @param quiet a single logical value.
 #' @param name_data name of the data argument in the calling function.
+#' @param data_type geometry types allowed in the data argument.
 #' @param call the environment in which the function is called.
 #'
 #' @noRd
@@ -18,6 +19,7 @@ validate_inputs <- function(
   quiet = TRUE,
   name_data = "data",
   name_grid = "grid",
+  data_type = "POINT",
   call = rlang::caller_env()
 ) {
 
@@ -25,7 +27,7 @@ validate_inputs <- function(
   validate_sf(
     data, 
     label = name_data, 
-    type = "POINT", 
+    type = data_type,
     quiet = quiet, 
     call = call
   )

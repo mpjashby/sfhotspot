@@ -12,12 +12,14 @@
 #'   Ignored if \code{grid} is not \code{NULL}.
 #' @param bandwidth either a single \code{numeric} value specifying the
 #'   bandwidth to be used in calculating the kernel density estimates, or a list
-#'   of exactly 2 such values. If this argument is \code{NULL} (the default),
-#'   the bandwidth for both \code{x} and \code{y} will be determined
-#'   automatically using the result of \code{\link[MASS]{bandwidth.nrd}} called
-#'   on the co-ordinates of the points in \code{x}. If this argument is
+#'   of exactly 2 such values. If this argument is \code{NULL} (the default), a
+#'   single bandwidth will be determined automatically using the result of
+#'   \code{\link[MASS]{bandwidth.nrd}} called on the co-ordinates of the points
+#'   in \code{x}, then used for both \code{x} and \code{y}. If this argument is
 #'   \code{list(NULL, NULL)}, separate bandwidths will be determined
-#'   automatically for \code{x} and \code{y} based on each layer.
+#'   automatically for \code{x} and \code{y} based on each layer. For lon/lat
+#'   data that are transformed automatically, bandwidths are specified or
+#'   calculated in the units of the projected co-ordinate reference system.
 #' @param bandwidth_adjust single positive \code{numeric} value by which the
 #'   value of \code{bandwidth} for both \code{x} and \code{y} will be
 #'   multiplied, or a list of two such values. Useful for setting the bandwidth
@@ -38,18 +40,21 @@
 #'   The result of this calculation will be returned in the \code{kde} column of
 #'   the return value.
 #' @param grid \code{\link[sf]{sf}} data frame containing polygons, which will
-#'   be used as the grid for which densities are estimated.
+#'   be used as the grid for which densities are estimated. Both \code{x} and
+#'   \code{y} must overlap the grid and use the same co-ordinate reference
+#'   system.
 #' @param weights \code{NULL} (the default) or a vector of length two giving
 #'   either \code{NULL} or the name of a column in each of \code{x} and
 #'   \code{y} to be used as weights for weighted counts and KDE values.
 #' @param transform the underlying SpatialKDE package cannot calculate kernel
 #'   density for lon/lat data, so this must be transformed to use a projected
 #'   co-ordinate reference system. If this argument is \code{TRUE} (the 
-#'   default) and \code{sf::st_is_longlat(x)} is \code{TRUE}, \code{x}, \code{y} 
-#'   and \code{grid} (if provided) will be transformed automatically using 
-#'   \code{link{st_transform_auto}} before the kernel density is estimated and
-#'   transformed back afterwards. Set this argument to \code{FALSE} to suppress 
-#'   automatic transformation of the data.
+#'   default) and \code{sf::st_is_longlat(x)} is \code{TRUE}, \code{x}, \code{y}
+#'   and \code{grid} (if provided) will be transformed to a common projected
+#'   co-ordinate reference system chosen using \code{\link{st_transform_auto}}
+#'   before bandwidths and kernel densities are estimated. The result is returned
+#'   using the original co-ordinate reference system. Set this argument to
+#'   \code{FALSE} to suppress automatic transformation of the data.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{FALSE}.
@@ -192,6 +197,9 @@ hotspot_dual_kde <- function(
       "{.or {.val c('ratio', 'log', 'diff', 'sum')}}."
     ))
   rlang::arg_match(method, c("ratio", "log", "diff", "sum"), multiple = FALSE)
+  if (!rlang::is_logical(transform, n = 1)) {
+    cli::cli_abort("{.arg transform} must be one of {.q TRUE} or {.q FALSE}.")
+  }
 
 
 
@@ -223,6 +231,37 @@ hotspot_dual_kde <- function(
 
   }
 
+  # Since the grid is based on `x`, validate that `y` also uses the grid CRS and
+  # has at least one point within the analysis area
+  validate_inputs(
+    data = y,
+    grid = grid,
+    quiet = quiet,
+    name_data = "y",
+    name_grid = "grid"
+  )
+
+
+
+  # PREPARE KDE DATA -----------------------------------------------------------
+
+  # Grid creation and point counting use the original CRS so that `cell_size`
+  # retains its documented units. KDE inputs use one common projected CRS.
+  x_kde <- x
+  y_kde <- y
+  grid_kde <- grid
+  is_transformed <- FALSE
+  if (
+    rlang::is_true(sf::st_is_longlat(x)) &
+    rlang::is_true(transform)
+  ) {
+    x_kde <- st_transform_auto(x, quiet = quiet)
+    kde_crs <- sf::st_crs(x_kde)
+    y_kde <- sf::st_transform(y, kde_crs)
+    grid_kde <- sf::st_transform(grid, kde_crs)
+    is_transformed <- TRUE
+  }
+
 
 
   # BANDWIDTH ------------------------------------------------------------------
@@ -230,7 +269,8 @@ hotspot_dual_kde <- function(
 
   # Bandwidth 1: check provided input and assign to internal objects ----
 
-  if (rlang::is_bare_list(bandwidth, n = 2)) {
+  separate_bandwidths <- rlang::is_bare_list(bandwidth, n = 2)
+  if (separate_bandwidths) {
     validate_bandwidth(bandwidth[[1]], list = TRUE)
     validate_bandwidth(bandwidth[[2]], list = TRUE)
     bandwidth_x <- bandwidth[[1]]
@@ -254,17 +294,39 @@ hotspot_dual_kde <- function(
   # Bandwidth 2: set values automatically if not provided ----
 
   if (rlang::is_null(bandwidth_x)) {
+    bandwidth_x_label <- if (
+      separate_bandwidths |
+      bandwidth_adjust_x != bandwidth_adjust_y
+    ) {
+      "for `x`"
+    } else {
+      "for `x` and `y`"
+    }
     bandwidth_x <- set_bandwidth(
-      x,
+      x_kde,
       adjust = bandwidth_adjust_x,
       quiet = quiet,
-      label = "for `x`"
+      label = bandwidth_x_label
     )
   }
 
-  if (rlang::is_null(bandwidth_y)) {
+  if (!separate_bandwidths & rlang::is_null(bandwidth_y)) {
+    bandwidth_y <- bandwidth_x
+    if (
+      bandwidth_adjust_x != bandwidth_adjust_y &
+      rlang::is_false(quiet)
+    ) {
+      # Report the second adjusted value while retaining the common bandwidth
+      set_bandwidth(
+        x_kde,
+        adjust = bandwidth_adjust_y,
+        quiet = quiet,
+        label = "for `y`"
+      )
+    }
+  } else if (rlang::is_null(bandwidth_y)) {
     bandwidth_y <- set_bandwidth(
-      y,
+      y_kde,
       adjust = bandwidth_adjust_y,
       quiet = quiet,
       label = "for `y`"
@@ -273,22 +335,23 @@ hotspot_dual_kde <- function(
 
 
   # Bandwidth 3: check bandwidth makes sense relative to cell size ----
+  bandwidth_cell_size <- if (is_transformed) NULL else cell_size
   if (bandwidth_x != bandwidth_y) {
     validate_bandwidth(
       bandwidth_x,
       adjust = bandwidth_adjust_x,
-      cell_size = cell_size
+      cell_size = bandwidth_cell_size
     )
     validate_bandwidth(
       bandwidth_y,
       adjust = bandwidth_adjust_y,
-      cell_size = cell_size
+      cell_size = bandwidth_cell_size
     )
   } else {
     validate_bandwidth(
       bandwidth_x,
       adjust = bandwidth_adjust_x,
-      cell_size = cell_size
+      cell_size = bandwidth_cell_size
     )
   }
 
@@ -307,32 +370,27 @@ hotspot_dual_kde <- function(
     )
   }
 
-  # Check if any points in `y` were not counted in polygons because the polygons
-  # (which are based on the bounding box of `x`) do not cover all the points
-
-
-
   # CALCULATE KDE --------------------------------------------------------------
 
   # Calculate KDE for `x` ----
   if (rlang::is_chr_na(weights_x)) {
     kde_x <- kernel_density(
-      x,
-      grid,
+      x_kde,
+      grid_kde,
       bandwidth = bandwidth_x,
       bandwidth_adjust = bandwidth_adjust_x,
-      transform = transform,
+      transform = FALSE,
       quiet = quiet,
       ...
     )
   } else {
     kde_x <- kernel_density(
-      x,
-      grid,
+      x_kde,
+      grid_kde,
       bandwidth = bandwidth_x,
       bandwidth_adjust = bandwidth_adjust_x,
       weights = weights_x,
-      transform = transform,
+      transform = FALSE,
       quiet = quiet,
       ...
     )
@@ -341,23 +399,23 @@ hotspot_dual_kde <- function(
   # Calculate KDE for `y` ----
   if (rlang::is_chr_na(weights_y)) {
     kde_y <- kernel_density(
-      y,
-      grid,
+      y_kde,
+      grid_kde,
       bandwidth = bandwidth_y,
       bandwidth_adjust = bandwidth_adjust_y,
-      transform = transform,
+      transform = FALSE,
       # Prevent duplicate messages
       quiet = TRUE,
       ...
     )
   } else {
     kde_y <- kernel_density(
-      y,
-      grid,
+      y_kde,
+      grid_kde,
       bandwidth = bandwidth_y,
       bandwidth_adjust = bandwidth_adjust_y,
       weights = weights_y,
-      transform = transform,
+      transform = FALSE,
       # Prevent duplicate messages
       quiet = TRUE,
       ...
@@ -368,20 +426,20 @@ hotspot_dual_kde <- function(
 
   # FORMAT RESULT --------------------------------------------------------------
 
-  # Combine layers
-  kde <- kde_x[, "geometry"]
-  kde$kde_x <- kde_x$kde_value
-  kde$kde_y <- kde_y$kde_value
+  # Extract KDE values (the result geometry comes from `counts` in the original
+  # CRS rather than the projected KDE grid)
+  kde_x_value <- kde_x$kde_value
+  kde_y_value <- kde_y$kde_value
 
   # Compare KDE layers
   if (method == "log") {
-    counts$kde <- log(kde$kde_x / kde$kde_y)
+    counts$kde <- log(kde_x_value / kde_y_value)
   } else if (method == "diff") {
-    counts$kde <- kde$kde_x - kde$kde_y
+    counts$kde <- kde_x_value - kde_y_value
   } else if (method == "sum") {
-    counts$kde <- kde$kde_x + kde$kde_y
+    counts$kde <- kde_x_value + kde_y_value
   } else {
-    counts$kde <- kde$kde_x / kde$kde_y
+    counts$kde <- kde_x_value / kde_y_value
   }
 
   # Return result

@@ -57,7 +57,7 @@ as weights for weighted counts and KDE values.}
 \item{nb_dist}{The distance around a cell that contains the neighbours of
 that cell, which are used in calculating the statistic. If this argument is
 \code{NULL} (the default), \code{nb_dist} is set as \code{cell_size *
-  sqrt(2)} so that only the cells immediately adjacent to each cell are
+sqrt(2)} so that only the cells immediately adjacent to each cell are
 treated as being its neighbours.}
 
 \item{include_self}{Should points in a given cell be counted as well as
@@ -162,12 +162,11 @@ hotspot_gistar(memphis_robberies_utm)
 hotspot_gistar(memphis_robberies_utm, cell_size = 200)
 }
 
-# Automatically set grid-cell size and bandwidth for lon/lat data, since it
-# is not intuitive to set these values manually in decimal degrees. To do
-# this it is necessary to not calculate KDEs due to a limitation in the
-# underlying function.
+# Automatically set grid-cell size and bandwidth for lon/lat data. The data
+# will be transformed automatically before KDE values are calculated and the
+# result will then be transformed back to the original CRS.
 \donttest{
-hotspot_gistar(memphis_robberies, kde = FALSE)
+hotspot_gistar(memphis_robberies)
 }
 
 }

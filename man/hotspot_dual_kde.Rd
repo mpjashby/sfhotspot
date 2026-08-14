@@ -35,12 +35,14 @@ Ignored if \code{grid} is not \code{NULL}.}
 
 \item{bandwidth}{either a single \code{numeric} value specifying the
 bandwidth to be used in calculating the kernel density estimates, or a list
-of exactly 2 such values. If this argument is \code{NULL} (the default),
-the bandwidth for both \code{x} and \code{y} will be determined
-automatically using the result of \code{\link[MASS]{bandwidth.nrd}} called
-on the co-ordinates of the points in \code{x}. If this argument is
+of exactly 2 such values. If this argument is \code{NULL} (the default), a
+single bandwidth will be determined automatically using the result of
+\code{\link[MASS]{bandwidth.nrd}} called on the co-ordinates of the points
+in \code{x}, then used for both \code{x} and \code{y}. If this argument is
 \code{list(NULL, NULL)}, separate bandwidths will be determined
-automatically for \code{x} and \code{y} based on each layer.}
+automatically for \code{x} and \code{y} based on each layer. For lon/lat
+data that are transformed automatically, bandwidths are specified or
+calculated in the units of the projected co-ordinate reference system.}
 
 \item{bandwidth_adjust}{single positive \code{numeric} value by which the
 value of \code{bandwidth} for both \code{x} and \code{y} will be
@@ -64,7 +66,9 @@ The result of this calculation will be returned in the \code{kde} column of
 the return value.}
 
 \item{grid}{\code{\link[sf]{sf}} data frame containing polygons, which will
-be used as the grid for which densities are estimated.}
+be used as the grid for which densities are estimated. Both \code{x} and
+\code{y} must overlap the grid and use the same co-ordinate reference
+system.}
 
 \item{weights}{\code{NULL} (the default) or a vector of length two giving
 either \code{NULL} or the name of a column in each of \code{x} and
@@ -74,10 +78,11 @@ either \code{NULL} or the name of a column in each of \code{x} and
 density for lon/lat data, so this must be transformed to use a projected
 co-ordinate reference system. If this argument is \code{TRUE} (the
 default) and \code{sf::st_is_longlat(x)} is \code{TRUE}, \code{x}, \code{y}
-and \code{grid} (if provided) will be transformed automatically using
-\code{link{st_transform_auto}} before the kernel density is estimated and
-transformed back afterwards. Set this argument to \code{FALSE} to suppress
-automatic transformation of the data.}
+and \code{grid} (if provided) will be transformed to a common projected
+co-ordinate reference system chosen using \code{\link{st_transform_auto}}
+before bandwidths and kernel densities are estimated. The result is returned
+using the original co-ordinate reference system. Set this argument to
+\code{FALSE} to suppress automatic transformation of the data.}
 
 \item{quiet}{if set to \code{TRUE}, messages reporting the values of any
 parameters set automatically will be suppressed. The default is
