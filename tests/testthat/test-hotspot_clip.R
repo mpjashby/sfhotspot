@@ -95,3 +95,26 @@ test_that("function produces message summarising rows removed", {
 test_that("function produces no message if no rows are removed (#66)", {
   expect_no_message(hotspot_clip(data_sf, memphis_precincts))
 })
+
+
+## Warnings ----
+
+test_that("expected st_intersection warning is suppressed (#79)", {
+  expect_no_warning(hotspot_clip(data_sf, boundary_sf, quiet = TRUE))
+})
+
+test_that("other st_intersection warnings are not suppressed (#79)", {
+  st_intersection <- sf::st_intersection
+  local_mocked_bindings(
+    st_intersection = function(...) {
+      warning("A relevant warning from st_intersection()")
+      st_intersection(...)
+    },
+    .package = "sf"
+  )
+
+  expect_warning(
+    hotspot_clip(data_sf, boundary_sf, quiet = TRUE),
+    "A relevant warning from st_intersection\\(\\)"
+  )
+})

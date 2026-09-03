@@ -47,8 +47,22 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
   # except the geometry
   boundary_outline <- sf::st_union(boundary[, geometry_column])
 
-  # Clip data
-  clipped_data <- suppressWarnings(sf::st_intersection(data, boundary_outline))
+  # Clip data, suppressing the warning produced because `st_intersection()`
+  # cannot know whether attribute values apply to only part of each geometry
+  clipped_data <- withCallingHandlers(
+    sf::st_intersection(data, boundary_outline),
+    warning = function(w) {
+      if (identical(
+        conditionMessage(w),
+        paste(
+          "attribute variables are assumed to be spatially constant",
+          "throughout all geometries"
+        )
+      )) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
 
   # Restore any package-specific result class
   if (length(result_class) > 0) {
