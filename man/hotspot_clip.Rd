@@ -7,7 +7,7 @@
 hotspot_clip(data, boundary, quiet = FALSE, ...)
 }
 \arguments{
-\item{data}{\code{\link[sf]{sf}} data frame containing points or polygons.}
+\item{data}{\code{\link[sf]{sf}} data frame containing spatial features.}
 
 \item{boundary}{\code{\link[sf]{sf}} data frame containing polygons.}
 
@@ -28,5 +28,6 @@ Extract spatial features inside a polygon
 This function is a wrapper around \code{\link[sf]{st_intersection}} that
 performs some additional checks and reports useful information. If
 \code{data} has a specialised result class produced by this package, that
-class is preserved in the clipped result.
+class is preserved in the clipped result. A warning is produced if clipping
+reduces the dimension of any geometry, such as from a polygon to a line.
 }

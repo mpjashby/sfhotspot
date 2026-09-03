@@ -1,11 +1,16 @@
 # sfhotspot 1.1.0
 
-* `hotspot_clip()` can now clip polygon results produced by the `hotspot_*()`
-  functions, as well as point data (#65).
+* `hotspot_clip()` can now clip any type of geometry, not just point data (#65,
+  #78) and produces warnings if clipping changes the geometry type of any 
+  features in a way that might create downstream problems.
 * `hotspot_clip()` now preserves the specialised `hspt_*` class of results
   produced by other package functions (#71).
 * `hotspot_clip()` no longer reports that zero rows were removed when all input
   features fall within the clipping boundary (#66).
+* `hotspot_clip()` no longer suppresses warnings produced by
+  `sf::st_intersection()` other than the constant "attribute variables are 
+  assumed to be spatially constant throughout all geometries" (since this is 
+  rarely relevant).
 * `hotspot_gistar()` now calculates KDE values for longitude/latitude data by
   automatically transforming them to a projected co-ordinate reference system
   and transforming the results back afterwards (#68).

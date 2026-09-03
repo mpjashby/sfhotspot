@@ -14,14 +14,17 @@ polygon_result <- hotspot_clip(
 # Note that common inputs are tested in `validate_inputs()` and tested in the
 # corresponding test file
 
-test_that("unsupported geometry produces a useful error", {
+test_that("boundary must contain polygon geometry", {
+  linestring_boundary <- suppressWarnings(
+    sf::st_cast(boundary_sf, "LINESTRING")
+  )
   expect_error(
     hotspot_clip(
-      sf::st_cast(data_sf, "LINESTRING"),
-      boundary_sf,
+      data_sf,
+      linestring_boundary,
       quiet = TRUE
     ),
-    "must be an SF object with POINT, POLYGON, or MULTIPOLYGON geometry"
+    "boundary.*must be an SF object with POLYGON or MULTIPOLYGON geometry"
   )
 })
 
@@ -50,6 +53,41 @@ test_that("polygon data can be clipped (#65)", {
   expect_equal(names(polygon_result), names(polygon_data_sf))
   expect_true(nrow(polygon_result) < nrow(polygon_data_sf))
   expect_true(all(sf::st_is(polygon_result, c("POLYGON", "MULTIPOLYGON"))))
+})
+
+test_that("data can contain any geometry type (#78)", {
+  geometries <- list(
+    sf::st_point(c(0.5, 0.5)),
+    sf::st_multipoint(matrix(c(0.25, 0.25, 0.75, 0.75), ncol = 2, byrow = TRUE)),
+    sf::st_linestring(matrix(c(0.25, 0.25, 0.75, 0.75), ncol = 2, byrow = TRUE)),
+    sf::st_multilinestring(list(
+      matrix(c(0.25, 0.25, 0.75, 0.75), ncol = 2, byrow = TRUE)
+    )),
+    sf::st_polygon(list(matrix(
+      c(0.25, 0.25, 0.75, 0.25, 0.75, 0.75, 0.25, 0.25),
+      ncol = 2,
+      byrow = TRUE
+    ))),
+    sf::st_multipolygon(list(list(matrix(
+      c(0.25, 0.25, 0.75, 0.25, 0.75, 0.75, 0.25, 0.25),
+      ncol = 2,
+      byrow = TRUE
+    )))),
+    sf::st_geometrycollection(list(
+      sf::st_point(c(0.5, 0.5)),
+      sf::st_linestring(matrix(c(0.25, 0.25, 0.75, 0.75), ncol = 2, byrow = TRUE))
+    ))
+  )
+  boundary <- sf::st_as_sf(sf::st_sfc(sf::st_polygon(list(matrix(
+    c(0, 0, 1, 0, 1, 1, 0, 1, 0, 0),
+    ncol = 2,
+    byrow = TRUE
+  )))))
+
+  for (geometry in geometries) {
+    data <- sf::st_as_sf(sf::st_sfc(geometry))
+    expect_no_error(hotspot_clip(data, boundary, quiet = TRUE))
+  }
 })
 
 test_that("package-specific result classes are preserved (#71)", {
@@ -117,4 +155,35 @@ test_that("other st_intersection warnings are not suppressed (#79)", {
     hotspot_clip(data_sf, boundary_sf, quiet = TRUE),
     "A relevant warning from st_intersection\\(\\)"
   )
+})
+
+test_that("lower-dimensional output produces a warning (#78)", {
+  data <- sf::st_as_sf(sf::st_sfc(sf::st_polygon(list(matrix(
+    c(0, 0, 1, 0, 1, 1, 0, 1, 0, 0),
+    ncol = 2,
+    byrow = TRUE
+  )))))
+  boundary <- sf::st_as_sf(sf::st_sfc(sf::st_polygon(list(matrix(
+    c(1, 0, 2, 0, 2, 1, 1, 1, 1, 0),
+    ncol = 2,
+    byrow = TRUE
+  )))))
+
+  expect_warning(
+    result <- hotspot_clip(data, boundary, quiet = TRUE),
+    "reduced the geometry dimension of 1 output feature"
+  )
+  expect_true(sf::st_is(result, "LINESTRING"))
+})
+
+test_that("single/multi type changes do not produce a warning (#78)", {
+  polygon <- sf::st_polygon(list(matrix(
+    c(0, 0, 1, 0, 1, 1, 0, 1, 0, 0),
+    ncol = 2,
+    byrow = TRUE
+  )))
+  data <- sf::st_as_sf(sf::st_sfc(sf::st_multipolygon(list(polygon))))
+  boundary <- sf::st_as_sf(sf::st_sfc(polygon))
+
+  expect_no_warning(hotspot_clip(data, boundary, quiet = TRUE))
 })
