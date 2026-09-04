@@ -48,7 +48,7 @@
 #'   \code{y} to be used as weights for weighted counts and KDE values.
 #' @param transform the underlying SpatialKDE package cannot calculate kernel
 #'   density for lon/lat data, so this must be transformed to use a projected
-#'   co-ordinate reference system. If this argument is \code{TRUE} (the 
+#'   co-ordinate reference system. If this argument is \code{TRUE} (the
 #'   default) and \code{sf::st_is_longlat(x)} is \code{TRUE}, \code{x}, \code{y}
 #'   and \code{grid} (if provided) will be transformed to a common projected
 #'   co-ordinate reference system chosen using \code{\link{st_transform_auto}}
@@ -60,8 +60,9 @@
 #'   \code{FALSE}.
 #' @param ... Further arguments passed to \code{\link[SpatialKDE]{kde}}.
 #' @return An \code{\link[sf]{sf}} tibble of grid cells with corresponding point
-#'   counts and dual kernel density estimates for each cell. This can be plotted
-#'   using \code{\link{autoplot}}.
+#'   counts and dual kernel density estimates for each cell. The result has
+#'   classes \code{hspt_dk} and \code{hspt_k}, and a \code{method} attribute
+#'   containing the comparison method used.
 #'
 #' This function creates a regular two-dimensional grid of cells (unless a
 #' custom grid is specified with \code{grid}), calculates the density of points
@@ -145,7 +146,6 @@ hotspot_dual_kde <- function(
   quiet = FALSE,
   ...
 ) {
-
   # Process arguments that are column names
   weights_name_error <- FALSE
   if (rlang::quo_is_null(rlang::enquo(weights))) {
@@ -191,17 +191,16 @@ hotspot_dual_kde <- function(
   validate_inputs(data = y, grid = NULL, quiet = quiet, name_data = "y")
   # `arg_match()` throws an uninformative error if `method` has length 0, so
   # first test if `method` is a character vector of length 1
-  if (!rlang::is_character(method, n = 1))
+  if (!rlang::is_character(method, n = 1)) {
     cli::cli_abort(paste0(
       "{.arg method} must be one of ",
       "{.or {.val c('ratio', 'log', 'diff', 'sum')}}."
     ))
+  }
   rlang::arg_match(method, c("ratio", "log", "diff", "sum"), multiple = FALSE)
   if (!rlang::is_logical(transform, n = 1)) {
     cli::cli_abort("{.arg transform} must be one of {.q TRUE} or {.q FALSE}.")
   }
-
-
 
   # CELL SIZE ------------------------------------------------------------------
 
@@ -211,15 +210,13 @@ hotspot_dual_kde <- function(
   # user has provided neither, we determine an appropriate cell size and then
   # use that as the basis for creating the grid.
   if (!rlang::is_null(grid)) {
-
     # Extract cell size from grid
     cell_size <- get_cell_size(grid)
-
   } else {
-
     # Set cell size
-    if (rlang::is_null(cell_size))
+    if (rlang::is_null(cell_size)) {
       cell_size <- set_cell_size(x, quiet = quiet)
+    }
 
     # Create grid
     grid <- create_grid(
@@ -228,7 +225,6 @@ hotspot_dual_kde <- function(
       grid_type = grid_type,
       quiet = quiet
     )
-
   }
 
   # Since the grid is based on `x`, validate that `y` also uses the grid CRS and
@@ -241,8 +237,6 @@ hotspot_dual_kde <- function(
     name_grid = "grid"
   )
 
-
-
   # PREPARE KDE DATA -----------------------------------------------------------
 
   # Grid creation and point counting use the original CRS so that `cell_size`
@@ -253,7 +247,7 @@ hotspot_dual_kde <- function(
   is_transformed <- FALSE
   if (
     rlang::is_true(sf::st_is_longlat(x)) &
-    rlang::is_true(transform)
+      rlang::is_true(transform)
   ) {
     x_kde <- st_transform_auto(x, quiet = quiet)
     kde_crs <- sf::st_crs(x_kde)
@@ -262,10 +256,7 @@ hotspot_dual_kde <- function(
     is_transformed <- TRUE
   }
 
-
-
   # BANDWIDTH ------------------------------------------------------------------
-
 
   # Bandwidth 1: check provided input and assign to internal objects ----
 
@@ -290,13 +281,12 @@ hotspot_dual_kde <- function(
     bandwidth_adjust_x <- bandwidth_adjust_y <- bandwidth_adjust
   }
 
-
   # Bandwidth 2: set values automatically if not provided ----
 
   if (rlang::is_null(bandwidth_x)) {
     bandwidth_x_label <- if (
       separate_bandwidths |
-      bandwidth_adjust_x != bandwidth_adjust_y
+        bandwidth_adjust_x != bandwidth_adjust_y
     ) {
       "for `x`"
     } else {
@@ -314,7 +304,7 @@ hotspot_dual_kde <- function(
     bandwidth_y <- bandwidth_x
     if (
       bandwidth_adjust_x != bandwidth_adjust_y &
-      rlang::is_false(quiet)
+        rlang::is_false(quiet)
     ) {
       # Report the second adjusted value while retaining the common bandwidth
       set_bandwidth(
@@ -332,7 +322,6 @@ hotspot_dual_kde <- function(
       label = "for `y`"
     )
   }
-
 
   # Bandwidth 3: check bandwidth makes sense relative to cell size ----
   bandwidth_cell_size <- if (is_transformed) NULL else cell_size
@@ -354,8 +343,6 @@ hotspot_dual_kde <- function(
       cell_size = bandwidth_cell_size
     )
   }
-
-
 
   # COUNT POINTS ---------------------------------------------------------------
 
@@ -422,8 +409,6 @@ hotspot_dual_kde <- function(
     )
   }
 
-
-
   # FORMAT RESULT --------------------------------------------------------------
 
   # Extract KDE values (the result geometry comes from `counts` in the original
@@ -452,6 +437,9 @@ hotspot_dual_kde <- function(
       tibble::as_tibble(counts[, c("n", "kde", "geometry")])
     )
   }
-  structure(result, class = c("hspt_k", class(result)))
-
+  structure(
+    result,
+    class = c("hspt_dk", "hspt_k", class(result)),
+    method = method
+  )
 }

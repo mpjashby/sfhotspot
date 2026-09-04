@@ -109,9 +109,11 @@ test_that("error if `y` does not overlap the analysis grid", {
 
 ## Correct outputs ----
 
-test_that("output is an SF tibble with class hspt_k", {
+test_that("output is an SF tibble with dual-KDE and KDE classes (#83)", {
   expect_s3_class(result, "sf")
   expect_s3_class(result, "tbl_df")
+  expect_identical(class(result)[1:2], c("hspt_dk", "hspt_k"))
+  expect_s3_class(result, "hspt_dk")
   expect_s3_class(result, "hspt_k")
   expect_s3_class(result_wt, "sf")
   expect_s3_class(result_wt, "tbl_df")
@@ -122,6 +124,37 @@ test_that("output is an SF tibble with class hspt_k", {
   expect_s3_class(result_dual_adj, "sf")
   expect_s3_class(result_dual_adj, "tbl_df")
   expect_s3_class(result_dual_adj, "hspt_k")
+})
+
+test_that("every comparison method is recorded in dual-KDE metadata (#83)", {
+  for (comparison_method in c("ratio", "log", "diff", "sum")) {
+    method_result <- hotspot_dual_kde(
+      data_sf,
+      data_sf,
+      cell_size = 1000,
+      bandwidth = 10000,
+      method = comparison_method,
+      quiet = TRUE
+    )
+
+    expect_identical(class(method_result)[1:2], c("hspt_dk", "hspt_k"))
+    expect_identical(attr(method_result, "method"), comparison_method)
+    expect_identical(
+      attr(method_result, "method") %in% c("diff", "log"),
+      comparison_method %in% c("diff", "log")
+    )
+  }
+})
+
+test_that("dual-KDE metadata supports existing downstream behaviour (#83)", {
+  subset_result <- result[seq_len(min(2, nrow(result))), ]
+
+  expect_output(print(result))
+  expect_s3_class(subset_result, "hspt_dk")
+  expect_s3_class(subset_result, "hspt_k")
+  expect_identical(attr(subset_result, "method"), "ratio")
+  expect_s3_class(autoplot(result), "ggplot")
+  expect_no_condition(autolayer(result))
 })
 
 test_that("output object has the required column names", {

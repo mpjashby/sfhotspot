@@ -92,8 +92,9 @@ parameters set automatically will be suppressed. The default is
 }
 \value{
 An \code{\link[sf]{sf}} tibble of grid cells with corresponding point
-counts and dual kernel density estimates for each cell. This can be plotted
-using \code{\link{autoplot}}.
+counts and dual kernel density estimates for each cell. The result has
+classes \code{hspt_dk} and \code{hspt_k}, and a \code{method} attribute
+containing the comparison method used.
 
 This function creates a regular two-dimensional grid of cells (unless a
 custom grid is specified with \code{grid}), calculates the density of points

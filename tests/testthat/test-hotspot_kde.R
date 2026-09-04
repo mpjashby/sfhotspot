@@ -34,9 +34,12 @@ result_wt <- hotspot_kde(
 
 ## Correct outputs ----
 
-test_that("output is an SF tibble with class hspt_k", {
+test_that("output remains an hspt_k SF tibble without dual-KDE metadata (#83)", {
   expect_s3_class(result, "sf")
   expect_s3_class(result, "tbl_df")
+  expect_identical(class(result)[[1]], "hspt_k")
+  expect_false(inherits(result, "hspt_dk"))
+  expect_null(attr(result, "method"))
   expect_s3_class(result, "hspt_k")
   expect_s3_class(result_wt, "sf")
   expect_s3_class(result_wt, "tbl_df")

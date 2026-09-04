@@ -91,7 +91,9 @@ test_that("data can contain any geometry type (#78)", {
 })
 
 test_that("package-specific result classes are preserved (#71)", {
-  result_classes <- c("hspt_n", "hspt_k", "hspt_c", "hspt_d", "hspt_g")
+  result_classes <- c(
+    "hspt_n", "hspt_dk", "hspt_k", "hspt_c", "hspt_d", "hspt_g"
+  )
   base_classes <- setdiff(class(polygon_data_sf), result_classes)
 
   for (result_class in result_classes) {
@@ -108,6 +110,22 @@ test_that("package-specific result classes are preserved (#71)", {
   }
 
   expect_s3_class(autoplot(polygon_result), "ggplot")
+})
+
+test_that("dual-KDE class and method survive clipping (#83)", {
+  dual_kde_data <- structure(
+    polygon_data_sf,
+    class = c("hspt_dk", "hspt_k", class(polygon_data_sf)),
+    method = "diff"
+  )
+  clipped_dual_kde <- hotspot_clip(
+    dual_kde_data,
+    memphis_precincts,
+    quiet = TRUE
+  )
+
+  expect_identical(class(clipped_dual_kde)[1:2], c("hspt_dk", "hspt_k"))
+  expect_identical(attr(clipped_dual_kde, "method"), "diff")
 })
 
 test_that("unrelated classes are not preserved (#71)", {
