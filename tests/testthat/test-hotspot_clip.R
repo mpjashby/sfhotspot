@@ -170,9 +170,10 @@ test_that("lower-dimensional output produces a warning (#78)", {
   )))))
 
   expect_warning(
-    result <- hotspot_clip(data, boundary, quiet = TRUE),
+    result <- hotspot_clip(data, boundary, quiet = FALSE),
     "reduced the geometry dimension of 1 output feature"
   )
+  expect_no_warning(hotspot_clip(data, boundary, quiet = TRUE))
   expect_true(sf::st_is(result, "LINESTRING"))
 })
 
