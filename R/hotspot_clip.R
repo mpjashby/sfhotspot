@@ -37,7 +37,7 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
   # not preserve classes it does not recognise
   result_class <- intersect(
     class(data),
-    c("hspt_n", "hspt_k", "hspt_c", "hspt_d")
+    c("hspt_n", "hspt_k", "hspt_c", "hspt_d", "hspt_g")
   )
 
   # Get name of geometry column in boundary file

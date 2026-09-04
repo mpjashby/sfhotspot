@@ -57,7 +57,8 @@
 #'   \code{FALSE}.
 #' @param ... Further arguments passed to \code{\link[SpatialKDE]{kde}} or
 #'   ignored if \code{kde = FALSE}.
-#' @return An \code{\link[sf]{sf}} tibble of regular grid cells with
+#' @return An \code{\link[sf]{sf}} tibble with class \code{hspt_g} containing
+#'   regular grid cells with
 #'   corresponding point counts,
 #'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}} or
 #'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}
@@ -256,23 +257,26 @@ hotspot_gistar <- function(
   # Join results
   if (rlang::is_true(kde)) result$kde <- kde_val$kde_value
 
-  # Return result
+  # Select and order output columns
   if (rlang::is_true(kde) & !rlang::is_chr_na(weights)) {
-    sf::st_as_sf(tibble::as_tibble(
+    result <- sf::st_as_sf(tibble::as_tibble(
       result[, c("n", "sum", "kde", "gistar", "pvalue", "geometry")]
     ))
   } else if (!rlang::is_chr_na(weights)) {
-    sf::st_as_sf(tibble::as_tibble(
+    result <- sf::st_as_sf(tibble::as_tibble(
       result[, c("n", "sum", "gistar", "pvalue", "geometry")]
     ))
   } else if (rlang::is_true(kde)) {
-    sf::st_as_sf(tibble::as_tibble(
+    result <- sf::st_as_sf(tibble::as_tibble(
       result[, c("n", "kde", "gistar", "pvalue", "geometry")]
     ))
   } else {
-    sf::st_as_sf(tibble::as_tibble(
+    result <- sf::st_as_sf(tibble::as_tibble(
       result[, c("n", "gistar", "pvalue", "geometry")]
     ))
   }
+
+  # Return result
+  structure(result, class = c("hspt_g", class(result)))
 
 }

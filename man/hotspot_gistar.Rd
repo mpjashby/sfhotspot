@@ -90,7 +90,8 @@ parameters set automatically will be suppressed. The default is
 ignored if \code{kde = FALSE}.}
 }
 \value{
-An \code{\link[sf]{sf}} tibble of regular grid cells with
+An \code{\link[sf]{sf}} tibble with class \code{hspt_g} containing
+regular grid cells with
 corresponding point counts,
 \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}} or
 \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}

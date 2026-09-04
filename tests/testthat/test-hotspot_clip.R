@@ -91,7 +91,7 @@ test_that("data can contain any geometry type (#78)", {
 })
 
 test_that("package-specific result classes are preserved (#71)", {
-  result_classes <- c("hspt_n", "hspt_k", "hspt_c", "hspt_d")
+  result_classes <- c("hspt_n", "hspt_k", "hspt_c", "hspt_d", "hspt_g")
   base_classes <- setdiff(class(polygon_data_sf), result_classes)
 
   for (result_class in result_classes) {

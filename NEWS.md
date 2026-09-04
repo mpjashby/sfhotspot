@@ -5,6 +5,9 @@
   features in a way that might create downstream problems.
 * `hotspot_clip()` now preserves the specialised `hspt_*` class of results
   produced by other package functions (#71).
+* `hotspot_gistar()` results now have the specialised class `hspt_g`, allowing
+  downstream functions to identify `gistar` as their primary value column
+  (#82).
 * `hotspot_clip()` no longer reports that zero rows were removed when all input
   features fall within the clipping boundary (#66).
 * `hotspot_clip()` no longer suppresses warnings produced by

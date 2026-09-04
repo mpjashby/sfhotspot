@@ -6,6 +6,13 @@ data_lonlat <- sf::st_transform(head(data_sf, 100), 4326)
 # not produce any errors or warnings
 result <- hotspot_gistar(data_sf, quiet = TRUE)
 result_wt <- hotspot_gistar(data_sf, weights = wt, quiet = TRUE)
+result_no_kde <- hotspot_gistar(data_sf, kde = FALSE, quiet = TRUE)
+result_wt_no_kde <- hotspot_gistar(
+  data_sf,
+  weights = wt,
+  kde = FALSE,
+  quiet = TRUE
+)
 
 
 
@@ -48,9 +55,23 @@ test_that("no message reporting cell size when grid is provided", {
 
 ## Correct outputs ----
 
-test_that("function produces an SF tibble", {
-  expect_s3_class(result, "sf")
-  expect_s3_class(result, "tbl_df")
+test_that("every return branch produces an hspt_g SF tibble (#82)", {
+  for (output in list(result, result_wt, result_no_kde, result_wt_no_kde)) {
+    expect_identical(class(output)[[1]], "hspt_g")
+    expect_s3_class(output, "hspt_g")
+    expect_s3_class(output, "sf")
+    expect_s3_class(output, "tbl_df")
+  }
+})
+
+test_that("standard SF printing and subsetting are preserved (#82)", {
+  expect_output(print(result), "Simple feature collection")
+
+  subset <- result[1:2, c("gistar", "geometry")]
+  expect_s3_class(subset, "hspt_g")
+  expect_s3_class(subset, "sf")
+  expect_equal(names(subset), c("gistar", "geometry"))
+  expect_equal(nrow(subset), 2)
 })
 
 test_that("function calculates KDE values for lon/lat data", {
@@ -68,11 +89,11 @@ test_that("output object has the required column names", {
     c("n", "sum", "kde", "gistar", "pvalue", "geometry")
   )
   expect_equal(
-    names(hotspot_gistar(data_sf, weights = wt, kde = FALSE)),
+    names(result_wt_no_kde),
     c("n", "sum", "gistar", "pvalue", "geometry")
   )
   expect_equal(
-    names(hotspot_gistar(data_sf, kde = FALSE)),
+    names(result_no_kde),
     c("n", "gistar", "pvalue", "geometry")
   )
 })
