@@ -6,7 +6,7 @@ counts <- count_points_in_polygons(
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
-result <- gistar(counts = counts, n = n)
+result <- gistar(counts = counts)
 
 
 # CHECK INPUTS -----------------------------------------------------------------
@@ -18,39 +18,40 @@ result <- gistar(counts = counts, n = n)
 ## Errors ----
 
 test_that("error if `data` is not an SF object", {
-  expect_error(gistar(counts = sf::st_drop_geometry(counts), n = n))
+  expect_error(gistar(counts = sf::st_drop_geometry(counts)))
 })
 
-test_that("error if `n` is not a column in `data or is not numeric`", {
-  expect_error(gistar(counts = counts, n = m))
-  expect_error(gistar(counts = counts, n = geometry))
+test_that("error if counts are missing or are not numeric", {
+  expect_error(gistar(counts = dplyr::select(counts, -n)), "named `n` or `sum`")
+  counts_character <- counts
+  counts_character$n <- as.character(counts_character$n)
+  expect_error(gistar(counts = counts_character), "must be numeric")
 })
 
 test_that("error if inputs don't have correct types", {
-  expect_error(gistar(counts = counts, n = n, nb_dist = character()))
-  expect_error(gistar(counts = counts, n = n, cell_size = character()))
-  expect_error(gistar(counts = counts, n = n, include_self = character()))
-  expect_error(gistar(counts = counts, n = n, p_adjust_method = 1))
-  expect_error(gistar(counts = counts, n = n, quiet = character()))
+  expect_error(gistar(counts = counts, nb_dist = character()))
+  expect_error(gistar(counts = counts, cell_size = character()))
+  expect_error(gistar(counts = counts, include_self = character()))
+  expect_error(gistar(counts = counts, p_adjust_method = 1))
+  expect_error(gistar(counts = counts, quiet = character()))
 })
 
 test_that("error if inputs aren't of length 1", {
-  expect_error(gistar(counts = counts, n = n, nb_dist = 1:2))
-  expect_error(gistar(counts = counts, n = n, cell_size = 1:2))
-  expect_error(gistar(counts = counts, n = n, include_self = c(TRUE, FALSE)))
+  expect_error(gistar(counts = counts, nb_dist = 1:2))
+  expect_error(gistar(counts = counts, cell_size = 1:2))
+  expect_error(gistar(counts = counts, include_self = c(TRUE, FALSE)))
   expect_error(gistar(
     counts = counts,
-    n = n,
     p_adjust_method = stats::p.adjust.methods[1:2])
   )
-  expect_error(gistar(counts = counts, n = n, quiet = c(TRUE, FALSE)))
+  expect_error(gistar(counts = counts, quiet = c(TRUE, FALSE)))
 })
 
 test_that("error if values are of the correct type/length but are invalid", {
-  expect_error(gistar(counts = counts, n = n, nb_dist = -1))
-  expect_error(gistar(counts = counts, n = n, cell_size = -1))
+  expect_error(gistar(counts = counts, nb_dist = -1))
+  expect_error(gistar(counts = counts, cell_size = -1))
   expect_error(
-    gistar(counts = counts, n = n, p_adjust_method = "some other method")
+    gistar(counts = counts, p_adjust_method = "some other method")
   )
 })
 
@@ -81,4 +82,21 @@ test_that("column values are within the specified range", {
   expect_true(all(result$n >= 0))
   expect_true(all(result$pvalue >= 0))
   expect_true(all(result$pvalue <= 1))
+})
+
+test_that("weighted counts are used when present (#86)", {
+  weighted_counts <- counts
+  weighted_counts$sum <- seq_len(nrow(weighted_counts))^2
+
+  weighted_result <- gistar(weighted_counts)
+  unweighted_result <- gistar(dplyr::select(weighted_counts, -sum))
+
+  expect_false(isTRUE(all.equal(
+    weighted_result$gistar,
+    unweighted_result$gistar
+  )))
+  expect_false(isTRUE(all.equal(
+    weighted_result$pvalue,
+    unweighted_result$pvalue
+  )))
 })

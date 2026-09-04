@@ -20,6 +20,8 @@
 * `hotspot_dual_kde()` now calculates valid KDE values for longitude/latitude
   data while using a common automatically selected bandwidth for both layers,
   and checks that both point layers overlap the analysis grid (#67).
+* `hotspot_gistar()` now uses weighted counts to calculate Gi* statistics and
+  p-values when weights are supplied (#86).
 
 
 # sfhotspot 1.0.0

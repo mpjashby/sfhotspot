@@ -416,7 +416,6 @@ hotspot_classify <- function(
       # Calculate Gi*
       period_count <- gistar(
         x,
-        n = "n",
         nb_dist = params$nb_dist,
         cell_size = cell_size,
         include_self = params$include_self,

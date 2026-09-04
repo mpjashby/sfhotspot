@@ -1,5 +1,5 @@
 data_sf <- sf::st_transform(head(memphis_robberies, 1000), 2843)
-data_sf$wt <- runif(nrow(data_sf), max = 1000)
+data_sf$wt <- seq_len(nrow(data_sf))
 data_lonlat <- sf::st_transform(head(data_sf, 100), 4326)
 
 # To speed up the checking process, run the function with arguments that should
@@ -114,4 +114,9 @@ test_that("column values are within the specified range", {
   expect_true(all(result_wt$kde >= 0))
   expect_true(all(result$pvalue >= 0))
   expect_true(all(result$pvalue <= 1))
+})
+
+test_that("weights affect Gi* statistics and p-values (#86)", {
+  expect_false(isTRUE(all.equal(result$gistar, result_wt$gistar)))
+  expect_false(isTRUE(all.equal(result$pvalue, result_wt$pvalue)))
 })

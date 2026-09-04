@@ -52,7 +52,7 @@ relative to the default.}
 be used as the grid for which counts are made.}
 
 \item{weights}{\code{NULL} or the name of a column in \code{data} to be used
-as weights for weighted counts and KDE values.}
+as weights for weighted counts, Gi*/Gi statistics and KDE values.}
 
 \item{nb_dist}{The distance around a cell that contains the neighbours of
 that cell, which are used in calculating the statistic. If this argument is
@@ -122,7 +122,9 @@ calculate the \eqn{Z} scores and then \code{\link[spdep]{p.adjustSP}}
 function to adjust the corresponding \eqn{p}-values for multiple comparison.
 The function also returns counts of points in each cell and (by default but
 optionally) kernel density estimates using the \code{\link[SpatialKDE]{kde}}
-function.
+function. If \code{weights} is supplied, the Gi*/Gi statistics are calculated
+from the weighted counts; otherwise, they are calculated from the unweighted
+counts.
 \subsection{Coverage of the output data}{
 
 The grid produced by this function covers the convex hull of the input data
