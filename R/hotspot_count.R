@@ -71,8 +71,23 @@ hotspot_count <- function(
     rlang::as_name(rlang::enquo(weights))
   )
 
+  data <- prepare_point_data(
+    data,
+    attributes = if (rlang::is_chr_na(weights)) NULL else weights,
+    quiet = quiet,
+    call = rlang::caller_env()
+  )
+  if (!rlang::is_null(grid)) {
+    grid <- prepare_spatial_data(grid, quiet = quiet, label = "grid")
+  }
+
   # Check inputs that are not checked in a helper function
-  validate_inputs(data = data, grid = grid, quiet = quiet)
+  validate_inputs(
+    data = data,
+    grid = grid,
+    quiet = quiet,
+    require_units = rlang::is_null(grid)
+  )
 
   # Create grid
   if (rlang::is_null(grid)) {
@@ -97,6 +112,6 @@ hotspot_count <- function(
   }
 
   # Return result
-  structure(counts, class = c("hspt_n", class(counts)))
+  new_hotspot_results(counts, class = "hspt_n")
 
 }

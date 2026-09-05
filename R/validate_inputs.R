@@ -20,6 +20,7 @@ validate_inputs <- function(
   name_data = "data",
   name_grid = "grid",
   data_type = "POINT",
+  require_units = FALSE,
   call = rlang::caller_env()
 ) {
 
@@ -28,6 +29,7 @@ validate_inputs <- function(
     data, 
     label = name_data, 
     type = data_type,
+    require_units = require_units,
     quiet = quiet, 
     call = call
   )
@@ -37,6 +39,7 @@ validate_inputs <- function(
       label = name_grid,
       type = c("POLYGON", "MULTIPOLYGON"),
       allow_null = TRUE,
+      require_units = require_units,
       quiet = quiet,
       call = call
     )
@@ -219,6 +222,9 @@ validate_sf <- function(
     label = "data",
     type = NULL,
     allow_null = FALSE,
+    allow_empty = FALSE,
+    require_crs = TRUE,
+    require_units = FALSE,
     quiet = TRUE,
     call = rlang::caller_env()
   ) {
@@ -242,6 +248,10 @@ validate_sf <- function(
     )
   }
 
+  if (allow_null && rlang::is_null(obj)) {
+    return(invisible(NULL))
+  }
+
   # Check that object has more than zero rows
   if (nrow(obj) <= 0) {
 
@@ -255,10 +265,47 @@ validate_sf <- function(
     
   }
 
+
+  # A CRS is needed to interpret co-ordinates and to compare spatial objects.
+  crs <- sf::st_crs(obj)
+  if (require_crs && (is.na(crs) || is.na(crs$wkt) || !nzchar(crs$wkt))) {
+    cli::cli_abort(
+      c(
+        "Co-ordinate reference system for {.var {label}} is missing.",
+        "i" = "Check or set the CRS using {.fn st_crs}."
+      ),
+      call = call
+    )
+  }
+
+  # Distance-based operations also need to know what one co-ordinate unit
+  # represents. Do not reject uncommon units as long as they are specified.
+  if (require_units) {
+    units <- sf::st_crs(obj, parameters = TRUE)$units_gdal
+    if (
+      rlang::is_null(units) ||
+        length(units) == 0 ||
+        is.na(units) ||
+        !nzchar(units)
+    ) {
+      cli::cli_abort(
+        c(
+          "Unit metadata for the CRS of {.var {label}} is missing.",
+          "i" = paste0(
+            "This operation creates a grid or uses a distance parameter, ",
+            "so the co-ordinate units must be known."
+          ),
+          "i" = "Set a complete CRS or transform {.var {label}} to a CRS with known units."
+        ),
+        call = call
+      )
+    }
+  }
+
   # Check obj has no empty geometries
   empty <- sf::st_is_empty(obj)
 
-  if (sum(empty) > 0) {
+  if (!allow_empty && sum(empty) > 0) {
 
     if (sum(empty) == nrow(obj)) {
       msg <- c("x" = "All rows have missing geometry.")
@@ -329,4 +376,132 @@ validate_sf <- function(
 
   invisible(NULL)
 
+}
+
+
+#' Prepare spatial data for hotspot analysis
+#'
+#' @noRd
+prepare_spatial_data <- function(
+  data,
+  quiet = FALSE,
+  label = "data",
+  call = rlang::caller_env()
+) {
+  # Perform checks needed before geometry can safely be normalised.
+  validate_sf(
+    data,
+    label = label,
+    type = NULL,
+    allow_empty = TRUE,
+    quiet = TRUE,
+    call = call
+  )
+
+  empty <- sf::st_is_empty(data)
+  if (any(empty)) {
+    removed <- sum(empty)
+    data <- data[!empty, , drop = FALSE]
+    if (rlang::is_false(quiet)) {
+      cli::cli_inform(
+        "Removed {removed} row{?s} from {.var {label}} because {?it has/they have} empty geometry.",
+        call = call
+      )
+    }
+    if (nrow(data) == 0) {
+      cli::cli_abort(
+        c(
+          "No rows with non-empty geometry remain in {.var {label}}.",
+          "i" = "All input geometries were empty."
+        ),
+        call = call
+      )
+    }
+  }
+
+  # GEOS does not support M dimensions, and hotspot methods use only X and Y.
+  data <- sf::st_zm(data, drop = TRUE, what = "ZM")
+
+  data
+}
+
+
+#' Prepare point data for hotspot analysis
+#'
+#' @noRd
+prepare_point_data <- function(
+  data,
+  attributes = NULL,
+  quiet = FALSE,
+  label = "data",
+  call = rlang::caller_env()
+) {
+  data <- prepare_spatial_data(
+    data,
+    quiet = quiet,
+    label = label,
+    call = call
+  )
+
+  geometry_types <- unique(as.character(sf::st_geometry_type(data)))
+  point_types <- c("POINT", "MULTIPOINT")
+  if (!all(geometry_types %in% point_types)) {
+    validate_sf(data, label = label, type = "POINT", quiet = quiet, call = call)
+  }
+
+  if (any(sf::st_is(data, "MULTIPOINT"))) {
+    attributes <- stats::na.omit(attributes)
+    attributes <- attributes[nzchar(attributes)]
+    if (length(attributes) > 0) {
+      cli::cli_abort(
+        c(
+          "{.var {label}} cannot contain MULTIPOINT geometry when attribute data are used.",
+          "i" = "Casting MULTIPOINT to POINT would repeat values from {.var {attributes}} for each resulting point."
+        ),
+        call = call
+      )
+    }
+    data <- suppressWarnings(sf::st_cast(data, "POINT"))
+  }
+
+  validate_sf(data, label = label, type = "POINT", quiet = TRUE, call = call)
+  data
+}
+
+
+#' Validate and class a hotspot result
+#'
+#' @noRd
+new_hotspot_results <- function(
+  result,
+  class = NULL,
+  ...,
+  call = rlang::caller_env()
+) {
+  if (!inherits(result, "sf")) {
+    cli::cli_abort("The hotspot operation did not produce an SF object.", call = call)
+  }
+  if (nrow(result) == 0) {
+    cli::cli_abort(
+      c(
+        "The hotspot operation produced zero output rows.",
+        "i" = "Check the input geometries and analysis parameters."
+      ),
+      call = call
+    )
+  }
+  empty <- sf::st_is_empty(result)
+  if (any(empty)) {
+    cli::cli_abort(
+      c(
+        "The hotspot operation produced empty output geometry.",
+        "x" = "{sum(empty)} output row{?s} contain{?s/} empty geometry."
+      ),
+      call = call
+    )
+  }
+
+  class <- unique(class)
+  base_classes <- setdiff(base::class(result), class)
+  structure(result, class = c(class, base_classes), ...)
 }

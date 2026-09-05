@@ -42,13 +42,13 @@ kernel_density <- function(
 ) {
 
   # Check inputs
-  if (rlang::is_empty(sf::st_crs(data, parameters = TRUE))) {
-    cli::cli_abort(c(
-      "Co-ordinate reference system for {.var data} is missing.",
-      "i" = "Cannot calculate KDE values from datasets with a missing CRS.",
-      "i" = "Check CRS of {.var data} using {.fn st_crs()}."
-    ))
-  }
+  validate_sf(
+    data,
+    type = "POINT",
+    require_units = TRUE,
+    quiet = quiet,
+    call = rlang::caller_env()
+  )
   validate_sf(
     grid,
     label = "grid",

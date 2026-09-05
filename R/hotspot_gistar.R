@@ -168,8 +168,18 @@ hotspot_gistar <- function(
     rlang::as_name(rlang::enquo(weights))
   )
 
+  data <- prepare_point_data(
+    data,
+    attributes = if (rlang::is_chr_na(weights)) NULL else weights,
+    quiet = quiet,
+    call = rlang::caller_env()
+  )
+  if (!rlang::is_null(grid)) {
+    grid <- prepare_spatial_data(grid, quiet = quiet, label = "grid")
+  }
+
   # Check inputs that are not checked in a helper function
-  validate_inputs(data = data, grid = grid, quiet = quiet)
+  validate_inputs(data = data, grid = grid, quiet = quiet, require_units = TRUE)
 
   # Report units when KDE values are not calculated, since `kernel_density()`
   # otherwise reports that lon/lat data have been transformed
@@ -281,6 +291,6 @@ hotspot_gistar <- function(
   }
 
   # Return result
-  structure(result, class = c("hspt_g", class(result)))
+  new_hotspot_results(result, class = "hspt_g")
 
 }

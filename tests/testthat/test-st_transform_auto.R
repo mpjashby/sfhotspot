@@ -16,7 +16,7 @@ sf::st_crs(robbery_nocrs) <- NA
 # Note checking of some inputs is tested in the test file for `validate_sf()`
 
 test_that("error if CRS is missing", {
-  expect_error(st_transform_auto(robbery_nocrs), "must have a specified")
+  expect_error(st_transform_auto(robbery_nocrs), "reference system.*missing")
 })
 
 test_that("error if `check` is not TRUE/FALSE", {

@@ -21,6 +21,14 @@
 #' @export
 
 hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
+  data <- prepare_spatial_data(data, quiet = quiet, call = rlang::caller_env())
+  boundary <- prepare_spatial_data(
+    boundary,
+    quiet = quiet,
+    label = "boundary",
+    call = rlang::caller_env()
+  )
+
   # Check inputs that are not checked in a helper function
   validate_inputs(
     data = data,
@@ -117,14 +125,6 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
 
   clipped_data[[source_id]] <- NULL
 
-  # Restore any package-specific result class
-  if (length(result_class) > 0) {
-    class(clipped_data) <- c(result_class, class(clipped_data))
-  }
-  if (!rlang::is_null(isoband_metadata)) {
-    attr(clipped_data, "isoband") <- isoband_metadata
-  }
-
   # Report number of rows removed
   if (rlang::is_false(quiet)) {
     final_rows <- nrow(clipped_data)
@@ -142,5 +142,9 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
   }
 
   # Return clipped data
-  clipped_data
+  new_hotspot_results(
+    clipped_data,
+    class = result_class,
+    isoband = isoband_metadata
+  )
 }

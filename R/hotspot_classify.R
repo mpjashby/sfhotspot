@@ -130,8 +130,22 @@ hotspot_classify <- function(
     rlang::as_name(rlang::enquo(time))
   )
 
+  data <- prepare_point_data(
+    data,
+    attributes = if (rlang::is_false(time)) {
+      names(data)[unlist(lapply(data, rlang::inherits_any, c("Date", "POSIXt")))]
+    } else {
+      time
+    },
+    quiet = quiet,
+    call = rlang::caller_env()
+  )
+  if (!rlang::is_null(grid)) {
+    grid <- prepare_spatial_data(grid, quiet = quiet, label = "grid")
+  }
+
   # Check inputs that are not checked in a helper function
-  validate_inputs(data = data, grid = grid, quiet = quiet)
+  validate_inputs(data = data, grid = grid, quiet = quiet, require_units = TRUE)
   if (!rlang::is_false(time) & !time %in% names(data))
     cli::cli_abort(
       "{.arg time} must be NULL or the name of a column in {.var data}."
@@ -591,6 +605,6 @@ hotspot_classify <- function(
 
   # Return result
   result <- grid[, c("hotspot_category", "geometry")]
-  structure(result, class = c("hspt_c", class(result)))
+  new_hotspot_results(result, class = "hspt_c")
 
 }

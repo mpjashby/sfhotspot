@@ -65,6 +65,8 @@ hotspot_isoband <- function(
   critical_p = 0.05,
   quiet = FALSE
 ) {
+  data <- prepare_spatial_data(data, quiet = quiet, call = rlang::caller_env())
+
   # Validate arguments that apply to every type of input
   validate_sf(
     data,
@@ -299,7 +301,7 @@ hotspot_isoband <- function(
     midpoint = switch(plot_type, diverging_zero = 0, diverging_one = 1, NULL),
     title = title
   )
-  structure(result, class = c("hspt_ib", class(result)), isoband = metadata)
+  new_hotspot_results(result, class = "hspt_ib", isoband = metadata)
 }
 
 isoband_source_class <- function(data) {

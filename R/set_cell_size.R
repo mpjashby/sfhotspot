@@ -27,7 +27,12 @@
 set_cell_size <- function(data, round = TRUE, quiet = TRUE) {
 
   # Check inputs
-  validate_sf(data, quiet = quiet, call = rlang::caller_env())
+  validate_sf(
+    data,
+    require_units = TRUE,
+    quiet = quiet,
+    call = rlang::caller_env()
+  )
   if (!rlang::is_logical(round))
     cli::cli_abort("{.arg round} must be one of {.q TRUE} or {.q FALSE}")
   if (!rlang::is_logical(quiet))

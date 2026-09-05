@@ -188,10 +188,34 @@ hotspot_dual_kde <- function(
     ))
   }
 
+  x <- prepare_point_data(
+    x,
+    attributes = if (rlang::is_chr_na(weights_x)) NULL else weights_x,
+    quiet = quiet,
+    label = "x",
+    call = rlang::caller_env()
+  )
+  y <- prepare_point_data(
+    y,
+    attributes = if (rlang::is_chr_na(weights_y)) NULL else weights_y,
+    quiet = quiet,
+    label = "y",
+    call = rlang::caller_env()
+  )
+  if (!rlang::is_null(grid)) {
+    grid <- prepare_spatial_data(grid, quiet = quiet, label = "grid")
+  }
+
   # Check inputs that are not checked in a helper function
   # `validate_inputs()` is called twice to validate both datasets
-  validate_inputs(data = x, grid = grid, quiet = quiet, name_data = "x")
-  validate_inputs(data = y, grid = NULL, quiet = quiet, name_data = "y")
+  validate_inputs(
+    data = x, grid = grid, quiet = quiet, name_data = "x",
+    require_units = TRUE
+  )
+  validate_inputs(
+    data = y, grid = NULL, quiet = quiet, name_data = "y",
+    require_units = TRUE
+  )
   # `arg_match()` throws an uninformative error if `method` has length 0, so
   # first test if `method` is a character vector of length 1
   if (!rlang::is_character(method, n = 1)) {
@@ -440,9 +464,9 @@ hotspot_dual_kde <- function(
       tibble::as_tibble(counts[, c("n", "kde", "geometry")])
     )
   }
-  structure(
+  new_hotspot_results(
     result,
-    class = c("hspt_dk", "hspt_k", class(result)),
+    class = c("hspt_dk", "hspt_k"),
     method = method
   )
 }

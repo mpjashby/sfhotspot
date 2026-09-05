@@ -109,8 +109,18 @@ hotspot_kde <- function(
     rlang::as_name(rlang::enquo(weights))
   )
 
+  data <- prepare_point_data(
+    data,
+    attributes = if (rlang::is_chr_na(weights)) NULL else weights,
+    quiet = quiet,
+    call = rlang::caller_env()
+  )
+  if (!rlang::is_null(grid)) {
+    grid <- prepare_spatial_data(grid, quiet = quiet, label = "grid")
+  }
+
   # Check inputs that are not checked in a helper function
-  validate_inputs(data = data, grid = grid, quiet = quiet)
+  validate_inputs(data = data, grid = grid, quiet = quiet, require_units = TRUE)
 
   # If the user has provided a grid then we extract the approximate cell size
   # based on the mean distance between the centroids of nearest neighbours. If
@@ -184,6 +194,6 @@ hotspot_kde <- function(
       tibble::as_tibble(counts[, c("n", "kde", "geometry")])
     )
   }
-  structure(result, class = c("hspt_k", class(result)))
+  new_hotspot_results(result, class = "hspt_k")
 
 }

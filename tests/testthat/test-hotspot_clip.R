@@ -83,9 +83,11 @@ test_that("data can contain any geometry type (#78)", {
     ncol = 2,
     byrow = TRUE
   )))))
+  sf::st_crs(boundary) <- 3857
 
   for (geometry in geometries) {
     data <- sf::st_as_sf(sf::st_sfc(geometry))
+    sf::st_crs(data) <- 3857
     expect_no_error(hotspot_clip(data, boundary, quiet = TRUE))
   }
 })
@@ -186,6 +188,7 @@ test_that("lower-dimensional output produces a warning (#78)", {
     ncol = 2,
     byrow = TRUE
   )))))
+  sf::st_crs(data) <- sf::st_crs(boundary) <- 3857
 
   expect_warning(
     result <- hotspot_clip(data, boundary, quiet = FALSE),
@@ -203,6 +206,7 @@ test_that("single/multi type changes do not produce a warning (#78)", {
   )))
   data <- sf::st_as_sf(sf::st_sfc(sf::st_multipolygon(list(polygon))))
   boundary <- sf::st_as_sf(sf::st_sfc(polygon))
+  sf::st_crs(data) <- sf::st_crs(boundary) <- 3857
 
   expect_no_warning(hotspot_clip(data, boundary, quiet = TRUE))
 })

@@ -114,8 +114,30 @@ hotspot_change <- function(
     rlang::as_name(rlang::enquo(groups))
   )
 
+  used_attribute <- if (!rlang::is_false(groups)) {
+    groups
+  } else if (!rlang::is_false(time)) {
+    time
+  } else {
+    names(data)[unlist(lapply(data, rlang::inherits_any, c("Date", "POSIXt")))]
+  }
+  data <- prepare_point_data(
+    data,
+    attributes = used_attribute,
+    quiet = quiet,
+    call = rlang::caller_env()
+  )
+  if (!rlang::is_null(grid)) {
+    grid <- prepare_spatial_data(grid, quiet = quiet, label = "grid")
+  }
+
   # Check inputs that are not checked in a helper function
-  validate_inputs(data = data, grid = grid, quiet = quiet)
+  validate_inputs(
+    data = data,
+    grid = grid,
+    quiet = quiet,
+    require_units = rlang::is_null(grid)
+  )
   if (!rlang::is_false(time) & !time %in% names(data))
     cli::cli_abort(
       "{.arg time} must be NULL or the name of a column in {.var data}."
@@ -271,6 +293,6 @@ hotspot_change <- function(
   result <- grid[, c("n_before", "n_after", "change", "geometry")]
 
   # Return result
-  structure(result, class = c("hspt_d", class(result)))
+  new_hotspot_results(result, class = "hspt_d")
 
 }

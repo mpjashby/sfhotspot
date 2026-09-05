@@ -46,10 +46,17 @@ create_grid <- function(
   ...
 ) {
 
+  data <- prepare_spatial_data(data, quiet = quiet, call = rlang::caller_env())
+  geometry_types <- unique(as.character(sf::st_geometry_type(data)))
+  if (all(geometry_types %in% c("POINT", "MULTIPOINT"))) {
+    data <- prepare_point_data(data, quiet = quiet, call = rlang::caller_env())
+  }
+
   # Check inputs
   validate_sf(
     data,
     allow_null = TRUE,
+    require_units = TRUE,
     quiet = quiet,
     call = rlang::caller_env()
   )
@@ -139,6 +146,6 @@ create_grid <- function(
   }
   
   # Return result
-  result
+  new_hotspot_results(result)
 
 }

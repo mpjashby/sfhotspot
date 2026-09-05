@@ -13,6 +13,7 @@ get_cell_size <- function(grid) {
     grid,
     label = "grid",
     type = c("POLYGON", "MULTIPOLYGON"),
+    require_units = TRUE,
     call = rlang::caller_env()
   )
 
