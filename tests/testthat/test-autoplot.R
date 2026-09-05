@@ -169,9 +169,9 @@ test_that("change scales are centred on zero with symmetric limits", {
 
 test_that("dual-KDE methods use method-specific scales and labels", {
   specifications <- list(
-    ratio = list(title = "Density ratio", limits = log10(c(0.25, 4))),
-    log = list(title = "Log density ratio", limits = c(-4, 4)),
-    diff = list(title = "Density difference", limits = c(-4, 4)),
+    ratio = list(title = "density ratio", limits = log10(c(0.25, 4))),
+    log = list(title = "log density ratio", limits = c(-4, 4)),
+    diff = list(title = "density difference", limits = c(-4, 4)),
     sum = list(title = "Combined density", limits = c(0, NA))
   )
 
@@ -239,18 +239,18 @@ test_that("Gi* KDE layers apply p-value and sign conditions", {
 })
 
 test_that("Gi* plots use audience-appropriate, sign-specific labels", {
-  expect_equal(
-    autoplot(result_gistar, sign = "hot")$labels$fill,
-    "Density in areas with more points than expected by chance"
+  captions <- c(
+    hot = "* in areas with more points than expected by chance",
+    cold = "* in areas with fewer points than expected by chance",
+    both = "* in areas with more or fewer points than expected by chance"
   )
-  expect_equal(
-    autoplot(result_gistar, sign = "cold")$labels$fill,
-    "Density in areas with fewer points than expected by chance"
-  )
-  expect_equal(
-    autoplot(result_gistar)$labels$fill,
-    "Density in areas with more or fewer points than expected by chance"
-  )
+
+  for (sign in names(captions)) {
+    plot <- autoplot(result_gistar, sign = sign)
+
+    expect_equal(plot$labels$fill, "density*")
+    expect_equal(plot$labels$caption, captions[[sign]])
+  }
 })
 
 test_that("Gi* values are mapped directly when KDE is absent", {

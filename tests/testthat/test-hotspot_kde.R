@@ -58,12 +58,20 @@ test_that("columns in output have the required types", {
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
 })
 
-test_that("no issues if cell size extracted from grid", {
-  expect_no_condition(
+test_that("cell size is extracted silently from a supplied grid", {
+  grid <- hotspot_grid(data_sf, cell_size = 1000, quiet = TRUE)
+
+  expect_no_message(
+    grid_result <- hotspot_kde(data_sf, grid = grid, bandwidth = 10000)
+  )
+  expect_equal(
+    grid_result,
     hotspot_kde(
       data_sf,
-      grid = hotspot_grid(data_sf, cell_size = 1000),
-      bandwidth = 10000
+      grid = grid,
+      cell_size = 500,
+      bandwidth = 10000,
+      quiet = TRUE
     )
   )
 })

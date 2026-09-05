@@ -213,13 +213,26 @@ test_that("lon/lat data use valid projected bandwidths and retain their CRS", {
   expect_equal(sf::st_crs(result_default), sf::st_crs(data_lonlat))
 })
 
-test_that("no issues when grid provided", {
-  expect_no_condition(
-    hotspot_dual_kde(
-      x = data_sf,
-      y = data_sf,
+test_that("cell size is extracted silently from a supplied grid", {
+  grid <- hotspot_grid(data_sf, cell_size = 1000, quiet = TRUE)
+
+  expect_no_message(
+    grid_result <- hotspot_dual_kde(
+      data_sf,
+      data_sf,
       bandwidth = 10000,
-      grid = hotspot_grid(data_sf, cell_size = 1000)
+      grid = grid
+    )
+  )
+  expect_equal(
+    grid_result,
+    hotspot_dual_kde(
+      data_sf,
+      data_sf,
+      cell_size = 500,
+      bandwidth = 10000,
+      grid = grid,
+      quiet = TRUE
     )
   )
 })

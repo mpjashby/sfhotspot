@@ -41,10 +41,21 @@ test_that("message if `data` uses a geographic CRS and KDE not performed", {
   )
 })
 
-test_that("no message reporting cell size when grid is provided", {
+test_that("cell size is extracted silently from a supplied grid", {
+  grid <- hotspot_grid(data_sf, cell_size = 1000, quiet = TRUE)
+
   expect_no_message(
-    hotspot_gistar(data_sf, grid = hotspot_grid(data_sf, cell_size = 1000)),
-    message = "Cell size set"
+    grid_result <- hotspot_gistar(data_sf, grid = grid, kde = FALSE)
+  )
+  expect_equal(
+    grid_result,
+    hotspot_gistar(
+      data_sf,
+      grid = grid,
+      cell_size = 500,
+      kde = FALSE,
+      quiet = TRUE
+    )
   )
 })
 

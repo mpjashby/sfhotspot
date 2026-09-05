@@ -343,13 +343,18 @@ hotspot_classify <- function(
     dates <- c(dates, max(data[[time]]) + lubridate::years(1))
   }
 
-  # Set cell size if not specified (do this here because it is needed by both
-  # `create_grid()` and `gistar()`)
-  if (rlang::is_null(cell_size))
-    cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
+  # If the user has provided a grid then extract the approximate cell size from
+  # it for use in `gistar()`. Otherwise, set the cell size if necessary and use
+  # it to create a grid.
+  if (!rlang::is_null(grid)) {
 
-  # Create grid
-  if (rlang::is_null(grid)) {
+    cell_size <- get_cell_size(grid)
+
+  } else {
+
+    if (rlang::is_null(cell_size))
+      cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
+
     grid <- create_grid(
       data,
       cell_size = cell_size,
