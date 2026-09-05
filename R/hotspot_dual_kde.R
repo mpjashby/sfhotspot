@@ -64,6 +64,9 @@
 #'   classes \code{hspt_dk} and \code{hspt_k}, and a \code{method} attribute
 #'   containing the comparison method used.
 #'
+#'   The output can be plotted with reasonable defaults using [autoplot()]. The
+#'   colour scale is selected according to the comparison method.
+#'
 #' This function creates a regular two-dimensional grid of cells (unless a
 #' custom grid is specified with \code{grid}), calculates the density of points
 #' in each cell for each of \code{x} and \code{y} using functions from the

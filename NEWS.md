@@ -8,6 +8,15 @@
 * `hotspot_gistar()` results now have the specialised class `hspt_g`, allowing
   downstream functions to identify `gistar` as their primary value column
   (#82).
+* Added `autoplot()` and `autolayer()` methods for `hotspot_gistar()` and
+  `hotspot_dual_kde()` results, and completed the plotting support for
+  `hotspot_classify()` results. Plot scales and legends now reflect the
+  semantics of each result, including the comparison method used for dual KDE
+  and significance/sign filtering for Gi* results. A new plotting vignette
+  demonstrates each distinct behaviour (#85).
+* Existing plotting methods now use transparent missing values, weighted counts
+  when present, sequential scales anchored at zero, and balanced diverging
+  scales for signed values (#85, #86).
 * `hotspot_clip()` no longer reports that zero rows were removed when all input
   features fall within the clipping boundary (#66).
 * `hotspot_clip()` no longer suppresses warnings produced by
@@ -21,7 +30,8 @@
   data while using a common automatically selected bandwidth for both layers,
   and checks that both point layers overlap the analysis grid (#67).
 * `hotspot_gistar()` now uses weighted counts to calculate Gi* statistics and
-  p-values when weights are supplied (#86).
+  p-values when weights are supplied, and `autoplot()`/`autolayer()` plot
+  weighted counts when they are present (#86).
 
 
 # sfhotspot 1.0.0

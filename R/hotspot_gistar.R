@@ -70,8 +70,11 @@
 #'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}
 #'   are given in the manual page for \code{\link[spdep]{localG}}.
 #'
-#'   The output from this function can be plotted in the same way as for other
-#'   SF objects, for which see \code{vignette("sf5", package = "sf")}.
+#'   The output from this function can be plotted with reasonable defaults
+#'   using [autoplot()]. When KDE values are returned, the default map shows
+#'   density only in areas identified as having significantly more or fewer
+#'   points than expected by chance. When `kde = FALSE`, the Gi*/Gi statistic is
+#'   plotted on a diverging scale centred on zero.
 #'
 #' @details
 #'

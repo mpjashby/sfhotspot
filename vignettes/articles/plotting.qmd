@@ -1,0 +1,200 @@
+---
+title: "Plotting results returned by functions in sfhotspot"
+vignette: >
+  %\VignetteIndexEntry{Plotting sfhotspot results}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+fig-align: center
+fig-asp: 0.7
+fig-width: 7
+---
+
+The `hotspot_*()` functions return simple-feature (SF) objects with specialised classes. `autoplot()` recognises those classes and chooses a variable, colour scale, and legend suited to the result. Some choices also depend on the columns or attributes present in the result.
+
+
+| Result | Default variable shown on map |
+|---|---|
+| `hotspot_count()` (`hspt_n`)                | `sum` when weighted counts are present; otherwise `n` |
+| `hotspot_kde()` (`hspt_k`)                  | `kde` |
+| `hotspot_dual_kde()` (`hspt_dk`)            | Scale selected from the `method` attribute |
+| `hotspot_change()` (`hspt_d`)               | Diverging scale of `change`, centred on zero |
+| `hotspot_classify()` (`hspt_c`)             | Categorical hotspot and coldspot colours |
+| `hotspot_gistar()` (`hspt_g`) with `kde`    | Density in statistically significant cells |
+| `hotspot_gistar()` (`hspt_g`) without `kde` | Diverging scale of `gistar`, centred on zero |
+
+The maps below show examples of the default maps produced for each `hotspot_*()` function, based on the `memphis_robberies`, `memphis_precincts` and `memphis_population` datasets included in the package. To get started, we create a grid covering the city of Memphis and transform the dataset to use an appropriate projected coordinate reference system (CRS), since that makes specifying cell size, etc., easier.
+
+```{r}
+#| label: setup
+
+library(sf)
+library(sfhotspot)
+library(ggplot2)
+
+# Transform objects to use a local co-ordinate reference system
+memphis_robberies_proj <- st_transform_auto(memphis_robberies)  
+memphis_precincts_proj <- st_transform_auto(memphis_precincts, quiet = TRUE)
+memphis_population_proj <- st_transform_auto(memphis_population, quiet = TRUE)
+
+# Set up consistent grids of cells
+memphis_grid <- hotspot_grid(memphis_precincts_proj, cell_size = 500)
+```
+
+
+::: {.callout-note title="Grid size"}
+The 500-metre grid cells used in these examples are probably too corse for actual analysis, but are used here because of constraints on rendering time for R package vignettes. In practice, the cell size should be chosen to suit the spatial scale of the data and the research question.
+:::
+
+
+## `hotspot_count()`
+
+For an unweighted point count, `autoplot()` maps the `n` column.
+
+```{r}
+#| label: plot-unweighted-count
+#| fig-alt: >
+#|   Grid map of Memphis robberies. Darker blue cells contain more robberies.
+
+memphis_robberies_count <- hotspot_count(
+  memphis_robberies_proj, 
+  grid = memphis_grid
+)
+
+autoplot(memphis_robberies_count)
+```
+
+If `hotspot_count()` is given weights, its result also contains a `sum` column. The plotting methods detect that column and map the weighted count instead.
+
+`autolayer()` applies the same variable mapping as `autoplot()`, but returns a layer so that it can be combined with other ggplot2 layers. For example, a count layer can be drawn with precinct boundaries. 
+
+```{r}
+#| label: plot-count-autolayer
+#| fig-alt: >
+#|   Map of Memphis robbery counts drawn with outlines of police precincts.
+#|   Areas of greater robbery counts are darker blue.
+
+ggplot() +
+  autolayer(memphis_robberies_count) +
+  geom_sf(data = memphis_precincts_proj, fill = NA, colour = "grey70") +
+  scale_fill_distiller(palette = "Blues", direction = 1) +
+  labs(fill = "Robbery\ncount") +
+  theme_void()
+```
+
+`autolayer()` is particularly useful because it allows control of where the layer derived from the result produced by a `hotspot_*()` function appears in a stack of other spatial layers, so that (for example) it can be placed on top of a base map.
+
+
+## `hotspot_kde()`
+
+When provided with an object produced by `hotspot_kde()`, `autoplot()` maps the `kde` column. The default colour scale is sequential, with darker blue indicating greater density. Note that since `hotspot_kde()` produces density estimates for the convex hull of the data, the resulting map may extend beyond the precinct boundaries. `hotspot_clip()` can be used to restrict the KDE to the specific area covered by the point dataset to avoid displaying spurious density estimates for areas not covered by the data.
+
+```{r}
+#| label: plot-kde
+#| cache: true
+#| fig-alt: >
+#|   Map of the density of robberies in Memphis. Darker blue areas have a
+#|   higher density of robberies.
+
+memphis_robberies_proj |> 
+  hotspot_kde(bandwidth_adjust = 0.25, grid = memphis_grid) |> 
+  hotspot_clip(memphis_precincts_proj) |> 
+  autoplot()
+```
+
+
+## `hotspot_dual_kde()`
+
+`hotspot_dual_kde()` is capable of comparing the density of two spatial datasets using different methods. The method used is recorded in the `method` attribute of the resulting object, which is then used by `autoplot()` and `autolayer()` to select the appropriate plotting method. For example, the default method compares the _ratio_ of the two densities, which is analogous to plotting rates.
+
+```{r}
+#| label: plot-dual-kde-ratio
+#| cache: true
+#| fig-alt: >
+#|   Map of the density of robberies relative to the population density in 
+#|   Memphis. Darker blue areas have a higher density of robberies relative to 
+#|   the population.
+
+hotspot_dual_kde(
+  memphis_robberies_proj, 
+  memphis_population_proj, 
+  bandwidth_adjust = 0.25,
+  grid = memphis_grid
+) |>
+  autoplot()
+```
+
+Ratios use a logarithmic diverging scale centred on one, so reciprocal values
+such as 0.5 and 2 receive equal visual emphasis. Logged ratios and differences
+use diverging scales centred on zero. Sums are non-negative and therefore use a
+sequential scale.
+
+
+## `hotspot_change()`
+
+`hotspot_change()` returns the differences between the number of points in each area in two time periods. Its scale is symmetric around zero so increases and decreases of the same size receive equal visual emphasis.
+
+```{r}
+#| label: plot-change
+#| fig-alt: >
+#|   Diverging grid map of changes in robbery counts between the first and
+#|   second halves of 2019. Decreases and increases use opposite colours.
+
+memphis_robberies_proj |>
+  hotspot_change(
+    boundary = as.POSIXct("2019-07-01", tz = "UTC"),
+    grid = memphis_grid
+  ) |>
+  autoplot()
+```
+
+
+## `hotspot_classify()`
+
+`hotspot_classify()` categorises grid cells based on their hotspot and coldspot status over time. The default palette uses warm hues for hotspot categories, cool hues for coldspot categories, purple for mixed results, and grey for no pattern.
+
+```{r}
+#| label: plot-classification
+#| fig-alt: >
+#|   Categorical map classifying Memphis grid cells as persistent, emerging,
+#|   intermittent or former hotspots and coldspots, mixed areas, or no pattern.
+
+memphis_robberies_proj |>
+  hotspot_classify(period = "1 month", grid = memphis_grid) |>
+  autoplot()
+```
+
+
+## `hotspot_gistar()`
+
+By default, `hotspot_gistar()` returns density estimates and p-values for each cell alongside the Getis-Ord Gi* statistic. The plotting methods use the p-values to select which cells are visible, then map the density of points in each visible cell. The `critical_p` and `sign` arguments to `autoplot()`/`autolayer()` can control this behaviour. Cells with `pvalue >= critical_p` are transparent. The default is `critical_p = 0.05`. The `sign` argument can be used to restrict the visible cells to those with significant positive or negative Gi*/Gi values.
+
+```{r}
+#| label: plot-gistar-both
+#| fig-alt: >
+#|   Density map showing only areas with significantly more or fewer robberies
+#|   than expected by chance. Other grid cells are transparent.
+
+memphis_robberies_proj |>
+  hotspot_gistar(grid = memphis_grid, bandwidth_adjust = 0.25) |>
+  autoplot()
+```
+
+If `kde = FALSE`, the result has no `kde` column. The plotting methods instead map the `gistar` column using a diverging scale centred on zero. In this case, the `critical_p` and `sign` arguments to `autoplot()`/`autolayer()` are ignored.
+
+```{r}
+#| label: plot-gistar-without-kde
+#| fig-alt: >
+#|   Diverging grid map of Getis-Ord Gi-star statistics for Memphis robberies,
+#|   centred on zero. Positive and negative values use opposite colours.
+
+memphis_robberies_proj |>
+  hotspot_gistar(grid = memphis_grid, bandwidth_adjust = 0.25, kde = FALSE) |>
+  autoplot()
+```
+
+## Customising plots
+
+`autoplot()` returns an ordinary ggplot object, so scales, labels, themes, and
+other layers can be added or replaced with ggplot2. `autolayer()` is useful when
+the sfhotspot result is one component of a larger map. See the individual
+method help pages for the arguments accepted by each method.
