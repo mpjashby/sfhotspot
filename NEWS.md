@@ -1,5 +1,8 @@
 # sfhotspot 1.1.0
 
+* Added `hotspot_isoband()` to generalise values in regular square hotspot
+  grids into tidy SF isobands, including class-aware plotting methods and
+  concise automatically formatted legend labels (#81).
 * `hotspot_clip()` can now clip any type of geometry, not just point data (#65,
   #78) and produces warnings if clipping changes the geometry type of any 
   features in a way that might create downstream problems.
@@ -12,8 +15,9 @@
   `hotspot_dual_kde()` results, and completed the plotting support for
   `hotspot_classify()` results. Plot scales and legends now reflect the
   semantics of each result, including the comparison method used for dual KDE
-  and significance/sign filtering for Gi* results. A new plotting vignette
-  demonstrates each distinct behaviour (#85).
+  and significance/sign filtering for Gi* results. Legend titles consistently
+  use lower-case terminology. A new website plotting article demonstrates each
+  distinct behaviour (#85).
 * Existing plotting methods now use transparent missing values, weighted counts
   when present, sequential scales anchored at zero, and balanced diverging
   scales for signed values (#85, #86).

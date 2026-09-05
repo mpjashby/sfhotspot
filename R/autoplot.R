@@ -62,7 +62,7 @@ autoplot.hspt_n <- function(object, ...) {
       limits = c(0, NA),
       na.value = "transparent"
     ) +
-    ggplot2::labs(fill = if (weighted) "Weighted count" else "Count") +
+    ggplot2::labs(fill = if (weighted) "weighted count" else "count") +
     ggplot2::theme_void()
 }
 
@@ -271,7 +271,7 @@ autoplot.hspt_dk <- function(object, ...) {
         limits = c(0, NA),
         na.value = "transparent"
       )
-    title <- "Combined density"
+    title <- "combined density"
   }
   plot + ggplot2::labs(fill = title) + ggplot2::theme_void()
 }
@@ -400,4 +400,119 @@ autolayer.hspt_g <- function(
     plot_value[!is.finite(plot_value)] <- NA_real_
   }
   plot_value_layer(object, plot_value, ...)
+}
+
+validate_isoband_plot <- function(object) {
+  validate_sf(object, label = "object", quiet = TRUE)
+  required <- c("lower", "upper", "band", "label")
+  missing <- setdiff(required, names(object))
+  if (length(missing) > 0) {
+    cli::cli_abort(
+      "{.var object} must contain {.and {.var {required}}} columns."
+    )
+  }
+  if (
+    !rlang::is_bare_numeric(object$lower) ||
+      !rlang::is_bare_numeric(object$upper) ||
+      !is.ordered(object$band) ||
+      !is.ordered(object$label)
+  ) {
+    cli::cli_abort(
+      paste(
+        "{.var object} must contain numeric bounds and ordered",
+        "{.var band} and {.var label} factors."
+      )
+    )
+  }
+  metadata <- attr(object, "isoband", exact = TRUE)
+  if (!is.list(metadata) ||
+      !metadata$plot_type %in% c(
+        "sequential", "diverging_zero", "diverging_one"
+      ) ||
+      !rlang::is_character(metadata$title, n = 1)) {
+    cli::cli_abort("{.var object} has missing or invalid isoband metadata.")
+  }
+  metadata
+}
+
+isoband_representatives <- function(lower, upper) {
+  result <- (lower + upper) / 2
+  finite_values <- c(lower, upper)[is.finite(c(lower, upper))]
+  span <- if (length(finite_values) > 1) diff(range(finite_values)) else 1
+  if (!is.finite(span) || span == 0) span <- 1
+  result[is.infinite(lower)] <- upper[is.infinite(lower)] - span
+  result[is.infinite(upper)] <- lower[is.infinite(upper)] + span
+  result
+}
+
+isoband_colours <- function(object, metadata) {
+  n <- nrow(object)
+  if (metadata$plot_type == "sequential") {
+    return(grDevices::colorRampPalette(c("#F7FBFF", "#08306B"))(n))
+  }
+  values <- isoband_representatives(object$lower, object$upper)
+  midpoint <- metadata$midpoint
+  limits <- range(c(values, midpoint), finite = TRUE)
+  positions <- numeric(length(values))
+  below <- values < midpoint
+  above <- values > midpoint
+  positions[values == midpoint] <- 0.5
+  if (any(below)) {
+    positions[below] <- 0.5 *
+      (values[below] - limits[[1]]) / (midpoint - limits[[1]])
+  }
+  if (any(above)) {
+    positions[above] <- 0.5 + 0.5 *
+      (values[above] - midpoint) / (limits[[2]] - midpoint)
+  }
+  spanning <- object$lower < midpoint & object$upper > midpoint
+  positions[spanning] <- 0.5
+  grDevices::rgb(
+    grDevices::colorRamp(c("#2166AC", "#F7F7F7", "#B2182B"))(positions),
+    maxColorValue = 255
+  )
+}
+
+#' Plot isobands
+#'
+#' Plot the output produced by [hotspot_isoband()] using a sequential or
+#' diverging discrete scale appropriate to the original hotspot result and
+#' selected value. Legend entries use the ordered `label` column containing
+#' concise, automatically formatted ranges.
+#'
+#' @param object An object with class `hspt_ib`, as produced by
+#'   [hotspot_isoband()].
+#' @param ... Further arguments passed to [ggplot2::geom_sf()], e.g. `alpha`.
+#' @return `autoplot()` returns a [ggplot2::ggplot] object. `autolayer()`
+#'   returns a layer that can be added to a [ggplot2::ggplot] object.
+#' @export
+autoplot.hspt_ib <- function(object, ...) {
+  metadata <- validate_isoband_plot(object)
+  colours <- isoband_colours(object, metadata)
+  visible_bands <- as.character(object$label)
+  names(colours) <- visible_bands
+  ggplot2::ggplot() +
+    autolayer(object, ...) +
+    ggplot2::scale_fill_manual(
+      values = colours,
+      breaks = visible_bands,
+      drop = FALSE,
+      na.value = "transparent"
+    ) +
+    ggplot2::labs(fill = metadata$title) +
+    ggplot2::theme_void()
+}
+
+#' @describeIn autoplot.hspt_ib Create a ggplot layer of isobands.
+#' @importFrom rlang .data
+#' @export
+autolayer.hspt_ib <- function(object, ...) {
+  validate_isoband_plot(object)
+  ggplot2::geom_sf(
+    mapping = ggplot2::aes(fill = .data$label),
+    data = object,
+    colour = NA,
+    inherit.aes = FALSE,
+    ...
+  )
 }

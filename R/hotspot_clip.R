@@ -37,8 +37,12 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
   # not preserve classes it does not recognise
   result_class <- intersect(
     class(data),
-    c("hspt_n", "hspt_dk", "hspt_k", "hspt_c", "hspt_d", "hspt_g")
+    c(
+      "hspt_n", "hspt_dk", "hspt_k", "hspt_c", "hspt_d", "hspt_g",
+      "hspt_ib"
+    )
   )
+  isoband_metadata <- attr(data, "isoband", exact = TRUE)
 
   # Get name of geometry column in boundary file
   geometry_column <- attr(boundary, "sf_column")
@@ -116,6 +120,9 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
   # Restore any package-specific result class
   if (length(result_class) > 0) {
     class(clipped_data) <- c(result_class, class(clipped_data))
+  }
+  if (!rlang::is_null(isoband_metadata)) {
+    attr(clipped_data, "isoband") <- isoband_metadata
   }
 
   # Report number of rows removed

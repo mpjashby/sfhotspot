@@ -101,7 +101,6 @@ memphis_robberies_proj |>
   autoplot()
 ```
 
-
 ## `hotspot_dual_kde()`
 
 `hotspot_dual_kde()` is capable of comparing the density of two spatial datasets using different methods. The method used is recorded in the `method` attribute of the resulting object, which is then used by `autoplot()` and `autolayer()` to select the appropriate plotting method. For example, the default method compares the _ratio_ of the two densities, which is analogous to plotting rates.
@@ -191,6 +190,33 @@ memphis_robberies_proj |>
   hotspot_gistar(grid = memphis_grid, bandwidth_adjust = 0.25, kde = FALSE) |>
   autoplot()
 ```
+
+## Isobands
+
+The numeric grid outputs from `hotspot_count()`, `hotspot_kde()`,
+`hotspot_dual_kde()`, `hotspot_change()` and `hotspot_gistar()` can be
+generalised into isobands using `hotspot_isoband()`. The categorical output
+from `hotspot_classify()` cannot be converted because isobands require numeric
+values on a regular square grid.
+
+Isobands retain information about the original `hotspot_*()` result and can
+themselves be plotted using `autoplot()` or `autolayer()`. The default palette,
+legend and treatment of meaningful values such as zero therefore depend on the
+function that produced the original grid. For example, KDE isobands use a
+sequential scale:
+
+```{r}
+#| label: plot-kde-isobands
+#| fig-alt: >
+#|   Isoband map of robbery density in Memphis. Darker blue bands represent
+#|   areas with higher estimated robbery density.
+
+memphis_robberies_proj |>
+  hotspot_kde(bandwidth_adjust = 0.25, grid = memphis_grid) |>
+  hotspot_isoband() |>
+  autoplot()
+```
+
 
 ## Customising plots
 

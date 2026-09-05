@@ -135,8 +135,8 @@ test_that("weighted count outputs map weighted values", {
 
   expect_equal(layer_data(autolayer(result_count))$.plot_value, result_count$n)
   expect_equal(layer_data(autolayer(weighted))$.plot_value, weighted$sum)
-  expect_equal(autoplot(result_count)$labels$fill, "Count")
-  expect_equal(autoplot(weighted)$labels$fill, "Weighted count")
+  expect_equal(autoplot(result_count)$labels$fill, "count")
+  expect_equal(autoplot(weighted)$labels$fill, "weighted count")
   expect_equal(autoplot(weighted)$scales$get_scales("fill")$limits[[1]], 0)
 })
 
@@ -172,7 +172,7 @@ test_that("dual-KDE methods use method-specific scales and labels", {
     ratio = list(title = "density ratio", limits = log10(c(0.25, 4))),
     log = list(title = "log density ratio", limits = c(-4, 4)),
     diff = list(title = "density difference", limits = c(-4, 4)),
-    sum = list(title = "Combined density", limits = c(0, NA))
+    sum = list(title = "combined density", limits = c(0, NA))
   )
 
   for (method in names(specifications)) {

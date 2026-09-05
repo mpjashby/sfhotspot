@@ -17,6 +17,8 @@
 ^README.qmd
 ^.vscode
 ^vignettes/.quarto
+^vignettes/articles/.*_cache$
+^vignettes/articles/.*_files$
 ^\.posit$
 ^README\.html$
 ^README_files$
