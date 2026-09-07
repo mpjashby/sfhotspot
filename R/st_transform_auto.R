@@ -33,9 +33,14 @@ st_transform_auto <- function(data, check = TRUE, quiet = FALSE) {
   # Transform data
   if (sf::st_is_longlat(data)) {
 
+    # UTM zone definitions and `latlon_to_utm()` use WGS84 longitude and
+    # latitude. Normalise other geographic CRSs before selecting and checking
+    # the zone, while retaining `data` for the final direct transformation.
+    data_wgs84 <- sf::st_transform(data, 4326)
+
     # Extract centroid for dataset
     centroid <- as.data.frame(
-      sf::st_coordinates(st_centroid_quietly(sf::st_union(data)))
+      sf::st_coordinates(st_centroid_quietly(sf::st_union(data_wgs84)))
     )
 
     # Identify EPSG code for centroid of data
@@ -65,7 +70,7 @@ st_transform_auto <- function(data, check = TRUE, quiet = FALSE) {
   }
 
   if (!sf::st_is_longlat(result) & check)
-    check_utm_data(data, code, quiet = quiet)
+    check_utm_data(data_wgs84, code, quiet = quiet)
 
   # Return result
   result

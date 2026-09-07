@@ -158,6 +158,15 @@ test_that("function performs expected transformation", {
 
 })
 
+test_that("geographic input need not use WGS84 (#89)", {
+  data_etrs89 <- sf::st_transform(memphis_robberies_jan, 4258)
+
+  expect_no_error(
+    result <- st_transform_auto(data_etrs89, quiet = TRUE)
+  )
+  expect_equal(sf::st_crs(result)$epsg, 32616)
+})
+
 test_that("no unexpected warnings", {
 
   # North Pole

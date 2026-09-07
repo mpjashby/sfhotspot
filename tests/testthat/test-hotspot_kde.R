@@ -79,3 +79,21 @@ test_that("cell size is extracted silently from a supplied grid", {
 test_that("no issues if cell size is set automatically", {
   expect_message(hotspot_kde(data_sf, bandwidth = 10000), "Cell size set to")
 })
+
+test_that("automatic transformation supports non-WGS84 geographic data (#89)", {
+  data_etrs89 <- sf::st_transform(data_sf, 4258)
+  grid_etrs89 <- sf::st_transform(
+    hotspot_grid(data_sf, cell_size = 1000, quiet = TRUE),
+    4258
+  )
+
+  expect_no_error(
+    result_etrs89 <- hotspot_kde(
+      data_etrs89,
+      grid = grid_etrs89,
+      bandwidth = 10000,
+      quiet = TRUE
+    )
+  )
+  expect_equal(sf::st_crs(result_etrs89), sf::st_crs(data_etrs89))
+})
