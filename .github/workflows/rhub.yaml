@@ -19,7 +19,7 @@ on:
           Comma-separated list of R-hub platforms to use.
           Full list: https://r-hub.github.io/containers/
         type: string
-        default: 'linux,windows'
+        default: 'linux,windows,macos'
       name:
         description: 'Run name. You can leave this empty.'
         type: string
