@@ -37,10 +37,9 @@ Suggests:
     testthat (>= 3.0.0),
     knitr,
     lubridate,
-    quarto,
+    rmarkdown,
     ggspatial
 LazyData: true
 Config/testthat/edition: 3
-VignetteBuilder: 
-  quarto
+VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0
