@@ -83,15 +83,19 @@ test_that("data can contain any geometry type (#78)", {
     ncol = 2,
     byrow = TRUE
   )))))
+  sf::st_crs(boundary) <- 3857
 
   for (geometry in geometries) {
     data <- sf::st_as_sf(sf::st_sfc(geometry))
+    sf::st_crs(data) <- 3857
     expect_no_error(hotspot_clip(data, boundary, quiet = TRUE))
   }
 })
 
 test_that("package-specific result classes are preserved (#71)", {
-  result_classes <- c("hspt_n", "hspt_k", "hspt_c", "hspt_d")
+  result_classes <- c(
+    "hspt_n", "hspt_dk", "hspt_k", "hspt_c", "hspt_d", "hspt_g"
+  )
   base_classes <- setdiff(class(polygon_data_sf), result_classes)
 
   for (result_class in result_classes) {
@@ -108,6 +112,22 @@ test_that("package-specific result classes are preserved (#71)", {
   }
 
   expect_s3_class(autoplot(polygon_result), "ggplot")
+})
+
+test_that("dual-KDE class and method survive clipping (#83)", {
+  dual_kde_data <- structure(
+    polygon_data_sf,
+    class = c("hspt_dk", "hspt_k", class(polygon_data_sf)),
+    method = "diff"
+  )
+  clipped_dual_kde <- hotspot_clip(
+    dual_kde_data,
+    memphis_precincts,
+    quiet = TRUE
+  )
+
+  expect_identical(class(clipped_dual_kde)[1:2], c("hspt_dk", "hspt_k"))
+  expect_identical(attr(clipped_dual_kde, "method"), "diff")
 })
 
 test_that("unrelated classes are not preserved (#71)", {
@@ -168,11 +188,13 @@ test_that("lower-dimensional output produces a warning (#78)", {
     ncol = 2,
     byrow = TRUE
   )))))
+  sf::st_crs(data) <- sf::st_crs(boundary) <- 3857
 
   expect_warning(
-    result <- hotspot_clip(data, boundary, quiet = TRUE),
+    result <- hotspot_clip(data, boundary, quiet = FALSE),
     "reduced the geometry dimension of 1 output feature"
   )
+  expect_no_warning(hotspot_clip(data, boundary, quiet = TRUE))
   expect_true(sf::st_is(result, "LINESTRING"))
 })
 
@@ -184,6 +206,7 @@ test_that("single/multi type changes do not produce a warning (#78)", {
   )))
   data <- sf::st_as_sf(sf::st_sfc(sf::st_multipolygon(list(polygon))))
   boundary <- sf::st_as_sf(sf::st_sfc(polygon))
+  sf::st_crs(data) <- sf::st_crs(boundary) <- 3857
 
   expect_no_warning(hotspot_clip(data, boundary, quiet = TRUE))
 })

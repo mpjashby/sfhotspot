@@ -130,8 +130,22 @@ hotspot_classify <- function(
     rlang::as_name(rlang::enquo(time))
   )
 
+  data <- prepare_point_data(
+    data,
+    attributes = if (rlang::is_false(time)) {
+      names(data)[unlist(lapply(data, rlang::inherits_any, c("Date", "POSIXt")))]
+    } else {
+      time
+    },
+    quiet = quiet,
+    call = rlang::caller_env()
+  )
+  if (!rlang::is_null(grid)) {
+    grid <- prepare_spatial_data(grid, quiet = quiet, label = "grid")
+  }
+
   # Check inputs that are not checked in a helper function
-  validate_inputs(data = data, grid = grid, quiet = quiet)
+  validate_inputs(data = data, grid = grid, quiet = quiet, require_units = TRUE)
   if (!rlang::is_false(time) & !time %in% names(data))
     cli::cli_abort(
       "{.arg time} must be NULL or the name of a column in {.var data}."
@@ -343,13 +357,18 @@ hotspot_classify <- function(
     dates <- c(dates, max(data[[time]]) + lubridate::years(1))
   }
 
-  # Set cell size if not specified (do this here because it is needed by both
-  # `create_grid()` and `gistar()`)
-  if (rlang::is_null(cell_size))
-    cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
+  # If the user has provided a grid then extract the approximate cell size from
+  # it for use in `gistar()`. Otherwise, set the cell size if necessary and use
+  # it to create a grid.
+  if (!rlang::is_null(grid)) {
 
-  # Create grid
-  if (rlang::is_null(grid)) {
+    cell_size <- get_cell_size(grid)
+
+  } else {
+
+    if (rlang::is_null(cell_size))
+      cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
+
     grid <- create_grid(
       data,
       cell_size = cell_size,
@@ -416,7 +435,6 @@ hotspot_classify <- function(
       # Calculate Gi*
       period_count <- gistar(
         x,
-        n = "n",
         nb_dist = params$nb_dist,
         cell_size = cell_size,
         include_self = params$include_self,
@@ -587,6 +605,6 @@ hotspot_classify <- function(
 
   # Return result
   result <- grid[, c("hotspot_category", "geometry")]
-  structure(result, class = c("hspt_c", class(result)))
+  new_hotspot_results(result, class = "hspt_c")
 
 }

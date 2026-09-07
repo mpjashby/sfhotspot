@@ -43,16 +43,16 @@ robberies in Memphis, Tennessee, in 2019.
     # A tibble: 2,245 × 4
             uid offense_type     date                        geometry
      *    <int> <fct>            <dttm>                   <POINT [°]>
-     1 15213800 personal robbery 2019-01-01 01:30:00 (-89.942 35.149)
-     2 15214030 personal robbery 2019-01-01 20:00:00  (-89.86 35.059)
-     3 15214042 personal robbery 2019-01-01 21:58:00 (-89.929 35.058)
-     4 15214050 personal robbery 2019-01-01 22:30:00 (-90.018 35.201)
-     5 15214118 personal robbery 2019-01-02 09:38:00   (-89.96 35.14)
-     6 15214242 personal robbery 2019-01-02 18:50:00 (-89.953 35.159)
-     7 15214290 personal robbery 2019-01-02 23:30:00  (-89.95 35.026)
-     8 15214295 personal robbery 2019-01-03 00:00:00 (-89.932 35.076)
-     9 15214319 personal robbery 2019-01-03 03:00:00 (-90.021 35.033)
-    10 15214428 personal robbery 2019-01-03 14:45:00 (-90.032 35.165)
+     1 15213800 personal robbery 2019-01-01 03:30:00 (-89.942 35.149)
+     2 15214030 personal robbery 2019-01-01 22:00:00  (-89.86 35.059)
+     3 15214042 personal robbery 2019-01-01 23:58:00 (-89.929 35.058)
+     4 15214050 personal robbery 2019-01-02 00:30:00 (-90.018 35.201)
+     5 15214118 personal robbery 2019-01-02 11:38:00   (-89.96 35.14)
+     6 15214242 personal robbery 2019-01-02 20:50:00 (-89.953 35.159)
+     7 15214290 personal robbery 2019-01-03 01:30:00  (-89.95 35.026)
+     8 15214295 personal robbery 2019-01-03 02:00:00 (-89.932 35.076)
+     9 15214319 personal robbery 2019-01-03 05:00:00 (-90.021 35.033)
+    10 15214428 personal robbery 2019-01-03 16:45:00 (-90.032 35.165)
     # ℹ 2,235 more rows
 
 We can plot this raw data, but the resulting plot is not very

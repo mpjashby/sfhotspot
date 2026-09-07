@@ -216,3 +216,64 @@ test_that("columns in output have the required types", {
 test_that("column values are within the specified range", {
   expect_true(all(result$kde_value >= 0))
 })
+
+test_that("automatic transformation restores the exact geographic CRS (#89)", {
+  data_etrs89 <- sf::st_transform(data_sf, 4258)
+  grid_etrs89 <- sf::st_transform(grid, 4258)
+
+  result_etrs89 <- kernel_density(
+    data_etrs89,
+    grid_etrs89,
+    bandwidth = 10000,
+    transform = TRUE,
+    quiet = TRUE
+  )
+
+  expect_equal(sf::st_crs(result_etrs89), sf::st_crs(data_etrs89))
+})
+
+test_that("data and grid use one automatically selected analysis CRS (#90)", {
+  boundary_data <- sf::st_as_sf(
+    data.frame(
+      x = c(-89.9995, -89.9985, -89.9975),
+      y = c(35, 35.001, 35.002)
+    ),
+    coords = c("x", "y"),
+    crs = 4326
+  )
+  ring <- matrix(
+    c(
+      -90.010, 34.990,
+      -89.995, 34.990,
+      -89.995, 35.010,
+      -90.010, 35.010,
+      -90.010, 34.990
+    ),
+    ncol = 2,
+    byrow = TRUE
+  )
+  boundary_grid <- sf::st_sf(
+    geometry = sf::st_sfc(sf::st_polygon(list(ring)), crs = 4326)
+  )
+  analysis_crs <- sf::st_crs(
+    st_transform_auto(boundary_data, check = FALSE, quiet = TRUE)
+  )
+
+  result_auto <- kernel_density(
+    boundary_data,
+    boundary_grid,
+    bandwidth = 1000,
+    transform = TRUE,
+    quiet = TRUE
+  )
+  result_explicit <- kernel_density(
+    sf::st_transform(boundary_data, analysis_crs),
+    sf::st_transform(boundary_grid, analysis_crs),
+    bandwidth = 1000,
+    transform = FALSE,
+    quiet = TRUE
+  )
+
+  expect_equal(result_auto$kde_value, result_explicit$kde_value)
+  expect_equal(sf::st_crs(result_auto), sf::st_crs(boundary_data))
+})

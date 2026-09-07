@@ -19,6 +19,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">Introduction to sfhotspot</a></li>
+    <li><a class="dropdown-item" href="../articles/plotting.html">Plotting results returned by functions in sfhotspot</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -163,8 +164,11 @@ parameters set automatically will be suppressed. The default is
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An <code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> tibble of grid cells with corresponding point
-counts and dual kernel density estimates for each cell. This can be plotted
-using <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></code>.</p>
+counts and dual kernel density estimates for each cell. The result has
+classes <code>hspt_dk</code> and <code>hspt_k</code>, and a <code>method</code> attribute
+containing the comparison method used.</p>
+<p>The output can be plotted with reasonable defaults using <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code>. The
+colour scale is selected according to the comparison method.</p>
 <p>This function creates a regular two-dimensional grid of cells (unless a
 custom grid is specified with <code>grid</code>), calculates the density of points
 in each cell for each of <code>x</code> and <code>y</code> using functions from the

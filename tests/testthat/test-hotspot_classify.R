@@ -70,3 +70,29 @@ test_that("columns in output have the required types", {
   expect_type(result$hotspot_category, "character")
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
 })
+
+test_that("cell size is extracted silently from a supplied grid (#87)", {
+  data_projected <- sf::st_transform(data_sf, 2843)
+  grid <- hotspot_grid(data_projected, cell_size = 2000, quiet = TRUE)
+
+  # Regression test for https://github.com/mpjashby/sfhotspot/issues/87
+  messages <- testthat::capture_messages(
+    grid_result <- hotspot_classify(
+      data_projected,
+      period = "1 month",
+      grid = grid
+    )
+  )
+  expected <- hotspot_classify(
+    data_projected,
+    period = "1 month",
+    grid = grid,
+    params = hotspot_classify_params(
+      nb_dist = get_cell_size(grid) * sqrt(2)
+    ),
+    quiet = TRUE
+  )
+
+  expect_false(any(grepl("Cell size set", messages, fixed = TRUE)))
+  expect_equal(grid_result$hotspot_category, expected$hotspot_category)
+})

@@ -1,11 +1,18 @@
 data_sf <- sf::st_transform(head(memphis_robberies, 1000), 2843)
-data_sf$wt <- runif(nrow(data_sf), max = 1000)
+data_sf$wt <- seq_len(nrow(data_sf))
 data_lonlat <- sf::st_transform(head(data_sf, 100), 4326)
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
 result <- hotspot_gistar(data_sf, quiet = TRUE)
 result_wt <- hotspot_gistar(data_sf, weights = wt, quiet = TRUE)
+result_no_kde <- hotspot_gistar(data_sf, kde = FALSE, quiet = TRUE)
+result_wt_no_kde <- hotspot_gistar(
+  data_sf,
+  weights = wt,
+  kde = FALSE,
+  quiet = TRUE
+)
 
 
 
@@ -34,10 +41,21 @@ test_that("message if `data` uses a geographic CRS and KDE not performed", {
   )
 })
 
-test_that("no message reporting cell size when grid is provided", {
+test_that("cell size is extracted silently from a supplied grid", {
+  grid <- hotspot_grid(data_sf, cell_size = 1000, quiet = TRUE)
+
   expect_no_message(
-    hotspot_gistar(data_sf, grid = hotspot_grid(data_sf, cell_size = 1000)),
-    message = "Cell size set"
+    grid_result <- hotspot_gistar(data_sf, grid = grid, kde = FALSE)
+  )
+  expect_equal(
+    grid_result,
+    hotspot_gistar(
+      data_sf,
+      grid = grid,
+      cell_size = 500,
+      kde = FALSE,
+      quiet = TRUE
+    )
   )
 })
 
@@ -48,9 +66,23 @@ test_that("no message reporting cell size when grid is provided", {
 
 ## Correct outputs ----
 
-test_that("function produces an SF tibble", {
-  expect_s3_class(result, "sf")
-  expect_s3_class(result, "tbl_df")
+test_that("every return branch produces an hspt_g SF tibble (#82)", {
+  for (output in list(result, result_wt, result_no_kde, result_wt_no_kde)) {
+    expect_identical(class(output)[[1]], "hspt_g")
+    expect_s3_class(output, "hspt_g")
+    expect_s3_class(output, "sf")
+    expect_s3_class(output, "tbl_df")
+  }
+})
+
+test_that("standard SF printing and subsetting are preserved (#82)", {
+  expect_output(print(result), "Simple feature collection")
+
+  subset <- result[1:2, c("gistar", "geometry")]
+  expect_s3_class(subset, "hspt_g")
+  expect_s3_class(subset, "sf")
+  expect_equal(names(subset), c("gistar", "geometry"))
+  expect_equal(nrow(subset), 2)
 })
 
 test_that("function calculates KDE values for lon/lat data", {
@@ -68,11 +100,11 @@ test_that("output object has the required column names", {
     c("n", "sum", "kde", "gistar", "pvalue", "geometry")
   )
   expect_equal(
-    names(hotspot_gistar(data_sf, weights = wt, kde = FALSE)),
+    names(result_wt_no_kde),
     c("n", "sum", "gistar", "pvalue", "geometry")
   )
   expect_equal(
-    names(hotspot_gistar(data_sf, kde = FALSE)),
+    names(result_no_kde),
     c("n", "gistar", "pvalue", "geometry")
   )
 })
@@ -93,4 +125,9 @@ test_that("column values are within the specified range", {
   expect_true(all(result_wt$kde >= 0))
   expect_true(all(result$pvalue >= 0))
   expect_true(all(result$pvalue <= 1))
+})
+
+test_that("weights affect Gi* statistics and p-values (#86)", {
+  expect_false(isTRUE(all.equal(result$gistar, result_wt$gistar)))
+  expect_false(isTRUE(all.equal(result$pvalue, result_wt$pvalue)))
 })

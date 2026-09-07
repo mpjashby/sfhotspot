@@ -21,6 +21,14 @@
 #' @export
 
 hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
+  data <- prepare_spatial_data(data, quiet = quiet, call = rlang::caller_env())
+  boundary <- prepare_spatial_data(
+    boundary,
+    quiet = quiet,
+    label = "boundary",
+    call = rlang::caller_env()
+  )
+
   # Check inputs that are not checked in a helper function
   validate_inputs(
     data = data,
@@ -37,8 +45,13 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
   # not preserve classes it does not recognise
   result_class <- intersect(
     class(data),
-    c("hspt_n", "hspt_k", "hspt_c", "hspt_d")
+    c(
+      "hspt_n", "hspt_dk", "hspt_k", "hspt_c", "hspt_d", "hspt_g",
+      "hspt_ib", "hspt_s"
+    )
   )
+  isoband_metadata <- attr(data, "isoband", exact = TRUE)
+  dbscan_metadata <- attr(data, "dbscan", exact = TRUE)
 
   # Get name of geometry column in boundary file
   geometry_column <- attr(boundary, "sf_column")
@@ -113,11 +126,6 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
 
   clipped_data[[source_id]] <- NULL
 
-  # Restore any package-specific result class
-  if (length(result_class) > 0) {
-    class(clipped_data) <- c(result_class, class(clipped_data))
-  }
-
   # Report number of rows removed
   if (rlang::is_false(quiet)) {
     final_rows <- nrow(clipped_data)
@@ -135,5 +143,10 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
   }
 
   # Return clipped data
-  clipped_data
+  new_hotspot_results(
+    clipped_data,
+    class = result_class,
+    isoband = isoband_metadata,
+    dbscan = dbscan_metadata
+  )
 }

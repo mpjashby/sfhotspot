@@ -21,23 +21,25 @@ BugReports: https://github.com/mpjashby/sfhotspot/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Imports:
+    classInt,
     cli,
+    dbscan,
     ggplot2,
+    isoband,
     rlang,
     sf,
     SpatialKDE,
     spdep,
     tibble
 Depends: 
-    R (>= 3.5)
+    R (>= 4.1.0)
 Suggests:
     testthat (>= 3.0.0),
     knitr,
     lubridate,
-    quarto,
+    rmarkdown,
     ggspatial
 LazyData: true
 Config/testthat/edition: 3
-VignetteBuilder: 
-  quarto
+VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0

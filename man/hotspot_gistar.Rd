@@ -52,7 +52,7 @@ relative to the default.}
 be used as the grid for which counts are made.}
 
 \item{weights}{\code{NULL} or the name of a column in \code{data} to be used
-as weights for weighted counts and KDE values.}
+as weights for weighted counts, Gi*/Gi statistics and KDE values.}
 
 \item{nb_dist}{The distance around a cell that contains the neighbours of
 that cell, which are used in calculating the statistic. If this argument is
@@ -90,7 +90,8 @@ parameters set automatically will be suppressed. The default is
 ignored if \code{kde = FALSE}.}
 }
 \value{
-An \code{\link[sf]{sf}} tibble of regular grid cells with
+An \code{\link[sf]{sf}} tibble with class \code{hspt_g} containing
+regular grid cells with
 corresponding point counts,
 \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}} or
 \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}
@@ -102,8 +103,11 @@ Critical values of
 \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}
 are given in the manual page for \code{\link[spdep]{localG}}.
 
-The output from this function can be plotted in the same way as for other
-SF objects, for which see \code{vignette("sf5", package = "sf")}.
+The output from this function can be plotted with reasonable defaults
+using \code{\link[=autoplot]{autoplot()}}. When KDE values are returned, the default map shows
+density only in areas identified as having significantly more or fewer
+points than expected by chance. When \code{kde = FALSE}, the Gi*/Gi statistic is
+plotted on a diverging scale centred on zero.
 }
 \description{
 Identify hotspot and coldspot locations, that is cells in a regular grid in
@@ -121,7 +125,9 @@ calculate the \eqn{Z} scores and then \code{\link[spdep]{p.adjustSP}}
 function to adjust the corresponding \eqn{p}-values for multiple comparison.
 The function also returns counts of points in each cell and (by default but
 optionally) kernel density estimates using the \code{\link[SpatialKDE]{kde}}
-function.
+function. If \code{weights} is supplied, the Gi*/Gi statistics are calculated
+from the weighted counts; otherwise, they are calculated from the unweighted
+counts.
 \subsection{Coverage of the output data}{
 
 The grid produced by this function covers the convex hull of the input data

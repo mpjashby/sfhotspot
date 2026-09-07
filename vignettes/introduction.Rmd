@@ -1,12 +1,10 @@
 ---
 title: "Introduction to sfhotspot"
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to sfhotspot}
-  %\VignetteEngine{quarto::html}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-fig-align: center
-fig-asp: 0.7
-fig-width: 6
 ---
 
 ```{r}
@@ -17,6 +15,12 @@ fig-width: 6
 library(sf)
 library(sfhotspot)
 library(ggplot2)
+
+knitr::opts_chunk$set(
+  fig.align = "center",
+  fig.asp = 0.7,
+  fig.width = 6
+)
 ```
 
 sfhotspot is a package for understanding patterns in data that represent points in space. You can use it to: 
@@ -35,7 +39,6 @@ All the functions in sfhotspot work on an SF data frame or tibble in which each 
 
 ```{r}
 #| echo: false
-#| tbl-cap: "The included `memphis_robberies` dataset"
 
 memphis_robberies
 ```

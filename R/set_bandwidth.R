@@ -21,7 +21,12 @@
 set_bandwidth <- function(data, adjust = 1, quiet = TRUE, label = "") {
 
   # Check inputs
-  validate_inputs(data = data, quiet = quiet, call = rlang::caller_env())
+  validate_inputs(
+    data = data,
+    quiet = quiet,
+    require_units = TRUE,
+    call = rlang::caller_env()
+  )
   validate_bandwidth(adjust = adjust, call = rlang::caller_env())
 
   # Find spatial unit

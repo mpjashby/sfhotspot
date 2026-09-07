@@ -50,10 +50,7 @@ test_that("output has not changed since last time the package was checked", {
     set_cell_size(data = data_sf, round = FALSE),
     style = "deparse"
   )
-  expect_snapshot_value(
-    set_cell_size(data = data_missing_crs),
-    style = "deparse"
-  )
+  expect_error(set_cell_size(data = data_missing_crs), "CRS.*missing|reference system.*missing")
 })
 
 test_that("small area does not cause zero cell size (#26)", {

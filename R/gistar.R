@@ -5,8 +5,6 @@
 #' statistics
 #'
 #' @param counts \code{\link[sf]{sf}} data frame.
-#' @param n Name of the column in \code{counts} containing counts of events for
-#'   each row.
 #' @param nb_dist The distance around a cell that contains the neighbours of
 #'   that cell, which are used in calculating the statistic. If this argument is
 #'   \code{NULL} (the default), \code{nb_dist} is set as \code{cell_size *
@@ -45,7 +43,6 @@
 
 gistar <- function(
   counts,
-  n,
   nb_dist = NULL,
   cell_size = NULL,
   include_self = TRUE,
@@ -53,17 +50,19 @@ gistar <- function(
   quiet = TRUE
 ) {
 
-  # Process arguments that are column names
-  n <- rlang::as_name(rlang::enquo(n))
-
   # Check inputs
   validate_sf(counts, "counts", quiet = quiet, call = rlang::caller_env())
-  if (!n %in% names(counts))
+  count_column <- if ("sum" %in% names(counts)) "sum" else "n"
+  if (!count_column %in% names(counts)) {
     cli::cli_abort(
-      "{.var n} must be the name of a column in the {.var counts} object"
+      "{.var counts} must contain a numeric column named {.var n} or {.var sum}"
     )
-  if (!rlang::is_double(counts[[n]]))
-    cli::cli_abort("The column specified in {.var n} must be numeric")
+  }
+  if (!rlang::is_bare_numeric(counts[[count_column]])) {
+    cli::cli_abort(
+      "The {.var {count_column}} column in {.var counts} must be numeric"
+    )
+  }
   validate_cell_size(cell_size)
   if (!rlang::is_null(nb_dist) & !rlang::is_double(nb_dist, n = 1))
     cli::cli_abort("{.var nb_dist} must be a single numeric value or NULL")
@@ -115,7 +114,10 @@ gistar <- function(
   if (include_self) nb <- spdep::include.self(nb)
 
   # Calculate gi* statistic
-  gi <- spdep::localG(counts[[n]], listw = spdep::nb2listw(nb, style = "B"))
+  gi <- spdep::localG(
+    counts[[count_column]],
+    listw = spdep::nb2listw(nb, style = "B")
+  )
 
   # Join results
   result <- counts

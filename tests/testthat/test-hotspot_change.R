@@ -96,6 +96,25 @@ test_that("columns in output have the required types", {
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
 })
 
+test_that("cell size is ignored silently when grid is provided", {
+  grid <- hotspot_grid(data_sf, cell_size = 0.01, quiet = TRUE)
+  boundary <- min(data_sf$date) + 30
+
+  expect_no_message(
+    grid_result <- hotspot_change(data_sf, boundary = boundary, grid = grid)
+  )
+  expect_equal(
+    grid_result,
+    hotspot_change(
+      data_sf,
+      boundary = boundary,
+      grid = grid,
+      cell_size = 0.001,
+      quiet = TRUE
+    )
+  )
+})
+
 
 ## Messages ----
 

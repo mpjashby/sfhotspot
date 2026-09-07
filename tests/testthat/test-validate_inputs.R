@@ -8,6 +8,7 @@ data_sf_zero_rows <- data_sf[data_sf$offense_type == "non-existent",]
 data_sf_wrong_geo <- data_sf_all_empty <- data_sf_empty <- data_sf
 data_sf_empty$geometry[1] <- sf::st_point()
 data_sf_all_empty$geometry <- sf::st_sfc(sf::st_point())
+sf::st_crs(data_sf_all_empty) <- sf::st_crs(data_sf)
 data_sf_wrong_geo$geometry[1] <- sf::st_cast(
   data_sf_wrong_geo$geometry[1],
   "LINESTRING"

@@ -19,6 +19,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">Introduction to sfhotspot</a></li>
+    <li><a class="dropdown-item" href="../articles/plotting.html">Plotting results returned by functions in sfhotspot</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -37,16 +38,28 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="sfhotspot-110">sfhotspot 1.1.0<a class="anchor" aria-label="anchor" href="#sfhotspot-110"></a></h2>
-<ul><li>
-<code><a href="../reference/hotspot_clip.html">hotspot_clip()</a></code> can now clip polygon results produced by the <code>hotspot_*()</code> functions, as well as point data (<a href="https://github.com/mpjashby/sfhotspot/issues/65" class="external-link">#65</a>).</li>
+<ul><li>New function <code><a href="../reference/hotspot_dbscan.html">hotspot_dbscan()</a></code> to identify clusters using the DBSCAN algorithm, as implemented in the <a href="https://github.com/mhahsler/dbscan" class="external-link">dbscan</a> package. Also added corresponding <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code> methods.</li>
+<li>New function <code><a href="../reference/hotspot_isoband.html">hotspot_isoband()</a></code> to generalise values in regular square hotspot grids into tidy SF isobands with appropriate visual representation (<a href="https://github.com/mpjashby/sfhotspot/issues/81" class="external-link">#81</a>).</li>
+<li>Added <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code> methods for <code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> and <code><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde()</a></code> results, and completed the plotting support for <code><a href="../reference/hotspot_classify.html">hotspot_classify()</a></code> results. Plot scales and legends now reflect the semantics of each result, including the comparison method used for dual KDE and significance/sign filtering for Gi* results. Legend titles consistently use lower-case terminology. A new website plotting article demonstrates each distinct behaviour (<a href="https://github.com/mpjashby/sfhotspot/issues/85" class="external-link">#85</a>).</li>
+<li>
+<code><a href="../reference/hotspot_clip.html">hotspot_clip()</a></code> can now clip any type of geometry, not just point data (<a href="https://github.com/mpjashby/sfhotspot/issues/65" class="external-link">#65</a>, <a href="https://github.com/mpjashby/sfhotspot/issues/78" class="external-link">#78</a>) and produces warnings if clipping changes the geometry type of any features in a way that might create downstream problems.</li>
 <li>
 <code><a href="../reference/hotspot_clip.html">hotspot_clip()</a></code> now preserves the specialised <code>hspt_*</code> class of results produced by other package functions (<a href="https://github.com/mpjashby/sfhotspot/issues/71" class="external-link">#71</a>).</li>
 <li>
+<code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> results now have the specialised class <code>hspt_g</code>, allowing downstream functions to identify <code>gistar</code> as their primary value column (<a href="https://github.com/mpjashby/sfhotspot/issues/82" class="external-link">#82</a>).</li>
+<li>Existing plotting methods now use transparent missing values, weighted counts when present, sequential scales anchored at zero, and balanced diverging scales for signed values (<a href="https://github.com/mpjashby/sfhotspot/issues/85" class="external-link">#85</a>, <a href="https://github.com/mpjashby/sfhotspot/issues/86" class="external-link">#86</a>).</li>
+<li>
 <code><a href="../reference/hotspot_clip.html">hotspot_clip()</a></code> no longer reports that zero rows were removed when all input features fall within the clipping boundary (<a href="https://github.com/mpjashby/sfhotspot/issues/66" class="external-link">#66</a>).</li>
+<li>
+<code><a href="../reference/hotspot_clip.html">hotspot_clip()</a></code> no longer suppresses warnings produced by <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">sf::st_intersection()</a></code> other than the constant “attribute variables are assumed to be spatially constant throughout all geometries” (since this is rarely relevant).</li>
 <li>
 <code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> now calculates KDE values for longitude/latitude data by automatically transforming them to a projected co-ordinate reference system and transforming the results back afterwards (<a href="https://github.com/mpjashby/sfhotspot/issues/68" class="external-link">#68</a>).</li>
 <li>
 <code><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde()</a></code> now calculates valid KDE values for longitude/latitude data while using a common automatically selected bandwidth for both layers, and checks that both point layers overlap the analysis grid (<a href="https://github.com/mpjashby/sfhotspot/issues/67" class="external-link">#67</a>).</li>
+<li>
+<code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> now uses weighted counts to calculate Gi* statistics and p-values when weights are supplied, and <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code>/<code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code> plot weighted counts when they are present (<a href="https://github.com/mpjashby/sfhotspot/issues/86" class="external-link">#86</a>).</li>
+<li>Automatic CRS transformation using <code><a href="../reference/st_transform_auto.html">st_transform_auto()</a></code> in KDE-related functions now correctly restores the original geographic CRS rather than converting to EPSG:4326 even when another geographic CRS was originally used (<a href="https://github.com/mpjashby/sfhotspot/issues/89" class="external-link">#89</a>).</li>
+<li>Automatic CRS transformation using <code><a href="../reference/st_transform_auto.html">st_transform_auto()</a></code> in <code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code> and <code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> now ensures the same CRS is selected for both <code>data</code> and <code>grid</code> (<a href="https://github.com/mpjashby/sfhotspot/issues/90" class="external-link">#90</a>).</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="sfhotspot-100">sfhotspot 1.0.0<a class="anchor" aria-label="anchor" href="#sfhotspot-100"></a></h2><p class="text-muted">CRAN release: 2025-07-29</p>

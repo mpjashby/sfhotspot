@@ -34,9 +34,12 @@ result_wt <- hotspot_kde(
 
 ## Correct outputs ----
 
-test_that("output is an SF tibble with class hspt_k", {
+test_that("output remains an hspt_k SF tibble without dual-KDE metadata (#83)", {
   expect_s3_class(result, "sf")
   expect_s3_class(result, "tbl_df")
+  expect_identical(class(result)[[1]], "hspt_k")
+  expect_false(inherits(result, "hspt_dk"))
+  expect_null(attr(result, "method"))
   expect_s3_class(result, "hspt_k")
   expect_s3_class(result_wt, "sf")
   expect_s3_class(result_wt, "tbl_df")
@@ -55,16 +58,42 @@ test_that("columns in output have the required types", {
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
 })
 
-test_that("no issues if cell size extracted from grid", {
-  expect_no_condition(
+test_that("cell size is extracted silently from a supplied grid", {
+  grid <- hotspot_grid(data_sf, cell_size = 1000, quiet = TRUE)
+
+  expect_no_message(
+    grid_result <- hotspot_kde(data_sf, grid = grid, bandwidth = 10000)
+  )
+  expect_equal(
+    grid_result,
     hotspot_kde(
       data_sf,
-      grid = hotspot_grid(data_sf, cell_size = 1000),
-      bandwidth = 10000
+      grid = grid,
+      cell_size = 500,
+      bandwidth = 10000,
+      quiet = TRUE
     )
   )
 })
 
 test_that("no issues if cell size is set automatically", {
   expect_message(hotspot_kde(data_sf, bandwidth = 10000), "Cell size set to")
+})
+
+test_that("automatic transformation supports non-WGS84 geographic data (#89)", {
+  data_etrs89 <- sf::st_transform(data_sf, 4258)
+  grid_etrs89 <- sf::st_transform(
+    hotspot_grid(data_sf, cell_size = 1000, quiet = TRUE),
+    4258
+  )
+
+  expect_no_error(
+    result_etrs89 <- hotspot_kde(
+      data_etrs89,
+      grid = grid_etrs89,
+      bandwidth = 10000,
+      quiet = TRUE
+    )
+  )
+  expect_equal(sf::st_crs(result_etrs89), sf::st_crs(data_etrs89))
 })

@@ -27,7 +27,7 @@
 #' @param grid \code{\link[sf]{sf}} data frame containing polygons, which will
 #'   be used as the grid for which counts are made.
 #' @param weights \code{NULL} or the name of a column in \code{data} to be used
-#'   as weights for weighted counts and KDE values.
+#'   as weights for weighted counts, Gi*/Gi statistics and KDE values.
 #' @param nb_dist The distance around a cell that contains the neighbours of
 #'   that cell, which are used in calculating the statistic. If this argument is
 #'   \code{NULL} (the default), \code{nb_dist} is set as \code{cell_size *
@@ -57,7 +57,8 @@
 #'   \code{FALSE}.
 #' @param ... Further arguments passed to \code{\link[SpatialKDE]{kde}} or
 #'   ignored if \code{kde = FALSE}.
-#' @return An \code{\link[sf]{sf}} tibble of regular grid cells with
+#' @return An \code{\link[sf]{sf}} tibble with class \code{hspt_g} containing
+#'   regular grid cells with
 #'   corresponding point counts,
 #'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}} or
 #'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}
@@ -69,8 +70,11 @@
 #'   \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G^*_i}}
 #'   are given in the manual page for \code{\link[spdep]{localG}}.
 #'
-#'   The output from this function can be plotted in the same way as for other
-#'   SF objects, for which see \code{vignette("sf5", package = "sf")}.
+#'   The output from this function can be plotted with reasonable defaults
+#'   using [autoplot()]. When KDE values are returned, the default map shows
+#'   density only in areas identified as having significantly more or fewer
+#'   points than expected by chance. When `kde = FALSE`, the Gi*/Gi statistic is
+#'   plotted on a diverging scale centred on zero.
 #'
 #' @details
 #'
@@ -84,7 +88,9 @@
 #' function to adjust the corresponding \eqn{p}-values for multiple comparison.
 #' The function also returns counts of points in each cell and (by default but
 #' optionally) kernel density estimates using the \code{\link[SpatialKDE]{kde}}
-#' function.
+#' function. If \code{weights} is supplied, the Gi*/Gi statistics are calculated
+#' from the weighted counts; otherwise, they are calculated from the unweighted
+#' counts.
 #'
 #' ## Coverage of the output data
 #'
@@ -162,8 +168,18 @@ hotspot_gistar <- function(
     rlang::as_name(rlang::enquo(weights))
   )
 
+  data <- prepare_point_data(
+    data,
+    attributes = if (rlang::is_chr_na(weights)) NULL else weights,
+    quiet = quiet,
+    call = rlang::caller_env()
+  )
+  if (!rlang::is_null(grid)) {
+    grid <- prepare_spatial_data(grid, quiet = quiet, label = "grid")
+  }
+
   # Check inputs that are not checked in a helper function
-  validate_inputs(data = data, grid = grid, quiet = quiet)
+  validate_inputs(data = data, grid = grid, quiet = quiet, require_units = TRUE)
 
   # Report units when KDE values are not calculated, since `kernel_density()`
   # otherwise reports that lon/lat data have been transformed
@@ -245,7 +261,6 @@ hotspot_gistar <- function(
   # Calculate Gi*
   result <- gistar(
     counts,
-    n = "n",
     nb_dist = nb_dist,
     cell_size = cell_size,
     include_self = include_self,
@@ -256,23 +271,26 @@ hotspot_gistar <- function(
   # Join results
   if (rlang::is_true(kde)) result$kde <- kde_val$kde_value
 
-  # Return result
+  # Select and order output columns
   if (rlang::is_true(kde) & !rlang::is_chr_na(weights)) {
-    sf::st_as_sf(tibble::as_tibble(
+    result <- sf::st_as_sf(tibble::as_tibble(
       result[, c("n", "sum", "kde", "gistar", "pvalue", "geometry")]
     ))
   } else if (!rlang::is_chr_na(weights)) {
-    sf::st_as_sf(tibble::as_tibble(
+    result <- sf::st_as_sf(tibble::as_tibble(
       result[, c("n", "sum", "gistar", "pvalue", "geometry")]
     ))
   } else if (rlang::is_true(kde)) {
-    sf::st_as_sf(tibble::as_tibble(
+    result <- sf::st_as_sf(tibble::as_tibble(
       result[, c("n", "kde", "gistar", "pvalue", "geometry")]
     ))
   } else {
-    sf::st_as_sf(tibble::as_tibble(
+    result <- sf::st_as_sf(tibble::as_tibble(
       result[, c("n", "gistar", "pvalue", "geometry")]
     ))
   }
+
+  # Return result
+  new_hotspot_results(result, class = "hspt_g")
 
 }

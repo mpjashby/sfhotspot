@@ -10,26 +10,22 @@
 \method{autolayer}{hspt_n}(object, ...)
 }
 \arguments{
-\item{object}{An object with the class \code{hspt_n}, e.g. as produced by
-\code{\link{hotspot_count}}.}
+\item{object}{An object with class \code{hspt_n}, e.g. as produced by
+\code{\link[=hotspot_count]{hotspot_count()}}.}
 
-\item{...}{further arguments passed to \code{\link[ggplot2]{geom_sf}}, e.g.
-\code{alpha}.}
+\item{...}{Further arguments passed to \code{\link[ggplot2:geom_sf]{ggplot2::geom_sf()}}, e.g. \code{alpha}.}
 }
 \value{
-A \code{\link[ggplot2]{ggplot}} object or layer that can be used as
-part of a \code{\link[ggplot2]{ggplot}} stack.
-
-\code{autoplot} returns a \code{ggplot} object, meaning you can further
-control the appearance of the plot by adding calls to further \code{ggplot2}
-functions.
+\code{autoplot()} returns a \link[ggplot2:ggplot]{ggplot2::ggplot} object. \code{autolayer()}
+returns a layer that can be added to a \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Plot the output produced by \code{\link{hotspot_count}} with reasonable
-default values.
+Plot the output produced by \code{\link[=hotspot_count]{hotspot_count()}} with reasonable default
+values. Weighted counts are plotted when the object contains a \code{sum} column;
+otherwise unweighted counts in the \code{n} column are plotted.
 }
 \section{Functions}{
 \itemize{
-\item \code{autolayer(hspt_n)}: Create a ggplot layer of grid counts
+\item \code{autolayer(hspt_n)}: Create a ggplot layer of grid counts.
 
 }}

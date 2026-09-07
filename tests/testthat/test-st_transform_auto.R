@@ -16,7 +16,7 @@ sf::st_crs(robbery_nocrs) <- NA
 # Note checking of some inputs is tested in the test file for `validate_sf()`
 
 test_that("error if CRS is missing", {
-  expect_error(st_transform_auto(robbery_nocrs), "must have a specified")
+  expect_error(st_transform_auto(robbery_nocrs), "reference system.*missing")
 })
 
 test_that("error if `check` is not TRUE/FALSE", {
@@ -156,6 +156,15 @@ test_that("function performs expected transformation", {
     32632
   )
 
+})
+
+test_that("geographic input need not use WGS84 (#89)", {
+  data_etrs89 <- sf::st_transform(memphis_robberies_jan, 4258)
+
+  expect_no_error(
+    result <- st_transform_auto(data_etrs89, quiet = TRUE)
+  )
+  expect_equal(sf::st_crs(result)$epsg, 32616)
 })
 
 test_that("no unexpected warnings", {

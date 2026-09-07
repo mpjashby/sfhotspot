@@ -1,10 +1,28 @@
 # sfhotspot 1.1.0
 
+* New function `hotspot_dbscan()` to identify clusters using the DBSCAN
+  algorithm, as implemented in the [dbscan](https://github.com/mhahsler/dbscan) 
+  package. Also added corresponding `autoplot()` and `autolayer()` methods.
+* New function `hotspot_isoband()` to generalise values in regular square hotspot
+  grids into tidy SF isobands with appropriate visual representation (#81).
+* Added `autoplot()` and `autolayer()` methods for `hotspot_gistar()` and
+  `hotspot_dual_kde()` results, and completed the plotting support for
+  `hotspot_classify()` results. Plot scales and legends now reflect the
+  semantics of each result, including the comparison method used for dual KDE
+  and significance/sign filtering for Gi* results. Legend titles consistently
+  use lower-case terminology. A new website plotting article demonstrates each
+  distinct behaviour (#85).
 * `hotspot_clip()` can now clip any type of geometry, not just point data (#65,
   #78) and produces warnings if clipping changes the geometry type of any 
   features in a way that might create downstream problems.
 * `hotspot_clip()` now preserves the specialised `hspt_*` class of results
   produced by other package functions (#71).
+* `hotspot_gistar()` results now have the specialised class `hspt_g`, allowing
+  downstream functions to identify `gistar` as their primary value column
+  (#82).
+* Existing plotting methods now use transparent missing values, weighted counts
+  when present, sequential scales anchored at zero, and balanced diverging
+  scales for signed values (#85, #86).
 * `hotspot_clip()` no longer reports that zero rows were removed when all input
   features fall within the clipping boundary (#66).
 * `hotspot_clip()` no longer suppresses warnings produced by
@@ -17,6 +35,16 @@
 * `hotspot_dual_kde()` now calculates valid KDE values for longitude/latitude
   data while using a common automatically selected bandwidth for both layers,
   and checks that both point layers overlap the analysis grid (#67).
+* `hotspot_gistar()` now uses weighted counts to calculate Gi* statistics and
+  p-values when weights are supplied, and `autoplot()`/`autolayer()` plot
+  weighted counts when they are present (#86).
+* Automatic CRS transformation using `st_transform_auto()` in KDE-related 
+  functions now correctly restores the original geographic CRS rather than 
+  converting to EPSG:4326 even when another geographic CRS was originally used 
+  (#89).
+* Automatic CRS transformation using `st_transform_auto()` in `hotspot_kde()` 
+  and `hotspot_gistar()` now ensures the same CRS is selected for both `data` 
+  and `grid` (#90).
 
 
 # sfhotspot 1.0.0

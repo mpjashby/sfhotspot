@@ -41,3 +41,13 @@ test_that("columns in output have the required types", {
   expect_type(hotspot_count(data = data_sf, weights = wt)$sum, "double")
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
 })
+
+test_that("cell size is ignored silently when grid is provided", {
+  grid <- hotspot_grid(data_sf, cell_size = 0.01, quiet = TRUE)
+
+  expect_no_message(grid_result <- hotspot_count(data_sf, grid = grid))
+  expect_equal(
+    grid_result,
+    hotspot_count(data_sf, grid = grid, cell_size = 0.001, quiet = TRUE)
+  )
+})

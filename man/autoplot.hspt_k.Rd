@@ -10,26 +10,20 @@
 \method{autolayer}{hspt_k}(object, ...)
 }
 \arguments{
-\item{object}{An object with the class \code{hspt_k}, e.g. as produced by
-\code{\link{hotspot_kde}}.}
+\item{object}{An object with class \code{hspt_k}, e.g. as produced by
+\code{\link[=hotspot_kde]{hotspot_kde()}}.}
 
-\item{...}{further arguments passed to \code{\link[ggplot2]{geom_sf}}, e.g.
-\code{alpha}.}
+\item{...}{Further arguments passed to \code{\link[ggplot2:geom_sf]{ggplot2::geom_sf()}}, e.g. \code{alpha}.}
 }
 \value{
-A \code{\link[ggplot2]{ggplot}} object or layer that can be used as
-part of a \code{\link[ggplot2]{ggplot}} stack.
-
-\code{autoplot} returns a \code{ggplot} object, meaning you can further
-control the appearance of the plot by adding calls to further \code{ggplot2}
-functions.
+\code{autoplot()} returns a \link[ggplot2:ggplot]{ggplot2::ggplot} object. \code{autolayer()}
+returns a layer that can be added to a \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Plot the output produced by \code{\link{hotspot_kde}} with reasonable
-default values.
+Plot the output produced by \code{\link[=hotspot_kde]{hotspot_kde()}} with reasonable default values.
 }
 \section{Functions}{
 \itemize{
-\item \code{autolayer(hspt_k)}: Create a ggplot layer of kernel-density values
+\item \code{autolayer(hspt_k)}: Create a ggplot layer of kernel-density values.
 
 }}

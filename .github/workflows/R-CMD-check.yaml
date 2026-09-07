@@ -48,6 +48,7 @@ jobs:
       # started by Quarto cannot see rcmdcheck's temporary package library.
       - name: Pre-install package for Quarto vignettes
         if: runner.os == 'Windows'
+        shell: bash
         run: R CMD INSTALL .
 
       - uses: r-lib/actions/check-r-package@v2

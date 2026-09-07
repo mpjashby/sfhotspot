@@ -42,13 +42,13 @@ kernel_density <- function(
 ) {
 
   # Check inputs
-  if (rlang::is_empty(sf::st_crs(data, parameters = TRUE))) {
-    cli::cli_abort(c(
-      "Co-ordinate reference system for {.var data} is missing.",
-      "i" = "Cannot calculate KDE values from datasets with a missing CRS.",
-      "i" = "Check CRS of {.var data} using {.fn st_crs()}."
-    ))
-  }
+  validate_sf(
+    data,
+    type = "POINT",
+    require_units = TRUE,
+    quiet = quiet,
+    call = rlang::caller_env()
+  )
   validate_sf(
     grid,
     label = "grid",
@@ -79,11 +79,13 @@ kernel_density <- function(
   }
 
   # Transform CRS if required
+  original_crs <- sf::st_crs(data)
   is_transformed <- FALSE
   if (sf::st_is_longlat(data)) {
     if (rlang::is_true(transform)) {
       data <- st_transform_auto(data, quiet = quiet)
-      grid <- st_transform_auto(grid, quiet = TRUE)
+      analysis_crs <- sf::st_crs(data)
+      grid <- sf::st_transform(grid, analysis_crs)
       is_transformed <- TRUE
     } else {
       cli::cli_abort(c(
@@ -156,7 +158,10 @@ kernel_density <- function(
 
   # Return result
   if (is_transformed) {
-    st_transform_auto(kde_val[, c("kde_value", "geometry")], quiet = TRUE)
+    sf::st_transform(
+      kde_val[, c("kde_value", "geometry")],
+      original_crs
+    )
   } else {
     kde_val[, c("kde_value", "geometry")]
   }

@@ -2,24 +2,28 @@
 % Please edit documentation in R/autoplot.R
 \name{autoplot.hspt_c}
 \alias{autoplot.hspt_c}
+\alias{autolayer.hspt_c}
 \title{Plot map of hotspot classifications}
 \usage{
 \method{autoplot}{hspt_c}(object, ...)
+
+\method{autolayer}{hspt_c}(object, ...)
 }
 \arguments{
-\item{object}{An object with the class \code{hspt_c}, e.g. as produced by
-\code{\link{hotspot_classify}}.}
+\item{object}{An object with class \code{hspt_c}, e.g. as produced by
+\code{\link[=hotspot_classify]{hotspot_classify()}}.}
 
-\item{...}{Currently ignored, but may be used for further options in future.}
+\item{...}{Further arguments passed to \code{\link[ggplot2:geom_sf]{ggplot2::geom_sf()}}, e.g. \code{alpha}.}
 }
 \value{
-A \code{\link[ggplot2]{ggplot}} object.
-
-This function returns a \code{ggplot} object, meaning you can further control
-the appearance of the plot by adding calls to further \code{ggplot2}
-functions.
+\code{autoplot()} returns a \link[ggplot2:ggplot]{ggplot2::ggplot} object. \code{autolayer()}
+returns a layer that can be added to a \link[ggplot2:ggplot]{ggplot2::ggplot} object.
 }
 \description{
-Plot the output produced by \code{\link{hotspot_classify}} with reasonable
-default values.
+Plot the output produced by \code{\link[=hotspot_classify]{hotspot_classify()}} with reasonable defaults.
 }
+\section{Functions}{
+\itemize{
+\item \code{autolayer(hspt_c)}: Create a ggplot layer of hotspot classifications.
+
+}}
