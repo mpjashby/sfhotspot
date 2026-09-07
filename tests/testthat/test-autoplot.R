@@ -22,7 +22,9 @@ class(result_gistar) <- c(
   "hspt_g",
   setdiff(class(result_gistar), "hspt_k")
 )
-result_gistar_no_kde <- dplyr::select(result_gistar, -kde)
+result_gistar_no_kde <- result_gistar[
+  , setdiff(names(result_gistar), "kde")
+]
 
 result_dual_kde <- result_kde
 class(result_dual_kde) <- c("hspt_dk", class(result_dual_kde))
@@ -90,7 +92,9 @@ test_that("Gi* plotting arguments are validated", {
   expect_error(autoplot(result_gistar, sign = TRUE))
   expect_error(autoplot(result_gistar, sign = "positive"))
 
-  missing_pvalue <- dplyr::select(result_gistar, -pvalue)
+  missing_pvalue <- result_gistar[
+    , setdiff(names(result_gistar), "pvalue")
+  ]
   expect_error(autoplot(missing_pvalue), "pvalue")
 })
 
@@ -268,6 +272,6 @@ test_that("Gi* values are mapped directly when KDE is absent", {
     symmetric_limits(result_gistar_no_kde$gistar)
   )
 
-  statistic_only <- dplyr::select(result_gistar_no_kde, gistar)
+  statistic_only <- result_gistar_no_kde[, "gistar"]
   expect_no_error(autoplot(statistic_only))
 })

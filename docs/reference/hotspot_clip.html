@@ -19,6 +19,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">Introduction to sfhotspot</a></li>
+    <li><a class="dropdown-item" href="../articles/plotting.html">Plotting results returned by functions in sfhotspot</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -50,7 +51,7 @@
 
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> data frame containing points or polygons.</p></dd>
+<dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a></code> data frame containing spatial features.</p></dd>
 
 
 <dt id="arg-boundary">boundary<a class="anchor" aria-label="anchor" href="#arg-boundary"></a></dt>
@@ -77,7 +78,8 @@ by the polygons.</p>
     <p>This function is a wrapper around <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></code> that
 performs some additional checks and reports useful information. If
 <code>data</code> has a specialised result class produced by this package, that
-class is preserved in the clipped result.</p>
+class is preserved in the clipped result. A warning is produced if clipping
+reduces the dimension of any geometry, such as from a polygon to a line.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -19,6 +19,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introduction.html">Introduction to sfhotspot</a></li>
+    <li><a class="dropdown-item" href="../articles/plotting.html">Plotting results returned by functions in sfhotspot</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -81,6 +82,13 @@
 
         <dt>
 
+          <code><a href="hotspot_dbscan.html">hotspot_dbscan()</a></code>
+
+        </dt>
+        <dd>Identify hotspots using DBSCAN</dd>
+
+        <dt>
+
           <code><a href="hotspot_classify.html">hotspot_classify()</a></code>
 
         </dt>
@@ -125,7 +133,7 @@
       </dl></div><div class="section level2">
       <h2 id="plotting-results">Plotting results<a class="anchor" aria-label="anchor" href="#plotting-results"></a></h2>
 
-      <div class="section-desc"><p>These methods for the <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> function automatically produce charts that are tailored to displaying the results produced by one of the <code>hotspot_*()</code> family of functions.</p></div>
+      <div class="section-desc"><p>These methods for the <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> function automatically produce charts that are tailored to displaying the results produced by one of the <code>hotspot_*()</code> family of functions. <code><a href="../reference/hotspot_isoband.html">hotspot_isoband()</a></code> generalises the polygons produced by the hotspot-analysis functions into polygons, which can sometimes be preferable for plotting.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -134,7 +142,14 @@
 
       <dl><dt>
 
-          <code><a href="autoplot.hspt_c.html">autoplot(<i>&lt;hspt_c&gt;</i>)</a></code>
+          <code><a href="hotspot_isoband.html">hotspot_isoband()</a></code>
+
+        </dt>
+        <dd>Convert a hotspot grid to isobands</dd>
+
+        <dt>
+
+          <code><a href="autoplot.hspt_c.html">autoplot(<i>&lt;hspt_c&gt;</i>)</a></code> <code><a href="autoplot.hspt_c.html">autolayer(<i>&lt;hspt_c&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot map of hotspot classifications</dd>
@@ -145,6 +160,27 @@
 
         </dt>
         <dd>Plot map of changes in grid counts</dd>
+
+        <dt>
+
+          <code><a href="autoplot.hspt_dk.html">autoplot(<i>&lt;hspt_dk&gt;</i>)</a></code> <code><a href="autoplot.hspt_dk.html">autolayer(<i>&lt;hspt_dk&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot map of dual kernel-density values</dd>
+
+        <dt>
+
+          <code><a href="autoplot.hspt_g.html">autoplot(<i>&lt;hspt_g&gt;</i>)</a></code> <code><a href="autoplot.hspt_g.html">autolayer(<i>&lt;hspt_g&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot map of Getis-Ord Gi* results</dd>
+
+        <dt>
+
+          <code><a href="autoplot.hspt_ib.html">autoplot(<i>&lt;hspt_ib&gt;</i>)</a></code> <code><a href="autoplot.hspt_ib.html">autolayer(<i>&lt;hspt_ib&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot isobands</dd>
 
         <dt>
 
@@ -159,6 +195,13 @@
 
         </dt>
         <dd>Plot map of grid counts</dd>
+
+        <dt>
+
+          <code><a href="autoplot.hspt_s.html">autoplot(<i>&lt;hspt_s&gt;</i>)</a></code> <code><a href="autoplot.hspt_s.html">autolayer(<i>&lt;hspt_s&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot DBSCAN hotspot clusters</dd>
       </dl></div><div class="section level2">
       <h2 id="sample-data">Sample data<a class="anchor" aria-label="anchor" href="#sample-data"></a></h2>
 

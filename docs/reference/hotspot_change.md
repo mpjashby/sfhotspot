@@ -131,7 +131,7 @@ continuous distribution.
 # counts from the second half
 # \donttest{
 hotspot_change(memphis_robberies)
-#> Boundary point set as 09:30 hours on 02 July 2019 automatically
+#> Boundary point set as 11:30 hours on 02 July 2019 automatically
 #> Cell size set to 0.00524 degrees automatically
 #> Simple feature collection with 2926 features and 3 fields
 #> Geometry type: POLYGON

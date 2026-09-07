@@ -46,7 +46,8 @@ knitr::kable(data.frame(
     "`hotspot_kde()`", 
     "`hotspot_dual_kde()`", 
     "`hotspot_gistar()`",
-    "`hotspot_classify()`"
+    "`hotspot_classify()`",
+    "`hotspot_dbscan()`"
   ),
   "use" = c(
     paste(
@@ -75,14 +76,15 @@ knitr::kable(data.frame(
       "clusters of points at different time periods. All parameters can be",
       "chosen automatically or be set by the user using the",
       "`hotspot_classify_params()` helper function."
+    ),
+    paste(
+      "Identify clusters of points using the DBSCAN algorithm."
     )
   )
 ))
 ```
 
-The results produced by `hotspot_count()`, `hotspot_change()`, `hotspot_kde()`, 
-`hotspot_dual_kde()` and `hotspot_classify()` can be easily plotted using 
-included methods for`autoplot()` and `autolayer()`.
+The results produced by `hotspot_count()`, `hotspot_change()`, `hotspot_kde()`, `hotspot_dual_kde()`, `hotspot_gistar()`, `hotspot_classify()` and `hotspot_dbscan()` can be easily plotted using included methods for`autoplot()` and `autolayer()`.
 
 There are also included datasets: 
 
@@ -128,11 +130,5 @@ memphis_robberies_htspt <- hotspot_gistar(memphis_robberies_utm, quiet = TRUE)
 # Visualise the hotspots by showing only those cells that have significantly
 # more points than expected by chance. For those cells, show the estimated
 # density of robberies.
-memphis_robberies_htspt |> 
-  filter(gistar > 0, pvalue < 0.05) |> 
-  ggplot(aes(colour = kde, fill = kde)) +
-  geom_sf() +
-  scale_colour_distiller(aesthetics = c("colour", "fill"), direction = 1) +
-  labs(title = "Density of robberies in Memphis, 2019") +
-  theme_void()
+autoplot(memphis_robberies_htspt)
 ```

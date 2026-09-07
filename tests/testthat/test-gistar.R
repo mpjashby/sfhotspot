@@ -22,7 +22,8 @@ test_that("error if `data` is not an SF object", {
 })
 
 test_that("error if counts are missing or are not numeric", {
-  expect_error(gistar(counts = dplyr::select(counts, -n)), "named `n` or `sum`")
+  expect_error(gistar(counts = counts[, setdiff(names(counts), "n")]),
+               "named `n` or `sum`")
   counts_character <- counts
   counts_character$n <- as.character(counts_character$n)
   expect_error(gistar(counts = counts_character), "must be numeric")
@@ -89,7 +90,9 @@ test_that("weighted counts are used when present (#86)", {
   weighted_counts$sum <- seq_len(nrow(weighted_counts))^2
 
   weighted_result <- gistar(weighted_counts)
-  unweighted_result <- gistar(dplyr::select(weighted_counts, -sum))
+  unweighted_result <- gistar(
+    weighted_counts[, setdiff(names(weighted_counts), "sum")]
+  )
 
   expect_false(isTRUE(all.equal(
     weighted_result$gistar,

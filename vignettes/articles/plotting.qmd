@@ -21,6 +21,7 @@ The `hotspot_*()` functions return simple-feature (SF) objects with specialised 
 | `hotspot_classify()` (`hspt_c`)             | Categorical hotspot and coldspot colours |
 | `hotspot_gistar()` (`hspt_g`) with `kde`    | Density in statistically significant cells |
 | `hotspot_gistar()` (`hspt_g`) without `kde` | Diverging scale of `gistar`, centred on zero |
+| `hotspot_dbscan()` (`hspt_db`)                | `n` |
 
 The maps below show examples of the default maps produced for each `hotspot_*()` function, based on the `memphis_robberies`, `memphis_precincts` and `memphis_population` datasets included in the package. To get started, we create a grid covering the city of Memphis and transform the dataset to use an appropriate projected coordinate reference system (CRS), since that makes specifying cell size, etc., easier.
 
@@ -42,7 +43,7 @@ memphis_grid <- hotspot_grid(memphis_precincts_proj, cell_size = 500)
 
 
 ::: {.callout-note title="Grid size"}
-The 500-metre grid cells used in these examples are probably too corse for actual analysis, but are used here because of constraints on rendering time for R package vignettes. In practice, the cell size should be chosen to suit the spatial scale of the data and the research question.
+The 500-metre grid cells used in these examples are probably too coarse for actual analysis, but are used here because of constraints on rendering time for R package vignettes. In practice, the cell size should be chosen to suit the spatial scale of the data and the research question.
 :::
 
 
@@ -188,6 +189,22 @@ If `kde = FALSE`, the result has no `kde` column. The plotting methods instead m
 
 memphis_robberies_proj |>
   hotspot_gistar(grid = memphis_grid, bandwidth_adjust = 0.25, kde = FALSE) |>
+  autoplot()
+```
+
+
+## `hotspot_dbscan()`
+
+`hotspot_dbscan()` returns polygons covering clusters of points identified by the DBSCAN algorithm. By default, the `fill` aesthetic is mapped to the `n` column, which counts the number of points in each cluster. This can be changed using the `fill` argument to `autoplot()` or `autolayer()`. Polygons can also be labelled using the `label` argument to `autoplot()` or `autolayer()`. The default colour scale is sequential, with darker blue indicating clusters with more points.
+
+
+```{r}
+#| label: plot-dbscan
+#| fig-alt: >
+#|   Map of clusters of robberies in Memphis identified by the DBSCAN algorithm.
+
+memphis_robberies_proj |>
+  hotspot_dbscan(density_adjust = 3) |>
   autoplot()
 ```
 

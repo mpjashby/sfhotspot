@@ -73,7 +73,7 @@ hotspot_gistar(
 - weights:
 
   `NULL` or the name of a column in `data` to be used as weights for
-  weighted counts and KDE values.
+  weighted counts, Gi\*/Gi statistics and KDE values.
 
 - nb_dist:
 
@@ -124,18 +124,22 @@ hotspot_gistar(
 
 ## Value
 
-An [`sf`](https://r-spatial.github.io/sf/reference/sf.html) tibble of
-regular grid cells with corresponding point counts, *G*_(*i*)^(\*) or
-*G*_(*i*)^(\*) values and (optionally) kernel density estimates for each
-cell. Values greater than zero indicate more points than would be
-expected for randomly distributed points and values less than zero
-indicate fewer points. Critical values of *G*_(*i*)^(\*) and
-*G*_(*i*)^(\*) are given in the manual page for
+An [`sf`](https://r-spatial.github.io/sf/reference/sf.html) tibble with
+class `hspt_g` containing regular grid cells with corresponding point
+counts, *G*_(*i*)^(\*) or *G*_(*i*)^(\*) values and (optionally) kernel
+density estimates for each cell. Values greater than zero indicate more
+points than would be expected for randomly distributed points and values
+less than zero indicate fewer points. Critical values of *G*_(*i*)^(\*)
+and *G*_(*i*)^(\*) are given in the manual page for
 [`localG`](https://r-spatial.github.io/spdep/reference/localG.html).
 
-The output from this function can be plotted in the same way as for
-other SF objects, for which see
-[`vignette("sf5", package = "sf")`](https://r-spatial.github.io/sf/articles/sf5.html).
+The output from this function can be plotted with reasonable defaults
+using
+[`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html).
+When KDE values are returned, the default map shows density only in
+areas identified as having significantly more or fewer points than
+expected by chance. When `kde = FALSE`, the Gi\*/Gi statistic is plotted
+on a diverging scale centred on zero.
 
 ## Details
 
@@ -148,7 +152,10 @@ function to calculate the \\Z\\ scores and then
 function to adjust the corresponding \\p\\-values for multiple
 comparison. The function also returns counts of points in each cell and
 (by default but optionally) kernel density estimates using the
-[`kde`](https://rdrr.io/pkg/SpatialKDE/man/kde.html) function.
+[`kde`](https://rdrr.io/pkg/SpatialKDE/man/kde.html) function. If
+`weights` is supplied, the Gi\*/Gi statistics are calculated from the
+weighted counts; otherwise, they are calculated from the unweighted
+counts.
 
 ### Coverage of the output data
 
@@ -196,7 +203,7 @@ hotspot_gistar(memphis_robberies_utm)
 #> Projected CRS: WGS 84 / UTM zone 15N
 #> # A tibble: 2,715 × 5
 #>        n   kde gistar pvalue                                            geometry
-#>    <dbl> <dbl>  <dbl>  <dbl>                                       <POLYGON [m]>
+#>  * <dbl> <dbl>  <dbl>  <dbl>                                       <POLYGON [m]>
 #>  1     0 11.1  -0.546  0.585 ((770486.2 3876436, 770486.2 3876936, 770986.2 387…
 #>  2     0 11.2  -0.598  0.550 ((770986.2 3876436, 770986.2 3876936, 771486.2 387…
 #>  3     0 11.2  -0.598  0.550 ((771486.2 3876436, 771486.2 3876936, 771986.2 387…
@@ -224,7 +231,7 @@ hotspot_gistar(memphis_robberies_utm, cell_size = 200)
 #> Projected CRS: WGS 84 / UTM zone 15N
 #> # A tibble: 16,133 × 5
 #>        n   kde gistar  pvalue                                           geometry
-#>    <dbl> <dbl>  <dbl>   <dbl>                                      <POLYGON [m]>
+#>  * <dbl> <dbl>  <dbl>   <dbl>                                      <POLYGON [m]>
 #>  1     0  11.2 -0.243 0.808   ((771936.2 3876586, 771936.2 3876786, 772136.2 38…
 #>  2     0  11.1 -0.266 0.790   ((772136.2 3876586, 772136.2 3876786, 772336.2 38…
 #>  3     0  11.1 -0.266 0.790   ((772336.2 3876586, 772336.2 3876786, 772536.2 38…
@@ -256,7 +263,7 @@ hotspot_gistar(memphis_robberies)
 #> Geodetic CRS:  WGS 84
 #> # A tibble: 2,926 × 5
 #>        n   kde gistar pvalue                                            geometry
-#>    <dbl> <dbl>  <dbl>  <dbl>                                       <POLYGON [°]>
+#>  * <dbl> <dbl>  <dbl>  <dbl>                                       <POLYGON [°]>
 #>  1     0  15.7 -0.992  0.321 ((-90.08418 34.99475, -90.07894 34.99475, -90.0789…
 #>  2     0  16.9 -0.850  0.395 ((-90.07894 34.99475, -90.0737 34.99475, -90.0737 …
 #>  3     0  18.4 -0.733  0.463 ((-90.0737 34.99475, -90.06846 34.99475, -90.06846…

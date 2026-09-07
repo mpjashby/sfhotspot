@@ -125,6 +125,8 @@ Tools for analysing hotspots.
   of points
 - [`hotspot_gistar()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_gistar.md)
   : Identify significant spatial clusters of points
+- [`hotspot_dbscan()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_dbscan.md)
+  : Identify hotspots using DBSCAN
 - [`hotspot_classify()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_classify.md)
   : Classify hot-spots
 - [`hotspot_classify_params()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_classify_params.md)
@@ -150,18 +152,36 @@ These methods for the
 [`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
 function automatically produce charts that are tailored to displaying
 the results produced by one of the `hotspot_*()` family of functions.
+[`hotspot_isoband()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_isoband.md)
+generalises the polygons produced by the hotspot-analysis functions into
+polygons, which can sometimes be preferable for plotting.
 
+- [`hotspot_isoband()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_isoband.md)
+  : Convert a hotspot grid to isobands
 - [`autoplot(`*`<hspt_c>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_c.md)
+  [`autolayer(`*`<hspt_c>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_c.md)
   : Plot map of hotspot classifications
 - [`autoplot(`*`<hspt_d>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_d.md)
   [`autolayer(`*`<hspt_d>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_d.md)
   : Plot map of changes in grid counts
+- [`autoplot(`*`<hspt_dk>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_dk.md)
+  [`autolayer(`*`<hspt_dk>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_dk.md)
+  : Plot map of dual kernel-density values
+- [`autoplot(`*`<hspt_g>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_g.md)
+  [`autolayer(`*`<hspt_g>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_g.md)
+  : Plot map of Getis-Ord Gi\* results
+- [`autoplot(`*`<hspt_ib>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_ib.md)
+  [`autolayer(`*`<hspt_ib>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_ib.md)
+  : Plot isobands
 - [`autoplot(`*`<hspt_k>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_k.md)
   [`autolayer(`*`<hspt_k>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_k.md)
   : Plot map of kernel-density values
 - [`autoplot(`*`<hspt_n>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_n.md)
   [`autolayer(`*`<hspt_n>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_n.md)
   : Plot map of grid counts
+- [`autoplot(`*`<hspt_s>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_s.md)
+  [`autolayer(`*`<hspt_s>`*`)`](https://pkgs.lesscrime.info/sfhotspot/reference/autoplot.hspt_s.md)
+  : Plot DBSCAN hotspot clusters
 
 ## Sample data
 
@@ -182,3 +202,5 @@ Sample data that can be used with the functions in this package.
 
 - [Introduction to
   sfhotspot](https://pkgs.lesscrime.info/sfhotspot/articles/introduction.md):
+- [Plotting results returned by functions in
+  sfhotspot](https://pkgs.lesscrime.info/sfhotspot/articles/plotting.md):
