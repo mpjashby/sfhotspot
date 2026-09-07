@@ -47,10 +47,11 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
     class(data),
     c(
       "hspt_n", "hspt_dk", "hspt_k", "hspt_c", "hspt_d", "hspt_g",
-      "hspt_ib"
+      "hspt_ib", "hspt_s"
     )
   )
   isoband_metadata <- attr(data, "isoband", exact = TRUE)
+  dbscan_metadata <- attr(data, "dbscan", exact = TRUE)
 
   # Get name of geometry column in boundary file
   geometry_column <- attr(boundary, "sf_column")
@@ -145,6 +146,7 @@ hotspot_clip <- function(data, boundary, quiet = FALSE, ...) {
   new_hotspot_results(
     clipped_data,
     class = result_class,
-    isoband = isoband_metadata
+    isoband = isoband_metadata,
+    dbscan = dbscan_metadata
   )
 }

@@ -307,7 +307,9 @@ hotspot_isoband <- function(
 isoband_source_class <- function(data) {
   # Prefer the most specific recognised class when objects inherit from more
   # than one sfhotspot class; otherwise handle the input as an ordinary SF grid
-  known <- c("hspt_dk", "hspt_n", "hspt_k", "hspt_d", "hspt_c", "hspt_g")
+  known <- c(
+    "hspt_dk", "hspt_n", "hspt_k", "hspt_d", "hspt_c", "hspt_g", "hspt_s"
+  )
   matched <- known[known %in% class(data)]
   if (length(matched) == 0) "sf" else matched[[1]]
 }
@@ -322,6 +324,10 @@ isoband_default_value <- function(data, source_class, quiet) {
     hspt_k = "kde",
     hspt_d = "change",
     hspt_g = if (rlang::has_name(data, "kde")) "kde" else "gistar",
+    hspt_s = cli::cli_abort(c(
+      "DBSCAN hotspot results cannot be converted to isobands.",
+      "i" = "{.cls hspt_s} objects already contain generalised hotspot polygons rather than values on a regular grid."
+    )),
     hspt_c = cli::cli_abort(c(
       "Cannot infer numeric values from hotspot classifications.",
       "i" = "The {.var hotspot_category} column is categorical and cannot be converted to isobands."

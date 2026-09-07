@@ -516,3 +516,93 @@ autolayer.hspt_ib <- function(object, ...) {
     ...
   )
 }
+
+#' Plot DBSCAN hotspot clusters
+#'
+#' Plot the polygon clusters produced by [hotspot_dbscan()] with reasonable
+#' defaults. Polygons can be filled according to their count, proportion or
+#' rank, and optionally labelled with the same values.
+#'
+#' @param object An object with class `hspt_s`, as produced by
+#'   [hotspot_dbscan()].
+#' @param fill A single string specifying the column used for the fill
+#'   aesthetic: `"n"` (the default), `"prop"` or `"rank"`.
+#' @param label A single string specifying the label shown in each cluster:
+#'   `"none"` (the default), `"n"`, `"prop"` or `"rank"`. Proportions are
+#'   formatted as percentages and ranks as ordinal numbers.
+#' @param ... Further arguments passed to [ggplot2::geom_sf()], e.g. `alpha`.
+#' @return `autoplot()` returns a [ggplot2::ggplot] object. `autolayer()`
+#'   returns one or more layers that can be added to a [ggplot2::ggplot] object.
+#' @export
+autoplot.hspt_s <- function(
+  object,
+  fill = c("n", "prop", "rank"),
+  label = c("none", "n", "prop", "rank"),
+  ...
+) {
+  fill <- rlang::arg_match(fill)
+  label <- rlang::arg_match(label)
+  ggplot2::ggplot() +
+    autolayer(object, fill = fill, label = label, ...) +
+    ggplot2::scale_fill_distiller(
+      type = "seq",
+      palette = "Blues",
+      direction = 1,
+      na.value = "transparent"
+    ) +
+    ggplot2::labs(fill = switch(
+      fill,
+      n = "count",
+      prop = "proportion",
+      rank = "rank"
+    )) +
+    ggplot2::theme_void()
+}
+
+format_dbscan_labels <- function(value, type) {
+  if (type == "prop") {
+    return(paste0(format(100 * value, digits = 3, trim = TRUE), "%"))
+  }
+  if (type == "rank") {
+    remainder_100 <- value %% 100
+    suffix <- ifelse(
+      remainder_100 >= 11 & remainder_100 <= 13,
+      "th",
+      c("th", "st", "nd", "rd", rep("th", 6))[value %% 10 + 1]
+    )
+    return(paste0(value, suffix))
+  }
+  as.character(value)
+}
+
+#' @describeIn autoplot.hspt_s Create ggplot layers for DBSCAN hotspot clusters.
+#' @importFrom rlang .data
+#' @export
+autolayer.hspt_s <- function(
+  object,
+  fill = c("n", "prop", "rank"),
+  label = c("none", "n", "prop", "rank"),
+  ...
+) {
+  fill <- rlang::arg_match(fill)
+  label <- rlang::arg_match(label)
+  validate_plot_column(object, fill)
+
+  plot_value <- object[[fill]]
+  plot_value[!is.finite(plot_value)] <- NA_real_
+  polygon_layer <- plot_value_layer(object, plot_value, ...)
+  if (label == "none") {
+    return(polygon_layer)
+  }
+
+  validate_plot_column(object, label)
+  object$.plot_label <- format_dbscan_labels(object[[label]], label)
+  list(
+    polygon_layer,
+    ggplot2::geom_sf_text(
+      mapping = ggplot2::aes(label = .data$.plot_label),
+      data = object,
+      inherit.aes = FALSE
+    )
+  )
+}

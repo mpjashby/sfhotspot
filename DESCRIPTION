@@ -23,6 +23,7 @@ Roxygen: list(markdown = TRUE)
 Imports:
     classInt,
     cli,
+    dbscan,
     ggplot2,
     isoband,
     rlang,

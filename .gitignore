@@ -45,7 +45,7 @@ inst/doc
 /Meta/
 
 # Cache directories
-/vignettes/rosm.cache/
+rosm.cache/
 
 /.quarto/
 /.posit/

@@ -225,3 +225,4 @@ memphis_robberies_proj |>
 other layers can be added or replaced with ggplot2. `autolayer()` is useful when
 the sfhotspot result is one component of a larger map. See the individual
 method help pages for the arguments accepted by each method.
+
