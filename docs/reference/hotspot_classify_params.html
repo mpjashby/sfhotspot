@@ -104,9 +104,12 @@ the default value.</p></dd>
 
 <dt id="arg-p-adjust-method">p_adjust_method<a class="anchor" aria-label="anchor" href="#arg-p-adjust-method"></a></dt>
 <dd><p>The method to be used to adjust <em>p</em>-values for
-multiple comparisons. <code>NULL</code> (the default) uses the default method
-used by <code><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">p.adjust</a></code>, but any of the character values in
-<code><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">stats::p.adjust.methods</a></code> may be specified.</p></dd>
+multiple comparisons using <code><a href="https://r-spatial.github.io/spdep/reference/p.adjustSP.html" class="external-link">p.adjustSP</a></code>. <code>NULL</code>
+(the default) uses the default method used by
+<code><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">p.adjust</a></code> (currently <code>"holm"</code>), but any of the
+character values in <code><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">stats::p.adjust.methods</a></code> may be specified. Set
+this argument to <code>"none"</code> to return unadjusted <em>p</em>-values. The
+adjustment is applied separately to the cells in each time period.</p></dd>
 
 </dl></div>
     <div class="section level2">

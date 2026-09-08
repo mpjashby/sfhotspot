@@ -31,14 +31,17 @@ arguments to each function.
 | [`hotspot_dual_kde()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_dual_kde.md) | Compare the kernel density of two layers of points, e.g. to estimate the local risk of an event occurring relative to local population. |
 | [`hotspot_gistar()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_gistar.md) | Calculate the Getis–Ord $`G_i^*`$ statistic for each cell in a regular grid, while optionally estimating kernel density. Cell size, bandwidth and neighbour distance can be set by the user or chosen automatically. |
 | [`hotspot_classify()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_classify.md) | Classify grid cells according to whether they have had significant clusters of points at different time periods. All parameters can be chosen automatically or be set by the user using the [`hotspot_classify_params()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_classify_params.md) helper function. |
+| [`hotspot_dbscan()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_dbscan.md) | Identify clusters of points using the DBSCAN algorithm. |
 
 The results produced by
 [`hotspot_count()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_count.md),
 [`hotspot_change()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_change.md),
 [`hotspot_kde()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_kde.md),
-[`hotspot_dual_kde()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_dual_kde.md)
-and
+[`hotspot_dual_kde()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_dual_kde.md),
+[`hotspot_gistar()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_gistar.md),
 [`hotspot_classify()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_classify.md)
+and
+[`hotspot_dbscan()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_dbscan.md)
 can be easily plotted using included methods
 for[`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
 and
@@ -67,20 +70,33 @@ package.
 
 # Load packages
 library(sf)
-#> Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE
+```
+
+``` R
+Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE
+```
+
+``` r
+
 library(sfhotspot)
 library(tidyverse)
-#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.4     ✔ readr     2.1.5
-#> ✔ forcats   1.0.0     ✔ stringr   1.5.1
-#> ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
-#> ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-#> ✔ purrr     1.0.4
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
-#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+```
 
+``` R
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
+
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+```
+
+``` r
 
 # Transform data to UTM zone 15N so that we can think in metres, not decimal 
 # degrees
@@ -95,15 +111,7 @@ memphis_robberies_htspt <- hotspot_gistar(memphis_robberies_utm, quiet = TRUE)
 # Visualise the hotspots by showing only those cells that have significantly
 # more points than expected by chance. For those cells, show the estimated
 # density of robberies.
-memphis_robberies_htspt |> 
-  filter(gistar > 0, pvalue < 0.05) |> 
-  ggplot(aes(colour = kde, fill = kde)) +
-  geom_sf() +
-  scale_colour_distiller(aesthetics = c("colour", "fill"), direction = 1) +
-  labs(title = "Density of robberies in Memphis, 2019") +
-  theme_void()
+autoplot(memphis_robberies_htspt)
 ```
 
-![A map showing hotspots of robbery in Memphis, TN created using the
-\`hotspot_gistar()\` function in the sfhotspot
-package](reference/figures/README-example-1.png)
+![](reference/figures/README-example-1.png)

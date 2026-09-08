@@ -85,7 +85,7 @@ Hot- and cold-spots are identified by calculating the Getis-Ord
 The corresponding \emph{p}-values are adjusted once within each period using
 \code{\link[spdep]{p.adjustSP}} and the method specified by
 \code{p_adjust_method} in \code{params}. They are not adjusted again across
-time periods.
+time periods, to avoid overly-conservative results.
 Cells are classified as follows, using the parameters provided in the
 \code{params} argument:
 \itemize{

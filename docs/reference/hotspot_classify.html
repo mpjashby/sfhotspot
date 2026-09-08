@@ -149,6 +149,10 @@ cold-spots.</p><div class="section">
 (gi-star) or
 <i>G</i><sub><i>i</i></sub><sup>*</sup>
 \(Z\)-score statistic for each cell in a regular grid for each time period.
+The corresponding <em>p</em>-values are adjusted once within each period using
+<code><a href="https://r-spatial.github.io/spdep/reference/p.adjustSP.html" class="external-link">p.adjustSP</a></code> and the method specified by
+<code>p_adjust_method</code> in <code>params</code>. They are not adjusted again across
+time periods, to avoid overly-conservative results.
 Cells are classified as follows, using the parameters provided in the
 <code>params</code> argument:</p><ul><li><p><em>Persistent hot-/cold-spots</em> are cells that have been hot-/cold-spots
 consistently over time. Formally: if the <em>p</em>-value is less than

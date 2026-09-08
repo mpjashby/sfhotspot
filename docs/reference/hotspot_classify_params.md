@@ -61,12 +61,16 @@ hotspot_classify_params(
 
 - p_adjust_method:
 
-  The method to be used to adjust *p*-values for multiple comparisons.
+  The method to be used to adjust *p*-values for multiple comparisons
+  using
+  [`p.adjustSP`](https://r-spatial.github.io/spdep/reference/p.adjustSP.html).
   `NULL` (the default) uses the default method used by
-  [`p.adjust`](https://rdrr.io/r/stats/p.adjust.html), but any of the
-  character values in
+  [`p.adjust`](https://rdrr.io/r/stats/p.adjust.html) (currently
+  `"holm"`), but any of the character values in
   [`stats::p.adjust.methods`](https://rdrr.io/r/stats/p.adjust.html) may
-  be specified.
+  be specified. Set this argument to `"none"` to return unadjusted
+  *p*-values. The adjustment is applied separately to the cells in each
+  time period.
 
 ## Value
 

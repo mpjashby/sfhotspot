@@ -35,25 +35,25 @@ of an event). In this introduction we will use the built-in
 of functions works. `memphis_robberies` contains details of 2,245
 robberies in Memphis, Tennessee, in 2019.
 
-    Simple feature collection with 2245 features and 3 fields
-    Geometry type: POINT
-    Dimension:     XY
-    Bounding box:  xmin: -90.125 ymin: 34.996 xmax: -89.733 ymax: 35.258
-    Geodetic CRS:  WGS 84
-    # A tibble: 2,245 × 4
-            uid offense_type     date                        geometry
-     *    <int> <fct>            <dttm>                   <POINT [°]>
-     1 15213800 personal robbery 2019-01-01 03:30:00 (-89.942 35.149)
-     2 15214030 personal robbery 2019-01-01 22:00:00  (-89.86 35.059)
-     3 15214042 personal robbery 2019-01-01 23:58:00 (-89.929 35.058)
-     4 15214050 personal robbery 2019-01-02 00:30:00 (-90.018 35.201)
-     5 15214118 personal robbery 2019-01-02 11:38:00   (-89.96 35.14)
-     6 15214242 personal robbery 2019-01-02 20:50:00 (-89.953 35.159)
-     7 15214290 personal robbery 2019-01-03 01:30:00  (-89.95 35.026)
-     8 15214295 personal robbery 2019-01-03 02:00:00 (-89.932 35.076)
-     9 15214319 personal robbery 2019-01-03 05:00:00 (-90.021 35.033)
-    10 15214428 personal robbery 2019-01-03 16:45:00 (-90.032 35.165)
-    # ℹ 2,235 more rows
+    ## Simple feature collection with 2245 features and 3 fields
+    ## Geometry type: POINT
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -90.125 ymin: 34.996 xmax: -89.733 ymax: 35.258
+    ## Geodetic CRS:  WGS 84
+    ## # A tibble: 2,245 × 4
+    ##         uid offense_type     date                        geometry
+    ##  *    <int> <fct>            <dttm>                   <POINT [°]>
+    ##  1 15213800 personal robbery 2019-01-01 03:30:00 (-89.942 35.149)
+    ##  2 15214030 personal robbery 2019-01-01 22:00:00  (-89.86 35.059)
+    ##  3 15214042 personal robbery 2019-01-01 23:58:00 (-89.929 35.058)
+    ##  4 15214050 personal robbery 2019-01-02 00:30:00 (-90.018 35.201)
+    ##  5 15214118 personal robbery 2019-01-02 11:38:00   (-89.96 35.14)
+    ##  6 15214242 personal robbery 2019-01-02 20:50:00 (-89.953 35.159)
+    ##  7 15214290 personal robbery 2019-01-03 01:30:00  (-89.95 35.026)
+    ##  8 15214295 personal robbery 2019-01-03 02:00:00 (-89.932 35.076)
+    ##  9 15214319 personal robbery 2019-01-03 05:00:00 (-90.021 35.033)
+    ## 10 15214428 personal robbery 2019-01-03 16:45:00 (-90.032 35.165)
+    ## # ℹ 2,235 more rows
 
 We can plot this raw data, but the resulting plot is not very
 informative (even with the points made semi-transparent), since there
@@ -84,32 +84,32 @@ arguments*](#common-args), below.
 point_counts <- hotspot_count(memphis_robberies)
 ```
 
-    Cell size set to 0.00524 degrees automatically
+    ## Cell size set to 0.00524 degrees automatically
 
 ``` r
 
 point_counts
 ```
 
-    Simple feature collection with 2926 features and 1 field
-    Geometry type: POLYGON
-    Dimension:     XY
-    Bounding box:  xmin: -90.1261 ymin: 34.99475 xmax: -89.72786 ymax: 35.26199
-    Geodetic CRS:  WGS 84
-    # A tibble: 2,926 × 2
-           n                                                                geometry
-     * <dbl>                                                           <POLYGON [°]>
-     1     0 ((-90.08418 34.99475, -90.07894 34.99475, -90.07894 34.99999, -90.0841…
-     2     0 ((-90.07894 34.99475, -90.0737 34.99475, -90.0737 34.99999, -90.07894 …
-     3     0 ((-90.0737 34.99475, -90.06846 34.99475, -90.06846 34.99999, -90.0737 …
-     4     0 ((-90.06846 34.99475, -90.06322 34.99475, -90.06322 34.99999, -90.0684…
-     5     0 ((-90.06322 34.99475, -90.05798 34.99475, -90.05798 34.99999, -90.0632…
-     6     0 ((-90.05798 34.99475, -90.05274 34.99475, -90.05274 34.99999, -90.0579…
-     7     0 ((-90.05274 34.99475, -90.0475 34.99475, -90.0475 34.99999, -90.05274 …
-     8     0 ((-90.0475 34.99475, -90.04226 34.99475, -90.04226 34.99999, -90.0475 …
-     9     0 ((-90.04226 34.99475, -90.03702 34.99475, -90.03702 34.99999, -90.0422…
-    10     0 ((-90.03702 34.99475, -90.03178 34.99475, -90.03178 34.99999, -90.0370…
-    # ℹ 2,916 more rows
+    ## Simple feature collection with 2926 features and 1 field
+    ## Geometry type: POLYGON
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -90.1261 ymin: 34.99475 xmax: -89.72786 ymax: 35.26199
+    ## Geodetic CRS:  WGS 84
+    ## # A tibble: 2,926 × 2
+    ##        n                                                                geometry
+    ##  * <dbl>                                                           <POLYGON [°]>
+    ##  1     0 ((-90.08418 34.99475, -90.07894 34.99475, -90.07894 34.99999, -90.0841…
+    ##  2     0 ((-90.07894 34.99475, -90.0737 34.99475, -90.0737 34.99999, -90.07894 …
+    ##  3     0 ((-90.0737 34.99475, -90.06846 34.99475, -90.06846 34.99999, -90.0737 …
+    ##  4     0 ((-90.06846 34.99475, -90.06322 34.99475, -90.06322 34.99999, -90.0684…
+    ##  5     0 ((-90.06322 34.99475, -90.05798 34.99475, -90.05798 34.99999, -90.0632…
+    ##  6     0 ((-90.05798 34.99475, -90.05274 34.99475, -90.05274 34.99999, -90.0579…
+    ##  7     0 ((-90.05274 34.99475, -90.0475 34.99475, -90.0475 34.99999, -90.05274 …
+    ##  8     0 ((-90.0475 34.99475, -90.04226 34.99475, -90.04226 34.99999, -90.0475 …
+    ##  9     0 ((-90.04226 34.99475, -90.03702 34.99475, -90.03702 34.99999, -90.0422…
+    ## 10     0 ((-90.03702 34.99475, -90.03178 34.99475, -90.03178 34.99999, -90.0370…
+    ## # ℹ 2,916 more rows
 
 We can then plot that grid of cells.
 
@@ -149,37 +149,37 @@ will try to choose reasonable default values.
 robbery_kde <- hotspot_kde(memphis_robberies)
 ```
 
-    Cell size set to 0.00524 degrees automatically
-    Data transformed to "WGS 84 / UTM zone 16N" co-ordinate system.
-    ℹ CRS code: "EPSG:32616".
-    ℹ Unit of measurement: metre.
-    Bandwidth set automatically based on rule of thumb.
-    ℹ Bandwidth = 5,588 metres.
+    ## Cell size set to 0.00524 degrees automatically
+    ## Data transformed to "WGS 84 / UTM zone 16N" co-ordinate system.
+    ## ℹ CRS code: "EPSG:32616".
+    ## ℹ Unit of measurement: metre.
+    ## Bandwidth set automatically based on rule of thumb.
+    ## ℹ Bandwidth = 5,588 metres.
 
 ``` r
 
 robbery_kde
 ```
 
-    Simple feature collection with 2926 features and 2 fields
-    Geometry type: POLYGON
-    Dimension:     XY
-    Bounding box:  xmin: -90.1261 ymin: 34.99475 xmax: -89.72786 ymax: 35.26199
-    Geodetic CRS:  WGS 84
-    # A tibble: 2,926 × 3
-           n   kde                                                          geometry
-     * <dbl> <dbl>                                                     <POLYGON [°]>
-     1     0  15.7 ((-90.08418 34.99475, -90.07894 34.99475, -90.07894 34.99999, -9…
-     2     0  16.9 ((-90.07894 34.99475, -90.0737 34.99475, -90.0737 34.99999, -90.…
-     3     0  18.4 ((-90.0737 34.99475, -90.06846 34.99475, -90.06846 34.99999, -90…
-     4     0  20.1 ((-90.06846 34.99475, -90.06322 34.99475, -90.06322 34.99999, -9…
-     5     0  22.5 ((-90.06322 34.99475, -90.05798 34.99475, -90.05798 34.99999, -9…
-     6     0  26.3 ((-90.05798 34.99475, -90.05274 34.99475, -90.05274 34.99999, -9…
-     7     0  31.2 ((-90.05274 34.99475, -90.0475 34.99475, -90.0475 34.99999, -90.…
-     8     0  36.6 ((-90.0475 34.99475, -90.04226 34.99475, -90.04226 34.99999, -90…
-     9     0  42.1 ((-90.04226 34.99475, -90.03702 34.99475, -90.03702 34.99999, -9…
-    10     0  47.1 ((-90.03702 34.99475, -90.03178 34.99475, -90.03178 34.99999, -9…
-    # ℹ 2,916 more rows
+    ## Simple feature collection with 2926 features and 2 fields
+    ## Geometry type: POLYGON
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -90.1261 ymin: 34.99475 xmax: -89.72786 ymax: 35.26199
+    ## Geodetic CRS:  WGS 84
+    ## # A tibble: 2,926 × 3
+    ##        n   kde                                                          geometry
+    ##  * <dbl> <dbl>                                                     <POLYGON [°]>
+    ##  1     0  15.7 ((-90.08418 34.99475, -90.07894 34.99475, -90.07894 34.99999, -9…
+    ##  2     0  16.9 ((-90.07894 34.99475, -90.0737 34.99475, -90.0737 34.99999, -90.…
+    ##  3     0  18.4 ((-90.0737 34.99475, -90.06846 34.99475, -90.06846 34.99999, -90…
+    ##  4     0  20.1 ((-90.06846 34.99475, -90.06322 34.99475, -90.06322 34.99999, -9…
+    ##  5     0  22.5 ((-90.06322 34.99475, -90.05798 34.99475, -90.05798 34.99999, -9…
+    ##  6     0  26.3 ((-90.05798 34.99475, -90.05274 34.99475, -90.05274 34.99999, -9…
+    ##  7     0  31.2 ((-90.05274 34.99475, -90.0475 34.99475, -90.0475 34.99999, -90.…
+    ##  8     0  36.6 ((-90.0475 34.99475, -90.04226 34.99475, -90.04226 34.99999, -90…
+    ##  9     0  42.1 ((-90.04226 34.99475, -90.03702 34.99475, -90.03702 34.99999, -9…
+    ## 10     0  47.1 ((-90.03702 34.99475, -90.03178 34.99475, -90.03178 34.99999, -9…
+    ## # ℹ 2,916 more rows
 
 Again, we can plot the result.
 

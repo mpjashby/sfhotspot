@@ -107,8 +107,13 @@ emerging or former hot- or cold-spots.
 
 Hot- and cold-spots are identified by calculating the Getis-Ord
 *G*_(*i*)^(\*) (gi-star) or *G*_(*i*)^(\*) \\Z\\-score statistic for
-each cell in a regular grid for each time period. Cells are classified
-as follows, using the parameters provided in the `params` argument:
+each cell in a regular grid for each time period. The corresponding
+*p*-values are adjusted once within each period using
+[`p.adjustSP`](https://r-spatial.github.io/spdep/reference/p.adjustSP.html)
+and the method specified by `p_adjust_method` in `params`. They are not
+adjusted again across time periods, to avoid overly-conservative
+results. Cells are classified as follows, using the parameters provided
+in the `params` argument:
 
 - *Persistent hot-/cold-spots* are cells that have been hot-/cold-spots
   consistently over time. Formally: if the *p*-value is less than

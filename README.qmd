@@ -1,9 +1,11 @@
 ---
-output: github_document
+format: gfm
+knitr:
+  opts_chunk:
+    fig.path: "man/figures/README-"
 ---
 
 <!-- README.md is generated from README.qmd. Please edit that file -->
-
 
 # sfhotspot <img src='man/figures/logo.png' align="right" height="139">
 

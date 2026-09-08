@@ -2,6 +2,16 @@
 
 ## sfhotspot 1.1.0
 
+- [`hotspot_gistar()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_gistar.md)
+  and
+  [`hotspot_classify()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_classify.md)
+  now use the default Holm method when `p_adjust_method = NULL`.
+  P-values are adjusted once using
+  [`spdep::p.adjustSP()`](https://r-spatial.github.io/spdep/reference/p.adjustSP.html);
+  [`hotspot_classify()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_classify.md)
+  no longer applies a second adjustment across time periods. Use
+  `p_adjust_method = "none"` to retain unadjusted p-values
+  ([\#94](https://github.com/mpjashby/sfhotspot/issues/94)).
 - New function
   [`hotspot_dbscan()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_dbscan.md)
   to identify clusters using the DBSCAN algorithm, as implemented in the
