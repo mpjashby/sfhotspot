@@ -57,6 +57,10 @@
 #' (gi-star) or
 #' \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}}
 #' \eqn{Z}-score statistic for each cell in a regular grid for each time period.
+#' The corresponding \emph{p}-values are adjusted once within each period using
+#' \code{\link[spdep]{p.adjustSP}} and the method specified by
+#' \code{p_adjust_method} in \code{params}. They are not adjusted again across
+#' time periods, to avoid overly-conservative results.
 #' Cells are classified as follows, using the parameters provided in the
 #' `params` argument:
 #'
@@ -119,7 +123,6 @@ hotspot_classify <- function(
   params = hotspot_classify_params(),
   quiet = FALSE
 ) {
-
   # Check for dependencies
   rlang::check_installed("lubridate", reason = "to use `hotspot_classify()`")
 
@@ -133,7 +136,11 @@ hotspot_classify <- function(
   data <- prepare_point_data(
     data,
     attributes = if (rlang::is_false(time)) {
-      names(data)[unlist(lapply(data, rlang::inherits_any, c("Date", "POSIXt")))]
+      names(data)[unlist(lapply(
+        data,
+        rlang::inherits_any,
+        c("Date", "POSIXt")
+      ))]
     } else {
       time
     },
@@ -146,10 +153,11 @@ hotspot_classify <- function(
 
   # Check inputs that are not checked in a helper function
   validate_inputs(data = data, grid = grid, quiet = quiet, require_units = TRUE)
-  if (!rlang::is_false(time) & !time %in% names(data))
+  if (!rlang::is_false(time) & !time %in% names(data)) {
     cli::cli_abort(
       "{.arg time} must be NULL or the name of a column in {.var data}."
     )
+  }
   if (!rlang::is_false(time)) {
     if (!rlang::inherits_any(data[[time]], c("Date", "POSIXt"))) {
       cli::cli_abort(paste0(
@@ -158,29 +166,33 @@ hotspot_classify <- function(
       ))
     }
   }
-  if (!rlang::is_null(period) & !rlang::is_character(period, n = 1))
+  if (!rlang::is_null(period) & !rlang::is_character(period, n = 1)) {
     cli::cli_abort("{.arg period} must be NULL or a single character value.")
+  }
   if (
     !rlang::is_null(start) &
-    !(rlang::inherits_any(start, c("Date", "POSIXt")) & length(start) == 1)
+      !(rlang::inherits_any(start, c("Date", "POSIXt")) & length(start) == 1)
   ) {
     cli::cli_abort(paste0(
       "{.arg start} must be NULL or a single {.cls {c('Date', 'POSIXt')}} ",
       "value."
     ))
   }
-  if (!rlang::is_logical(collapse, n = 1))
+  if (!rlang::is_logical(collapse, n = 1)) {
     cli::cli_abort("{.arg collapse} must be {.q TRUE} or {.q FALSE}")
-  if (!rlang::is_bare_list(params))
+  }
+  if (!rlang::is_bare_list(params)) {
     cli::cli_abort(c(
       "{.arg params} must be a list.",
       "i" = "use {.fn hotspot_classify_params()} to construct {.arg params}."
     ))
-  if (!all(names(rlang::fn_fmls(hotspot_classify_params)) %in% names(params)))
+  }
+  if (!all(names(rlang::fn_fmls(hotspot_classify_params)) %in% names(params))) {
     cli::cli_abort(c(
       "{.arg params} must be a list containing all the required parameters.",
       "i" = "use {.fn hotspot_classify_params()} to construct {.arg params}."
     ))
+  }
 
   # Replace name of geometry column in SF objects if necessary
   grid <- set_geometry_name(grid)
@@ -209,19 +221,22 @@ hotspot_classify <- function(
 
   # Error if start date is before first time in data
   if (!rlang::is_null(start)) {
-    if (start > min(data[[time]]))
+    if (start > min(data[[time]])) {
       cli::cli_abort(
-        "{.arg start} must be before the first date/time in ","{.var data}."
+        "{.arg start} must be before the first date/time in ",
+        "{.var data}."
       )
+    }
   }
 
   # Set start date if not specified
-  if (rlang::is_null(start)) start <- min(data[[time]])
+  if (rlang::is_null(start)) {
+    start <- min(data[[time]])
+  }
 
   # Identify time period
   time_span <- difftime(max(data[[time]]), min(data[[time]]))
   if (rlang::is_character(period)) {
-
     # Extract the number of units
     # Source: https://stackoverflow.com/a/19256529/8222654
     periods <- as.numeric(regmatches(
@@ -236,7 +251,7 @@ hotspot_classify <- function(
     )[[1]][1]
 
     # If no number or unit was found in time_unit, throw an error
-    if (rlang::is_na(periods) | rlang::is_na(unit))
+    if (rlang::is_na(periods) | rlang::is_na(unit)) {
       cli::cli_abort(c(
         paste0(
           "{.arg period} must be NULL or a character value containing a ",
@@ -248,9 +263,8 @@ hotspot_classify <- function(
           "quarter and year."
         )
       ))
-
+    }
   } else {
-
     # Identify time period automatically
     if (attr(time_span, "units") == "weeks") {
       time_span <- difftime(
@@ -263,7 +277,6 @@ hotspot_classify <- function(
     periods <- NA
 
     if (attr(time_span, "units") == "days") {
-
       unit <- "days"
 
       # Try to decide on a reasonable unit
@@ -284,7 +297,6 @@ hotspot_classify <- function(
         # Need to deal with fact that years have different lengths
         unit <- "years"
       }
-
     }
 
     # Just divide the time span into 10 equal units
@@ -295,14 +307,24 @@ hotspot_classify <- function(
     if (rlang::is_false(quiet)) {
       cli::cli_inform("{.arg period} set to {periods} {unit} automatically.")
     }
-
   }
 
   # Create sequence of start dates for each period
-  if (unit %in% c(
-    "day", "week", "month", "quarter", "year", "days", "weeks", "months",
-    "quarters", "years"
-  )) {
+  if (
+    unit %in%
+      c(
+        "day",
+        "week",
+        "month",
+        "quarter",
+        "year",
+        "days",
+        "weeks",
+        "months",
+        "quarters",
+        "years"
+      )
+  ) {
     dates <- seq(
       from = as.Date(start),
       to = as.Date(max(data[[time]])),
@@ -320,7 +342,6 @@ hotspot_classify <- function(
   period_remainder <- as.numeric(time_span) %% periods
   if (period_remainder != 0) {
     if (rlang::is_true(collapse)) {
-
       dates <- dates[1:(length(dates) - 1)]
 
       if (rlang::is_false(quiet)) {
@@ -332,9 +353,7 @@ hotspot_classify <- function(
           )
         ))
       }
-
     } else if (rlang::is_false(quiet)) {
-
       cli::cli_inform(c(
         "Date range data is not a multiple of chosen period.",
         "i" = paste0(
@@ -345,7 +364,6 @@ hotspot_classify <- function(
           "penultimate period."
         )
       ))
-
     }
   }
 
@@ -361,13 +379,11 @@ hotspot_classify <- function(
   # it for use in `gistar()`. Otherwise, set the cell size if necessary and use
   # it to create a grid.
   if (!rlang::is_null(grid)) {
-
     cell_size <- get_cell_size(grid)
-
   } else {
-
-    if (rlang::is_null(cell_size))
+    if (rlang::is_null(cell_size)) {
       cell_size <- set_cell_size(data, round = TRUE, quiet = quiet)
+    }
 
     grid <- create_grid(
       data,
@@ -400,7 +416,6 @@ hotspot_classify <- function(
   # Count cells for each period
   period_counts <- mapply(
     function(x, y) {
-
       # If there are no rows in the data for a particular period, `aggregate()`
       # (used in `count_points_in_polygons()`) will throw an error, so in that
       # case just return a copy of the grid with a column of zero counts
@@ -422,7 +437,6 @@ hotspot_classify <- function(
       # all the data frames returned into a single flat list, from which it is
       # not possible to extract the data for each period
       list(y = counted)
-
     },
     period_data,
     names(period_data)
@@ -431,7 +445,6 @@ hotspot_classify <- function(
   # Calculate Gi* for each period
   period_gistar <- mapply(
     function(x, y) {
-
       # Calculate Gi*
       period_count <- gistar(
         x,
@@ -451,7 +464,6 @@ hotspot_classify <- function(
       # all the data frames returned into a single flat list, from which it is
       # not possible to extract the data for each period
       list(y = period_count)
-
     },
     period_counts,
     seq_len(length(period_counts))
@@ -462,14 +474,10 @@ hotspot_classify <- function(
     !!!lapply(period_gistar, sf::st_drop_geometry)
   )
 
-  # Adjust p-values based on number of periods
+  # Group results by cell without adjusting the p-values again: `gistar()` has
+  # already applied the requested spatial adjustment within each period
   cell_gistar <- split(period_gistar, period_gistar$id)
-  cell_gistar <- rlang::exec(
-    rbind,
-    !!!lapply(cell_gistar, function(x) {
-      x$pvalue <- stats::p.adjust(x$pvalue, method = params$p_adjust_method)
-      x
-    }))
+  cell_gistar <- rlang::exec(rbind, !!!cell_gistar)
 
   # Compare p-value to threshold value
   cell_gistar$hot <- cell_gistar$gistar > 0
@@ -536,20 +544,24 @@ hotspot_classify <- function(
     recent_h = rowSums(
       ch[, (ncol(ch) - recent_periods):ncol(ch)],
       na.rm = TRUE
-    ) / recent_periods,
+    ) /
+      recent_periods,
     recent_c = rowSums(
       cc[, (ncol(cc) - recent_periods):ncol(cc)],
       na.rm = TRUE
-    ) / recent_periods,
+    ) /
+      recent_periods,
     # Proportion of non-recent periods that are significant
     older_h = rowSums(
       ch[, 1:(ncol(ch) - recent_periods)],
       na.rm = TRUE
-    ) / (ncol(ch) - recent_periods),
+    ) /
+      (ncol(ch) - recent_periods),
     older_c = rowSums(
       cc[, 1:(ncol(cc) - recent_periods)],
       na.rm = TRUE
-    ) / (ncol(cc) - recent_periods)
+    ) /
+      (ncol(cc) - recent_periods)
   )
 
   # Test for hot/coldspot categories
@@ -606,5 +618,4 @@ hotspot_classify <- function(
   # Return result
   result <- grid[, c("hotspot_category", "geometry")]
   new_hotspot_results(result, class = "hspt_c")
-
 }

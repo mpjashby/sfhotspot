@@ -71,6 +71,25 @@ test_that("columns in output have the required types", {
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
 })
 
+test_that("p-values are not adjusted again across periods (#94)", {
+  testthat::local_mocked_bindings(
+    gistar = function(counts, ...) {
+      counts$gistar <- 1
+      counts$pvalue <- c(0.01, rep(1, nrow(counts) - 1))
+      counts
+    },
+    .package = "sfhotspot"
+  )
+
+  classified <- hotspot_classify(
+    data_sf,
+    period = "1 month",
+    quiet = TRUE
+  )
+
+  expect_identical(classified$hotspot_category[[1]], "persistent hotspot")
+})
+
 test_that("cell size is extracted silently from a supplied grid (#87)", {
   data_projected <- sf::st_transform(data_sf, 2843)
   grid <- hotspot_grid(data_projected, cell_size = 2000, quiet = TRUE)

@@ -1,5 +1,10 @@
 # sfhotspot 1.1.0
 
+* `hotspot_gistar()` and `hotspot_classify()` now use the default Holm method
+  when `p_adjust_method = NULL`. P-values are adjusted once using
+  `spdep::p.adjustSP()`; `hotspot_classify()` no longer applies a second
+  adjustment across time periods. Use `p_adjust_method = "none"` to retain
+  unadjusted p-values (#94).
 * New function `hotspot_dbscan()` to identify clusters using the DBSCAN
   algorithm, as implemented in the [dbscan](https://github.com/mhahsler/dbscan) 
   package. Also added corresponding `autoplot()` and `autolayer()` methods.

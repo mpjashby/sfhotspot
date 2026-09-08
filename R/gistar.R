@@ -23,9 +23,11 @@
 #'   (if \code{include_self = FALSE}) values? You are unlikely to want to change
 #'   the default value.
 #' @param p_adjust_method The method to be used to adjust \emph{p}-values for
-#'   multiple comparisons. \code{NULL} (the default) uses the default method
-#'   used by \code{\link[stats]{p.adjust}}, but any of the character values in
-#'   \code{stats::p.adjust.methods} may be specified.
+#'   multiple comparisons using \code{\link[spdep]{p.adjustSP}}. \code{NULL}
+#'   (the default) uses the default method used by
+#'   \code{\link[stats]{p.adjust}} (currently \code{"holm"}), but any of the
+#'   character values in \code{stats::p.adjust.methods} may be specified. Set
+#'   this argument to \code{"none"} to return unadjusted \emph{p}-values.
 #' @param quiet if set to \code{TRUE}, messages reporting the values of any
 #'   parameters set automatically will be suppressed. The default is
 #'   \code{TRUE}.
@@ -81,6 +83,9 @@ gistar <- function(
       ))
     }
   }
+  if (rlang::is_null(p_adjust_method)) {
+    p_adjust_method <- stats::p.adjust.methods[[1]]
+  }
   if (!rlang::is_logical(quiet, n = 1))
     cli::cli_abort("{.arg quiet} must be one of {.q TRUE} or {.q FALSE}")
 
@@ -125,7 +130,7 @@ gistar <- function(
   result$pvalue <- spdep::p.adjustSP(
     2 * stats::pnorm(-abs(as.numeric(result$gistar))),
     nb,
-    method = ifelse(rlang::is_null(p_adjust_method), "none", p_adjust_method)
+    method = p_adjust_method
   )
 
   # Return result

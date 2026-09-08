@@ -127,6 +127,27 @@ test_that("column values are within the specified range", {
   expect_true(all(result$pvalue <= 1))
 })
 
+test_that("NULL uses Holm adjustment once (#94)", {
+  holm_result <- hotspot_gistar(
+    data_sf,
+    kde = FALSE,
+    p_adjust_method = "holm",
+    quiet = TRUE
+  )
+  unadjusted_result <- hotspot_gistar(
+    data_sf,
+    kde = FALSE,
+    p_adjust_method = "none",
+    quiet = TRUE
+  )
+
+  expect_equal(result_no_kde$pvalue, holm_result$pvalue)
+  expect_false(isTRUE(all.equal(
+    result_no_kde$pvalue,
+    unadjusted_result$pvalue
+  )))
+})
+
 test_that("weights affect Gi* statistics and p-values (#86)", {
   expect_false(isTRUE(all.equal(result$gistar, result_wt$gistar)))
   expect_false(isTRUE(all.equal(result$pvalue, result_wt$pvalue)))

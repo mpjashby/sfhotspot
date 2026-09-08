@@ -85,6 +85,12 @@ test_that("column values are within the specified range", {
   expect_true(all(result$pvalue <= 1))
 })
 
+test_that("NULL uses the default p-value adjustment method (#94)", {
+  holm_result <- gistar(counts, p_adjust_method = "holm")
+
+  expect_equal(result$pvalue, holm_result$pvalue)
+})
+
 test_that("weighted counts are used when present (#86)", {
   weighted_counts <- counts
   weighted_counts$sum <- seq_len(nrow(weighted_counts))^2

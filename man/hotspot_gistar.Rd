@@ -69,9 +69,11 @@ counts in neighbouring cells when calculating the values of
 the default value.}
 
 \item{p_adjust_method}{The method to be used to adjust \emph{p}-values for
-multiple comparisons. \code{NULL} (the default) uses the default method
-used by \code{\link[stats]{p.adjust}}, but any of the character values in
-\code{stats::p.adjust.methods} may be specified.}
+multiple comparisons using \code{\link[spdep]{p.adjustSP}}. \code{NULL}
+(the default) uses the default method used by
+\code{\link[stats]{p.adjust}} (currently \code{"holm"}), but any of the
+character values in \code{stats::p.adjust.methods} may be specified. Set
+this argument to \code{"none"} to return unadjusted \emph{p}-values.}
 
 \item{transform}{the underlying SpatialKDE package cannot calculate kernel
 density for lon/lat data, so this must be transformed to use a projected

@@ -82,6 +82,10 @@ Hot- and cold-spots are identified by calculating the Getis-Ord
 (gi-star) or
 \ifelse{html}{\out{<i>G</i><sub><i>i</i></sub><sup>*</sup>}}{\eqn{G_i}}
 \eqn{Z}-score statistic for each cell in a regular grid for each time period.
+The corresponding \emph{p}-values are adjusted once within each period using
+\code{\link[spdep]{p.adjustSP}} and the method specified by
+\code{p_adjust_method} in \code{params}. They are not adjusted again across
+time periods.
 Cells are classified as follows, using the parameters provided in the
 \code{params} argument:
 \itemize{
