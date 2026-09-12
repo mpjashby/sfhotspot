@@ -256,8 +256,34 @@ test_that("DBSCAN results have configurable plot fills and labels", {
                c("33.3%", "33.3%"))
   expect_equal(autolayer(result, label = "rank")[[2]]$data$.plot_label,
                c("1st", "2nd"))
+  expect_equal(
+    autolayer(result, label = c("n", "prop"))[[2]]$data$.plot_label,
+    c("n = 4\n33.3%", "n = 4\n33.3%")
+  )
+  expect_equal(
+    autolayer(result, label = c("rank", "n"))[[2]]$data$.plot_label,
+    c("1st\nn = 4", "2nd\nn = 4")
+  )
   expect_length(autoplot(result, label = "rank")$layers, 2)
   expect_no_condition(ggplot2::ggplot_build(autoplot(result, label = "prop")))
+
+  outline <- autolayer(result, fill = "none")
+  expect_equal(outline[[1]]$data$.plot_value, result$n)
+  expect_true(is.na(outline[[1]]$aes_params$fill))
+  expect_equal(outline[[1]]$aes_params$linewidth, 0.8)
+  expect_true("colour" %in% names(outline[[1]]$mapping))
+  outline_plot <- autoplot(result, fill = "none", label = c("rank", "n"))
+  expect_null(outline_plot$scales$get_scales("fill"))
+  expect_equal(outline_plot$labels$colour, "rank")
+  expect_equal(
+    outline_plot$scales$get_scales("colour")$palette(c(0, 1)),
+    c("#EFF3FF", "#084594")
+  )
+
+  geographic <- sf::st_transform(result, 4326)
+  expect_no_warning(
+    ggplot2::ggplot_build(autoplot(geographic, label = "n"))
+  )
 })
 
 test_that("DBSCAN plotting arguments and columns are validated", {
@@ -267,6 +293,8 @@ test_that("DBSCAN plotting arguments and columns are validated", {
 
   expect_error(autoplot(result, fill = "density"), "fill")
   expect_error(autolayer(result, label = "cluster"), "label")
+  expect_error(autolayer(result, label = c("none", "n")), "cannot be combined")
+  expect_error(autolayer(result, label = c("n", "n")), "duplicated")
   expect_error(autolayer(result[, "geometry"]), "n")
   result$n <- as.character(result$n)
   expect_error(autoplot(result), "must be numeric")

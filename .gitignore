@@ -23,6 +23,8 @@
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
+/vignettes/.quarto/
+/vignettes/articles/*_cache/
 /vignettes/articles/*_files/
 
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
@@ -45,7 +47,7 @@ inst/doc
 /Meta/
 
 # Cache directories
-rosm.cache/
+**/rosm.cache/
 
 /.quarto/
 /.posit/

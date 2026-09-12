@@ -526,9 +526,12 @@ autolayer.hspt_ib <- function(object, ...) {
 #' @param object An object with class `hspt_s`, as produced by
 #'   [hotspot_dbscan()].
 #' @param fill A single string specifying the column used for the fill
-#'   aesthetic: `"n"` (the default), `"prop"` or `"rank"`.
-#' @param label A single string specifying the label shown in each cluster:
-#'   `"none"` (the default), `"n"`, `"prop"` or `"rank"`. Proportions are
+#'   aesthetic: `"n"` (the default), `"prop"` or `"rank"`. Use `"none"` to
+#'   draw unfilled polygons with borders coloured according to the first value
+#'   in `label`, or according to `"n"` if labels are not shown.
+#' @param label One or more strings specifying the labels shown in each cluster:
+#'   `"none"` (the default), or any combination of `"n"`, `"prop"` and
+#'   `"rank"`. Multiple labels are separated by newlines. Proportions are
 #'   formatted as percentages and ranks as ordinal numbers.
 #' @param ... Further arguments passed to [ggplot2::geom_sf()], e.g. `alpha`.
 #' @return `autoplot()` returns a [ggplot2::ggplot] object. `autolayer()`
@@ -536,27 +539,56 @@ autolayer.hspt_ib <- function(object, ...) {
 #' @export
 autoplot.hspt_s <- function(
   object,
-  fill = c("n", "prop", "rank"),
-  label = c("none", "n", "prop", "rank"),
+  fill = c("n", "prop", "rank", "none"),
+  label = "none",
   ...
 ) {
   fill <- rlang::arg_match(fill)
-  label <- rlang::arg_match(label)
-  ggplot2::ggplot() +
-    autolayer(object, fill = fill, label = label, ...) +
-    ggplot2::scale_fill_distiller(
+  label <- match_dbscan_labels(label)
+  plot <- ggplot2::ggplot() +
+    autolayer(object, fill = fill, label = label, ...)
+  scale_title <- switch(
+    if (fill == "none" && label[[1]] == "none") "n" else
+      if (fill == "none") label[[1]] else fill,
+    n = "count",
+    prop = "proportion",
+    rank = "rank"
+  )
+
+  if (fill == "none") {
+    plot <- plot + ggplot2::scale_colour_distiller(
       type = "seq",
       palette = "Blues",
       direction = 1,
       na.value = "transparent"
-    ) +
-    ggplot2::labs(fill = switch(
-      fill,
-      n = "count",
-      prop = "proportion",
-      rank = "rank"
-    )) +
-    ggplot2::theme_void()
+    ) + ggplot2::labs(colour = scale_title)
+  } else {
+    plot <- plot + ggplot2::scale_fill_distiller(
+      type = "seq",
+      palette = "Blues",
+      direction = 1,
+      na.value = "transparent"
+    ) + ggplot2::labs(fill = scale_title)
+  }
+
+  plot + ggplot2::theme_void()
+}
+
+match_dbscan_labels <- function(label) {
+  label <- rlang::arg_match(
+    label,
+    c("none", "n", "prop", "rank"),
+    multiple = TRUE
+  )
+  if ("none" %in% label && length(label) > 1) {
+    cli::cli_abort(
+      "{.val none} cannot be combined with other values in {.arg label}."
+    )
+  }
+  if (anyDuplicated(label)) {
+    cli::cli_abort("Values in {.arg label} must not be duplicated.")
+  }
+  label
 }
 
 format_dbscan_labels <- function(value, type) {
@@ -575,33 +607,76 @@ format_dbscan_labels <- function(value, type) {
   as.character(value)
 }
 
+dbscan_label_point <- function(x) {
+  withCallingHandlers(
+    sf::st_point_on_surface(sf::st_zm(x)),
+    warning = function(cnd) {
+      if (identical(
+        conditionMessage(cnd),
+        paste(
+          "st_point_on_surface may not give correct results for",
+          "longitude/latitude data"
+        )
+      )) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}
+
 #' @describeIn autoplot.hspt_s Create ggplot layers for DBSCAN hotspot clusters.
 #' @importFrom rlang .data
 #' @export
 autolayer.hspt_s <- function(
   object,
-  fill = c("n", "prop", "rank"),
-  label = c("none", "n", "prop", "rank"),
+  fill = c("n", "prop", "rank", "none"),
+  label = "none",
   ...
 ) {
   fill <- rlang::arg_match(fill)
-  label <- rlang::arg_match(label)
-  validate_plot_column(object, fill)
+  label <- match_dbscan_labels(label)
+  plot_column <- if (fill == "none") {
+    if (label[[1]] == "none") "n" else label[[1]]
+  } else {
+    fill
+  }
+  validate_plot_column(object, plot_column)
 
-  plot_value <- object[[fill]]
+  plot_value <- object[[plot_column]]
   plot_value[!is.finite(plot_value)] <- NA_real_
-  polygon_layer <- plot_value_layer(object, plot_value, ...)
-  if (label == "none") {
+  if (fill == "none") {
+    object$.plot_value <- plot_value
+    dots <- list(...)
+    dots$mapping <- ggplot2::aes(colour = .data$.plot_value)
+    dots$data <- object
+    dots$fill <- NA
+    dots$inherit.aes <- FALSE
+    if (is.null(dots$linewidth)) {
+      dots$linewidth <- 0.8
+    }
+    polygon_layer <- do.call(ggplot2::geom_sf, dots)
+  } else {
+    polygon_layer <- plot_value_layer(object, plot_value, ...)
+  }
+  if (label[[1]] == "none") {
     return(polygon_layer)
   }
 
-  validate_plot_column(object, label)
-  object$.plot_label <- format_dbscan_labels(object[[label]], label)
+  formatted_labels <- lapply(label, function(type) {
+    validate_plot_column(object, type)
+    value <- format_dbscan_labels(object[[type]], type)
+    if (type == "n" && length(label) > 1) {
+      value <- paste0("n = ", value)
+    }
+    value
+  })
+  object$.plot_label <- do.call(paste, c(formatted_labels, sep = "\n"))
   list(
     polygon_layer,
     ggplot2::geom_sf_text(
       mapping = ggplot2::aes(label = .data$.plot_label),
       data = object,
+      fun.geometry = dbscan_label_point,
       inherit.aes = FALSE
     )
   )

@@ -5,29 +5,22 @@
 \alias{autolayer.hspt_s}
 \title{Plot DBSCAN hotspot clusters}
 \usage{
-\method{autoplot}{hspt_s}(
-  object,
-  fill = c("n", "prop", "rank"),
-  label = c("none", "n", "prop", "rank"),
-  ...
-)
+\method{autoplot}{hspt_s}(object, fill = c("n", "prop", "rank", "none"), label = "none", ...)
 
-\method{autolayer}{hspt_s}(
-  object,
-  fill = c("n", "prop", "rank"),
-  label = c("none", "n", "prop", "rank"),
-  ...
-)
+\method{autolayer}{hspt_s}(object, fill = c("n", "prop", "rank", "none"), label = "none", ...)
 }
 \arguments{
 \item{object}{An object with class \code{hspt_s}, as produced by
 \code{\link[=hotspot_dbscan]{hotspot_dbscan()}}.}
 
 \item{fill}{A single string specifying the column used for the fill
-aesthetic: \code{"n"} (the default), \code{"prop"} or \code{"rank"}.}
+aesthetic: \code{"n"} (the default), \code{"prop"} or \code{"rank"}. Use \code{"none"} to
+draw unfilled polygons with borders coloured according to the first value
+in \code{label}, or according to \code{"n"} if labels are not shown.}
 
-\item{label}{A single string specifying the label shown in each cluster:
-\code{"none"} (the default), \code{"n"}, \code{"prop"} or \code{"rank"}. Proportions are
+\item{label}{One or more strings specifying the labels shown in each cluster:
+\code{"none"} (the default), or any combination of \code{"n"}, \code{"prop"} and
+\code{"rank"}. Multiple labels are separated by newlines. Proportions are
 formatted as percentages and ranks as ordinal numbers.}
 
 \item{...}{Further arguments passed to \code{\link[ggplot2:geom_sf]{ggplot2::geom_sf()}}, e.g. \code{alpha}.}
