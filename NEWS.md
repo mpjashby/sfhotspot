@@ -7,7 +7,10 @@
   unadjusted p-values (#94).
 * New function `hotspot_dbscan()` to identify clusters using the DBSCAN
   algorithm, as implemented in the [dbscan](https://github.com/mhahsler/dbscan) 
-  package. Also added corresponding `autoplot()` and `autolayer()` methods.
+  package. Its `min_pts` and `eps` parameters are selected automatically by
+  default from the number of points and nearest-neighbour distances,
+  respectively. Also added corresponding `autoplot()` and `autolayer()`
+  methods.
 * New function `hotspot_isoband()` to generalise values in regular square hotspot
   grids into tidy SF isobands with appropriate visual representation (#81).
 * Added `autoplot()` and `autolayer()` methods for `hotspot_gistar()` and

@@ -11,18 +11,16 @@ count, proportion or rank, and optionally labelled with the same values.
 # S3 method for class 'hspt_s'
 autoplot(
   object,
-  fill = c("n", "prop", "rank"),
-  label = c("none", "n", "prop", "rank"),
-  ...
+  fill = c("n", "prop", "rank", "none"),
+  label = "none",
+  ...,
+  basemap_type = "none",
+  basemap_zoom = NULL,
+  basemap_attribution = NULL
 )
 
 # S3 method for class 'hspt_s'
-autolayer(
-  object,
-  fill = c("n", "prop", "rank"),
-  label = c("none", "n", "prop", "rank"),
-  ...
-)
+autolayer(object, fill = c("n", "prop", "rank", "none"), label = "none", ...)
 ```
 
 ## Arguments
@@ -35,19 +33,44 @@ autolayer(
 - fill:
 
   A single string specifying the column used for the fill aesthetic:
-  `"n"` (the default), `"prop"` or `"rank"`.
+  `"n"` (the default), `"prop"` or `"rank"`. Use `"none"` to draw
+  unfilled polygons with borders coloured according to the first value
+  in `label`, or according to `"n"` if labels are not shown.
 
 - label:
 
-  A single string specifying the label shown in each cluster: `"none"`
-  (the default), `"n"`, `"prop"` or `"rank"`. Proportions are formatted
-  as percentages and ranks as ordinal numbers.
+  One or more strings specifying the labels shown in each cluster:
+  `"none"` (the default), or any combination of `"n"`, `"prop"` and
+  `"rank"`. Multiple labels are separated by newlines. Proportions are
+  formatted as percentages and ranks as ordinal numbers.
 
 - ...:
 
   Further arguments passed to
   [`ggplot2::geom_sf()`](https://ggplot2.tidyverse.org/reference/ggsf.html),
   e.g. `alpha`.
+
+- basemap_type:
+
+  A map type passed to the `type` argument of
+  [`ggspatial::annotation_map_tile()`](https://paleolimbot.github.io/ggspatial/reference/annotation_map_tile.html),
+  or `"none"` (the default) for no base map. A base map requires the
+  suggested `ggspatial` package and an internet connection unless the
+  required tiles are cached. When a base map is used, the hotspot layer
+  is drawn with `alpha = 0.75`, overriding any `alpha` value supplied in
+  `...`.
+
+- basemap_zoom:
+
+  The zoom level passed to
+  [`ggspatial::annotation_map_tile()`](https://paleolimbot.github.io/ggspatial/reference/annotation_map_tile.html),
+  or `NULL` to choose it automatically.
+
+- basemap_attribution:
+
+  Attribution for the tile provider, or `NULL` to use the statement
+  known for `basemap_type`. A non-empty string is required for a custom
+  or otherwise unknown map type.
 
 ## Value
 

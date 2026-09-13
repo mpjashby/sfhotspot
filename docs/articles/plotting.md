@@ -346,3 +346,23 @@ layers can be added or replaced with ggplot2.
 is useful when the sfhotspot result is one component of a larger map.
 See the individual method help pages for the arguments accepted by each
 method.
+
+An optional map-tile background can provide geographic context. This
+requires the suggested ggspatial package and an internet connection
+unless the tiles are already cached. When a base map is requested, the
+hotspot layer is drawn with an alpha of 0.75 so that the background
+remains visible.
+
+``` r
+
+autoplot(
+  memphis_robberies_count,
+  basemap_type = "osm",
+  basemap_zoom = 12
+)
+```
+
+The default remains `basemap_type = "none"`, so ordinary plots never
+download tiles. Known map types receive an attribution caption
+automatically. For a custom or new map type, supply the provider’s
+required statement explicitly using `basemap_attribution`.

@@ -70,15 +70,26 @@ test_that("polygon counts include noise points inside the final hull", {
   expect_identical(result$prop, 1)
 })
 
-test_that("automatic eps uses global convex-hull density", {
+test_that("automatic min_pts uses a bounded square-root rule", {
+  expect_identical(set_dbscan_min_pts(2, quiet = TRUE), 2L)
+  expect_identical(set_dbscan_min_pts(100, quiet = TRUE), 10L)
+  expect_identical(set_dbscan_min_pts(1000, quiet = TRUE), 32L)
+  expect_identical(set_dbscan_min_pts(10000, quiet = TRUE), 50L)
+  expect_error(set_dbscan_min_pts(1, quiet = TRUE), "At least two")
+  expect_message(
+    set_dbscan_min_pts(100, quiet = FALSE),
+    "Minimum points set automatically"
+  )
+})
+
+test_that("automatic eps uses adjusted median nearest-neighbour distance", {
   data <- make_dbscan_points()
-  area <- as.numeric(sf::st_area(sf::st_convex_hull(sf::st_union(data))))
-  expected <- sqrt(((3 - 1) * area) / (pi * nrow(data) * 2))
+  coordinates <- sf::st_coordinates(data)[, c("X", "Y"), drop = FALSE]
+  expected <- stats::median(dbscan::kNNdist(coordinates, k = 2)) / sqrt(2)
 
   expect_message(
     value <- set_dbscan_eps(
-      area,
-      n = nrow(data),
+      coordinates,
       min_pts = 3,
       density_adjust = 2,
       data = data,
@@ -88,8 +99,7 @@ test_that("automatic eps uses global convex-hull density", {
   )
   expect_equal(value, expected)
   expect_no_message(set_dbscan_eps(
-    area,
-    n = nrow(data),
+    coordinates,
     min_pts = 3,
     density_adjust = 2,
     data = data,
@@ -103,7 +113,8 @@ test_that("automatic eps is recorded in metadata", {
 
   expect_true(metadata$eps_auto)
   expect_true(is.finite(metadata$eps) && metadata$eps > 0)
-  expect_identical(metadata$min_pts, 5L)
+  expect_identical(metadata$min_pts, 15L)
+  expect_true(metadata$min_pts_auto)
   expect_identical(metadata$density_adjust, 2)
   expect_identical(metadata$hull, "concave")
   expect_identical(metadata$hull_ratio, 0.75)
@@ -188,22 +199,28 @@ test_that("reserved and supported dot arguments are handled", {
   )
 })
 
-test_that("all-noise and degenerate automatic inputs give useful errors", {
+test_that("all-noise and coincident automatic inputs give useful errors", {
   data <- make_dbscan_points()
   expect_error(
     hotspot_dbscan(data, eps = 0.01, min_pts = 3, quiet = TRUE),
     "No DBSCAN hotspots"
   )
 
+  coincident <- sf::st_as_sf(
+    data.frame(x = rep(1, 5), y = rep(1, 5)),
+    coords = c("x", "y"),
+    crs = 3857
+  )
+  expect_error(
+    hotspot_dbscan(coincident, quiet = TRUE),
+    "finite positive automatic.*eps"
+  )
+
   collinear <- sf::st_as_sf(
     data.frame(x = 1:5, y = 1:5), coords = c("x", "y"), crs = 3857
   )
-  expect_error(
-    hotspot_dbscan(collinear, quiet = TRUE),
-    "convex hull.*zero area"
-  )
   expect_s3_class(
-    hotspot_dbscan(collinear, eps = 2, min_pts = 2, quiet = TRUE),
+    hotspot_dbscan(collinear, density_adjust = 0.25, quiet = TRUE),
     "hspt_s"
   )
 })

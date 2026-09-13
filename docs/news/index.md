@@ -15,8 +15,10 @@
 - New function
   [`hotspot_dbscan()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_dbscan.md)
   to identify clusters using the DBSCAN algorithm, as implemented in the
-  [dbscan](https://github.com/mhahsler/dbscan) package. Also added
-  corresponding
+  [dbscan](https://github.com/mhahsler/dbscan) package. Its `min_pts`
+  and `eps` parameters are selected automatically by default from the
+  number of points and nearest-neighbour distances, respectively. Also
+  added corresponding
   [`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
   and
   [`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html)

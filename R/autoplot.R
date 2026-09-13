@@ -39,6 +39,110 @@ ratio_limits <- function(x) {
   c(10^-max_log, 10^max_log)
 }
 
+map_tile_attribution <- function(type, attribution = NULL) {
+  if (!is.null(attribution)) {
+    if (!rlang::is_string(attribution) || !nzchar(attribution)) {
+      cli::cli_abort(
+        "{.arg basemap_attribution} must be a single non-empty string."
+      )
+    }
+    return(attribution)
+  }
+
+  attributions <- c(
+    osm = "\u00a9 OpenStreetMap contributors",
+    opencycle = paste(
+      "\u00a9 OpenStreetMap contributors;",
+      "map tiles \u00a9 Thunderforest"
+    ),
+    hotstyle = paste(
+      "\u00a9 OpenStreetMap contributors;",
+      "map tiles \u00a9 Humanitarian OpenStreetMap Team"
+    ),
+    loviniahike = paste(
+      "\u00a9 OpenStreetMap contributors;",
+      "map tiles \u00a9 Waymarked Trails"
+    ),
+    loviniacycle = paste(
+      "\u00a9 OpenStreetMap contributors;",
+      "map tiles \u00a9 Waymarked Trails"
+    ),
+    stamenbw = paste(
+      "Map tiles by Stamen Design (CC BY 3.0);",
+      "data \u00a9 OpenStreetMap contributors"
+    ),
+    stamenwatercolor = paste(
+      "Map tiles by Stamen Design (CC BY 3.0);",
+      "data \u00a9 OpenStreetMap contributors"
+    ),
+    osmtransport = paste(
+      "\u00a9 OpenStreetMap contributors;",
+      "map tiles \u00a9 Thunderforest"
+    ),
+    thunderforestlandscape = paste(
+      "\u00a9 OpenStreetMap contributors;",
+      "map tiles \u00a9 Thunderforest"
+    ),
+    thunderforestoutdoors = paste(
+      "\u00a9 OpenStreetMap contributors;",
+      "map tiles \u00a9 Thunderforest"
+    ),
+    cartodark = paste(
+      "Map tiles \u00a9 CARTO;",
+      "data \u00a9 OpenStreetMap contributors"
+    ),
+    cartolight = paste(
+      "Map tiles \u00a9 CARTO;",
+      "data \u00a9 OpenStreetMap contributors"
+    )
+  )
+  if (!rlang::is_string(type) || !type %in% names(attributions)) {
+    cli::cli_abort(c(
+      "No attribution is known for {.arg basemap_type} {.val {type}}.",
+      "i" = "Attribution is usually a legal requirement for using tiles.",
+      "i" = paste(
+        "Supply the provider's required attribution using",
+        "{.arg basemap_attribution}."
+      )
+    ))
+  }
+  unname(attributions[[type]])
+}
+
+build_autoplot <- function(
+  object,
+  layer_args = list(),
+  basemap_type = "none",
+  basemap_zoom = NULL,
+  basemap_attribution = NULL
+) {
+  if (!rlang::is_string(basemap_type)) {
+    cli::cli_abort("{.arg basemap_type} must be a single string.")
+  }
+
+  plot <- ggplot2::ggplot()
+  if (basemap_type != "none") {
+    rlang::check_installed(
+      "ggspatial",
+      reason = "to add a base map"
+    )
+    tile_args <- list(
+      type = basemap_type,
+      zoom = basemap_zoom,
+      zoomin = 0,
+      progress = "none"
+    )
+    plot <- plot + do.call(ggspatial::annotation_map_tile, tile_args)
+    layer_args$alpha <- 0.75
+    plot <- plot +
+      ggplot2::labs(
+        caption = map_tile_attribution(basemap_type, basemap_attribution)
+      )
+  }
+
+  plot + do.call(autolayer, c(list(object), layer_args))
+}
+
 #' Plot map of grid counts
 #'
 #' Plot the output produced by [hotspot_count()] with reasonable default
@@ -47,14 +151,36 @@ ratio_limits <- function(x) {
 #'
 #' @param object An object with class `hspt_n`, e.g. as produced by
 #'   [hotspot_count()].
+#' @param basemap_type A map type passed to the `type` argument of
+#'   [ggspatial::annotation_map_tile()], or `"none"` (the default) for no base
+#'   map. A base map requires the suggested `ggspatial` package and an internet
+#'   connection unless the required tiles are cached. When a base map is used,
+#'   the hotspot layer is drawn with `alpha = 0.75`, overriding any `alpha`
+#'   value supplied in `...`.
+#' @param basemap_zoom The zoom level passed to
+#'   [ggspatial::annotation_map_tile()], or `NULL` to choose it automatically.
+#' @param basemap_attribution Attribution for the tile provider, or `NULL` to
+#'   use the statement known for `basemap_type`. A non-empty string is required
+#'   for a custom or otherwise unknown map type.
 #' @param ... Further arguments passed to [ggplot2::geom_sf()], e.g. `alpha`.
 #' @return `autoplot()` returns a [ggplot2::ggplot] object. `autolayer()`
 #'   returns a layer that can be added to a [ggplot2::ggplot] object.
 #' @export
-autoplot.hspt_n <- function(object, ...) {
+autoplot.hspt_n <- function(
+  object,
+  ...,
+  basemap_type = "none",
+  basemap_zoom = NULL,
+  basemap_attribution = NULL
+) {
   weighted <- rlang::has_name(object, "sum")
-  ggplot2::ggplot() +
-    autolayer(object, ...) +
+  build_autoplot(
+    object,
+    layer_args = list(...),
+    basemap_type = basemap_type,
+    basemap_zoom = basemap_zoom,
+    basemap_attribution = basemap_attribution
+  ) +
     ggplot2::scale_fill_distiller(
       type = "seq",
       palette = "Blues",
@@ -83,13 +209,25 @@ autolayer.hspt_n <- function(object, ...) {
 #'
 #' @param object An object with class `hspt_k`, e.g. as produced by
 #'   [hotspot_kde()].
+#' @inheritParams autoplot.hspt_n
 #' @param ... Further arguments passed to [ggplot2::geom_sf()], e.g. `alpha`.
 #' @return `autoplot()` returns a [ggplot2::ggplot] object. `autolayer()`
 #'   returns a layer that can be added to a [ggplot2::ggplot] object.
 #' @export
-autoplot.hspt_k <- function(object, ...) {
-  ggplot2::ggplot() +
-    autolayer(object, ...) +
+autoplot.hspt_k <- function(
+  object,
+  ...,
+  basemap_type = "none",
+  basemap_zoom = NULL,
+  basemap_attribution = NULL
+) {
+  build_autoplot(
+    object,
+    layer_args = list(...),
+    basemap_type = basemap_type,
+    basemap_zoom = basemap_zoom,
+    basemap_attribution = basemap_attribution
+  ) +
     ggplot2::scale_fill_distiller(
       type = "seq",
       palette = "Blues",
@@ -131,13 +269,25 @@ hotspot_category_colours <- c(
 #'
 #' @param object An object with class `hspt_c`, e.g. as produced by
 #'   [hotspot_classify()].
+#' @inheritParams autoplot.hspt_n
 #' @param ... Further arguments passed to [ggplot2::geom_sf()], e.g. `alpha`.
 #' @return `autoplot()` returns a [ggplot2::ggplot] object. `autolayer()`
 #'   returns a layer that can be added to a [ggplot2::ggplot] object.
 #' @export
-autoplot.hspt_c <- function(object, ...) {
-  ggplot2::ggplot() +
-    autolayer(object, ...) +
+autoplot.hspt_c <- function(
+  object,
+  ...,
+  basemap_type = "none",
+  basemap_zoom = NULL,
+  basemap_attribution = NULL
+) {
+  build_autoplot(
+    object,
+    layer_args = list(...),
+    basemap_type = basemap_type,
+    basemap_zoom = basemap_zoom,
+    basemap_attribution = basemap_attribution
+  ) +
     ggplot2::scale_fill_manual(
       values = hotspot_category_colours,
       breaks = names(hotspot_category_colours),
@@ -187,14 +337,26 @@ autolayer.hspt_c <- function(object, ...) {
 #'
 #' @param object An object with class `hspt_d`, e.g. as produced by
 #'   [hotspot_change()].
+#' @inheritParams autoplot.hspt_n
 #' @param ... Further arguments passed to [ggplot2::geom_sf()], e.g. `alpha`.
 #' @return `autoplot()` returns a [ggplot2::ggplot] object. `autolayer()`
 #'   returns a layer that can be added to a [ggplot2::ggplot] object.
 #' @export
-autoplot.hspt_d <- function(object, ...) {
+autoplot.hspt_d <- function(
+  object,
+  ...,
+  basemap_type = "none",
+  basemap_zoom = NULL,
+  basemap_attribution = NULL
+) {
   validate_plot_column(object, "change")
-  ggplot2::ggplot() +
-    autolayer(object, ...) +
+  build_autoplot(
+    object,
+    layer_args = list(...),
+    basemap_type = basemap_type,
+    basemap_zoom = basemap_zoom,
+    basemap_attribution = basemap_attribution
+  ) +
     ggplot2::scale_fill_gradient2(
       midpoint = 0,
       limits = symmetric_limits(object$change),
@@ -238,13 +400,26 @@ validate_dual_kde <- function(object) {
 #'
 #' @param object An object with class `hspt_dk`, e.g. as produced by
 #'   [hotspot_dual_kde()]. The object must have a valid `method` attribute.
+#' @inheritParams autoplot.hspt_n
 #' @param ... Further arguments passed to [ggplot2::geom_sf()], e.g. `alpha`.
 #' @return `autoplot()` returns a [ggplot2::ggplot] object. `autolayer()`
 #'   returns a layer that can be added to a [ggplot2::ggplot] object.
 #' @export
-autoplot.hspt_dk <- function(object, ...) {
+autoplot.hspt_dk <- function(
+  object,
+  ...,
+  basemap_type = "none",
+  basemap_zoom = NULL,
+  basemap_attribution = NULL
+) {
   method <- validate_dual_kde(object)
-  plot <- ggplot2::ggplot() + autolayer(object, ...)
+  plot <- build_autoplot(
+    object,
+    layer_args = list(...),
+    basemap_type = basemap_type,
+    basemap_zoom = basemap_zoom,
+    basemap_attribution = basemap_attribution
+  )
   if (method == "ratio") {
     plot <- plot +
       ggplot2::scale_fill_gradient2(
@@ -323,6 +498,7 @@ validate_gistar_plot <- function(object, critical_p, sign) {
 #'
 #' @param object An object with class `hspt_g`, e.g. as produced by
 #'   [hotspot_gistar()].
+#' @inheritParams autoplot.hspt_n
 #' @param critical_p A single numeric value specifying the largest p-value to
 #'   treat as statistically significant when plotting density.
 #' @param sign Which significant results should show density: `"both"` (the
@@ -336,13 +512,24 @@ autoplot.hspt_g <- function(
   object,
   critical_p = 0.05,
   sign = c("both", "hot", "cold"),
-  ...
+  ...,
+  basemap_type = "none",
+  basemap_zoom = NULL,
+  basemap_attribution = NULL
 ) {
   sign <- rlang::arg_match(sign)
   validate_gistar_plot(object, critical_p, sign)
   has_kde <- rlang::has_name(object, "kde")
-  plot <- ggplot2::ggplot() +
-    autolayer(object, critical_p = critical_p, sign = sign, ...)
+  plot <- build_autoplot(
+    object,
+    layer_args = c(
+      list(critical_p = critical_p, sign = sign),
+      list(...)
+    ),
+    basemap_type = basemap_type,
+    basemap_zoom = basemap_zoom,
+    basemap_attribution = basemap_attribution
+  )
   if (has_kde) {
     plot <- plot +
       ggplot2::scale_fill_distiller(
@@ -369,6 +556,11 @@ autoplot.hspt_g <- function(
       )
     title <- "Gi* statistic"
     caption <- NULL
+  }
+  if (!is.null(caption) && !is.null(plot$labels$caption)) {
+    caption <- paste(caption, plot$labels$caption, sep = "\n")
+  } else if (is.null(caption)) {
+    caption <- plot$labels$caption
   }
   plot + ggplot2::labs(fill = title, caption = caption) + ggplot2::theme_void()
 }
@@ -425,11 +617,16 @@ validate_isoband_plot <- function(object) {
     )
   }
   metadata <- attr(object, "isoband", exact = TRUE)
-  if (!is.list(metadata) ||
-      !metadata$plot_type %in% c(
-        "sequential", "diverging_zero", "diverging_one"
-      ) ||
-      !rlang::is_character(metadata$title, n = 1)) {
+  if (
+    !is.list(metadata) ||
+      !metadata$plot_type %in%
+        c(
+          "sequential",
+          "diverging_zero",
+          "diverging_one"
+        ) ||
+      !rlang::is_character(metadata$title, n = 1)
+  ) {
     cli::cli_abort("{.var object} has missing or invalid isoband metadata.")
   }
   metadata
@@ -439,7 +636,9 @@ isoband_representatives <- function(lower, upper) {
   result <- (lower + upper) / 2
   finite_values <- c(lower, upper)[is.finite(c(lower, upper))]
   span <- if (length(finite_values) > 1) diff(range(finite_values)) else 1
-  if (!is.finite(span) || span == 0) span <- 1
+  if (!is.finite(span) || span == 0) {
+    span <- 1
+  }
   result[is.infinite(lower)] <- upper[is.infinite(lower)] - span
   result[is.infinite(upper)] <- lower[is.infinite(upper)] + span
   result
@@ -459,11 +658,14 @@ isoband_colours <- function(object, metadata) {
   positions[values == midpoint] <- 0.5
   if (any(below)) {
     positions[below] <- 0.5 *
-      (values[below] - limits[[1]]) / (midpoint - limits[[1]])
+      (values[below] - limits[[1]]) /
+      (midpoint - limits[[1]])
   }
   if (any(above)) {
-    positions[above] <- 0.5 + 0.5 *
-      (values[above] - midpoint) / (limits[[2]] - midpoint)
+    positions[above] <- 0.5 +
+      0.5 *
+        (values[above] - midpoint) /
+        (limits[[2]] - midpoint)
   }
   spanning <- object$lower < midpoint & object$upper > midpoint
   positions[spanning] <- 0.5
@@ -482,17 +684,29 @@ isoband_colours <- function(object, metadata) {
 #'
 #' @param object An object with class `hspt_ib`, as produced by
 #'   [hotspot_isoband()].
+#' @inheritParams autoplot.hspt_n
 #' @param ... Further arguments passed to [ggplot2::geom_sf()], e.g. `alpha`.
 #' @return `autoplot()` returns a [ggplot2::ggplot] object. `autolayer()`
 #'   returns a layer that can be added to a [ggplot2::ggplot] object.
 #' @export
-autoplot.hspt_ib <- function(object, ...) {
+autoplot.hspt_ib <- function(
+  object,
+  ...,
+  basemap_type = "none",
+  basemap_zoom = NULL,
+  basemap_attribution = NULL
+) {
   metadata <- validate_isoband_plot(object)
   colours <- isoband_colours(object, metadata)
   visible_bands <- as.character(object$label)
   names(colours) <- visible_bands
-  ggplot2::ggplot() +
-    autolayer(object, ...) +
+  build_autoplot(
+    object,
+    layer_args = list(...),
+    basemap_type = basemap_type,
+    basemap_zoom = basemap_zoom,
+    basemap_attribution = basemap_attribution
+  ) +
     ggplot2::scale_fill_manual(
       values = colours,
       breaks = visible_bands,
@@ -525,6 +739,7 @@ autolayer.hspt_ib <- function(object, ...) {
 #'
 #' @param object An object with class `hspt_s`, as produced by
 #'   [hotspot_dbscan()].
+#' @inheritParams autoplot.hspt_n
 #' @param fill A single string specifying the column used for the fill
 #'   aesthetic: `"n"` (the default), `"prop"` or `"rank"`. Use `"none"` to
 #'   draw unfilled polygons with borders coloured according to the first value
@@ -541,34 +756,51 @@ autoplot.hspt_s <- function(
   object,
   fill = c("n", "prop", "rank", "none"),
   label = "none",
-  ...
+  ...,
+  basemap_type = "none",
+  basemap_zoom = NULL,
+  basemap_attribution = NULL
 ) {
   fill <- rlang::arg_match(fill)
   label <- match_dbscan_labels(label)
-  plot <- ggplot2::ggplot() +
-    autolayer(object, fill = fill, label = label, ...)
+  plot <- build_autoplot(
+    object,
+    layer_args = c(list(fill = fill, label = label), list(...)),
+    basemap_type = basemap_type,
+    basemap_zoom = basemap_zoom,
+    basemap_attribution = basemap_attribution
+  )
   scale_title <- switch(
-    if (fill == "none" && label[[1]] == "none") "n" else
-      if (fill == "none") label[[1]] else fill,
+    if (fill == "none" && label[[1]] == "none") {
+      "n"
+    } else if (fill == "none") {
+      label[[1]]
+    } else {
+      fill
+    },
     n = "count",
     prop = "proportion",
     rank = "rank"
   )
 
   if (fill == "none") {
-    plot <- plot + ggplot2::scale_colour_distiller(
-      type = "seq",
-      palette = "Blues",
-      direction = 1,
-      na.value = "transparent"
-    ) + ggplot2::labs(colour = scale_title)
+    plot <- plot +
+      ggplot2::scale_colour_distiller(
+        type = "seq",
+        palette = "Blues",
+        direction = 1,
+        na.value = "transparent"
+      ) +
+      ggplot2::labs(colour = scale_title)
   } else {
-    plot <- plot + ggplot2::scale_fill_distiller(
-      type = "seq",
-      palette = "Blues",
-      direction = 1,
-      na.value = "transparent"
-    ) + ggplot2::labs(fill = scale_title)
+    plot <- plot +
+      ggplot2::scale_fill_distiller(
+        type = "seq",
+        palette = "Blues",
+        direction = 1,
+        na.value = "transparent"
+      ) +
+      ggplot2::labs(fill = scale_title)
   }
 
   plot + ggplot2::theme_void()
@@ -611,13 +843,15 @@ dbscan_label_point <- function(x) {
   withCallingHandlers(
     sf::st_point_on_surface(sf::st_zm(x)),
     warning = function(cnd) {
-      if (identical(
-        conditionMessage(cnd),
-        paste(
-          "st_point_on_surface may not give correct results for",
-          "longitude/latitude data"
+      if (
+        identical(
+          conditionMessage(cnd),
+          paste(
+            "st_point_on_surface may not give correct results for",
+            "longitude/latitude data"
+          )
         )
-      )) {
+      ) {
         invokeRestart("muffleWarning")
       }
     }

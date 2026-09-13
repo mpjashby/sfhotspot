@@ -7,16 +7,17 @@
 #' @param data An [sf::sf] object containing point geometries.
 #' @param eps A single positive number specifying the DBSCAN neighbourhood
 #'   radius in the units of the analysis co-ordinate reference system (CRS).
-#'   If `NULL`, the radius is calculated automatically from the mean point
-#'   density within the convex hull of `data`.
+#'   If `NULL`, the radius is calculated automatically from nearest-neighbour
+#'   distances. See **Automatic parameter selection**.
 #' @param min_pts A single integer specifying the minimum number of points in
 #'   an `eps` neighbourhood, including the point itself, for a point to be a
-#'   core point. The default is `5`.
+#'   core point. If `NULL`, the value is calculated automatically from the
+#'   number of point coordinates in `data`. See **Automatic parameter
+#'   selection**.
 #' @param density_adjust A single positive number controlling automatic
 #'   selection of `eps`. Ignored unless `eps = NULL`. A value of `1` (the
-#'   background-density reference) identifies neighbourhoods with approximately
-#'   at least the mean density within the convex hull of `data`; the default of
-#'   `2` corresponds to approximately twice that density.
+#'   reference neighbourhood density) uses the median nearest-neighbour
+#'   distance; the default of `2` requires approximately twice that density.
 #' @param hull The type of hull used to represent each cluster: `"convex"`
 #'   or `"concave"` (the default).
 #' @param hull_ratio For concave hulls, a number from zero to one specifying the
@@ -33,18 +34,38 @@
 #'   `borderPoints` and nearest-neighbour search controls. The arguments `x`,
 #'   `eps`, `minPts`, and `weights` cannot be supplied through `...`.
 #'
+#' @section Automatic parameter selection:
+#' When `min_pts = NULL`, it is calculated as
+#'
+#' `min(n, 50, max(5, ceiling(sqrt(n))))`,
+#'
+#' where `n` is the number of point coordinates after empty geometries have
+#' been removed and `MULTIPOINT` geometries have been expanded. For datasets
+#' with two to four coordinates, all coordinates are required. At least two
+#' coordinates are needed for automatic selection. This rule increases the
+#' evidence required to identify a hotspot in larger datasets, while the upper
+#' limit prevents the required number of neighbours becoming excessively
+#' large.
+#'
+#' When `eps = NULL`, the function calculates the distance from every point to
+#' its `(min_pts - 1)`th nearest other point. The median of those distances is
+#' a typical local neighbourhood radius. The value used for clustering is
+#'
+#' `eps = median_neighbour_distance / sqrt(density_adjust)`.
+#'
+#' `min_pts - 1` other points are used because DBSCAN counts the focal point
+#' itself. Since circular area is proportional to the square of its radius,
+#' the default `density_adjust = 2` searches for the required number of points
+#' in approximately half the typical neighbourhood area, corresponding to
+#' approximately twice the typical local point density. Larger values identify
+#' denser concentrations; values below one allow less-dense concentrations.
+#'
+#' Automatic values provide a starting point for exploratory analysis. DBSCAN
+#' results can be sensitive to both parameters, so users should consider
+#' whether the resulting neighbourhood size and minimum density are meaningful
+#' for their application.
+#'
 #' @details
-#' When `eps = NULL`, the neighbourhood radius is calculated as
-#'
-#' `sqrt(((min_pts - 1) * A) / (pi * n * density_adjust))`,
-#'
-#' where `A` is the area of the convex hull of the input point coordinates and
-#' `n` is the number of coordinates. This means that the expected number of
-#' points in an `eps` neighbourhood is approximately `density_adjust` times the
-#' mean density of points within the convex hull. A value of
-#' `density_adjust = 1` identifies clusters with at least the mean density;
-#' the default of `2` requires approximately twice the mean density, and still
-#' larger values identify clusters with higher density.
 #'
 #' `MULTIPOINT` geometries are cast to individual points before analysis. The
 #' output `n` column counts all input point coordinates intersecting each final
@@ -80,7 +101,7 @@
 hotspot_dbscan <- function(
   data,
   eps = NULL,
-  min_pts = 5,
+  min_pts = NULL,
   density_adjust = 2,
   hull = c("concave", "convex"),
   hull_ratio = 0.75,
@@ -113,6 +134,11 @@ hotspot_dbscan <- function(
   # individual POINT rows. From here on, one row represents one coordinate,
   # which is the denominator used for the output `prop` column.
   data <- prepare_point_data(data, quiet = quiet, call = call)
+
+  min_pts_auto <- rlang::is_null(min_pts)
+  if (min_pts_auto) {
+    min_pts <- set_dbscan_min_pts(nrow(data), quiet = quiet, call = call)
+  }
 
   # Both DBSCAN and buffering interpret numeric distances in CRS units, so a
   # complete CRS with known unit metadata is required even when eps is supplied.
@@ -165,8 +191,7 @@ hotspot_dbscan <- function(
   }
 
   # DBSCAN accepts a numeric matrix rather than an SF object. The convex hull
-  # of all prepared points serves two purposes: its area defines the reference
-  # density for automatic eps, and its geometry bounds the returned hotspots.
+  # of all prepared points bounds the returned hotspots.
   coordinates <- sf::st_coordinates(analysis_data)[, c("X", "Y"), drop = FALSE]
   study_hull <- sf::st_convex_hull(sf::st_union(analysis_data))
   study_area <- as.numeric(sf::st_area(study_hull))
@@ -176,8 +201,7 @@ hotspot_dbscan <- function(
   # effective neighbourhood distance, including polygon buffering.
   if (eps_auto) {
     eps <- set_dbscan_eps(
-      area = study_area,
-      n = nrow(coordinates),
+      coordinates = coordinates,
       min_pts = min_pts,
       density_adjust = density_adjust,
       data = analysis_data,
@@ -186,8 +210,8 @@ hotspot_dbscan <- function(
     )
   }
 
-  # A zero-area input hull cannot be used for automatic eps selection. With an
-  # explicit eps, buffer it so clipping can still produce polygonal output.
+  # A zero-area input hull cannot serve directly as a polygonal clipping
+  # boundary, so buffer it by the resolved eps value.
   clip_boundary <- if (is.finite(study_area) && study_area > 0) {
     study_hull
   } else {
@@ -318,6 +342,7 @@ hotspot_dbscan <- function(
     eps = eps,
     eps_auto = eps_auto,
     min_pts = as.integer(min_pts),
+    min_pts_auto = min_pts_auto,
     density_adjust = if (eps_auto) density_adjust else NULL,
     hull = hull,
     hull_ratio = if (hull == "concave") hull_ratio else NULL,
@@ -342,8 +367,7 @@ validate_dbscan_params <- function(
   dots,
   call = rlang::caller_env()
 ) {
-  # eps may be NULL to request automatic selection; all other accepted numeric
-  # parameters are mandatory finite scalars within their documented ranges.
+  # eps and min_pts may be NULL to request automatic selection.
   if (
     !rlang::is_null(eps) &&
       (!rlang::is_bare_numeric(eps) ||
@@ -357,14 +381,15 @@ validate_dbscan_params <- function(
     )
   }
   if (
-    !rlang::is_bare_numeric(min_pts) ||
-      length(min_pts) != 1 ||
-      !is.finite(min_pts) ||
-      min_pts < 2 ||
-      min_pts != floor(min_pts)
+    !rlang::is_null(min_pts) &&
+      (!rlang::is_bare_numeric(min_pts) ||
+        length(min_pts) != 1 ||
+        !is.finite(min_pts) ||
+        min_pts < 2 ||
+        min_pts != floor(min_pts))
   ) {
     cli::cli_abort(
-      "{.arg min_pts} must be a single finite integer of at least two.",
+      "{.arg min_pts} must be NULL or a single finite integer of at least two.",
       call = call
     )
   }
@@ -413,7 +438,7 @@ validate_dbscan_params <- function(
 
   # These arguments determine behaviour promised by hotspot_dbscan() and must
   # not be replaced downstream. In particular, accepting weights would make
-  # the unweighted automatic-density formula and coordinate counts misleading.
+  # the unweighted parameter selection and coordinate counts misleading.
   reserved <- intersect(dot_names, c("x", "eps", "minPts", "weights"))
   if (length(reserved) > 0) {
     details <- if ("weights" %in% reserved) {
@@ -432,37 +457,45 @@ validate_dbscan_params <- function(
   invisible(NULL)
 }
 
-# Calculate the neighbourhood radius whose circular area is expected to contain
-# min_pts observations (the focal point plus min_pts - 1 other points) at the
-# requested multiple of the mean density inside the input-point convex hull.
+# Select min_pts from the number of prepared point coordinates.
+set_dbscan_min_pts <- function(n, quiet, call = rlang::caller_env()) {
+  if (n < 2) {
+    cli::cli_abort(
+      "At least two point coordinates are required to select {.arg min_pts} automatically.",
+      call = call
+    )
+  }
+  min_pts <- as.integer(min(n, 50, max(5, ceiling(sqrt(n)))))
+  if (rlang::is_false(quiet)) {
+    cli::cli_inform(
+      c(
+        "Minimum points set automatically from the number of point coordinates.",
+        "i" = "{.arg min_pts} = {min_pts}."
+      ),
+      call = call
+    )
+  }
+  min_pts
+}
+
+# Calculate the neighbourhood radius from the median distance to each point's
+# min_pts - 1 nearest other point, adjusted for the requested density.
 set_dbscan_eps <- function(
-  area,
-  n,
+  coordinates,
   min_pts,
   density_adjust,
   data,
   quiet,
   call = rlang::caller_env()
 ) {
-  # Coincident or collinear points have a zero-area convex hull, so mean areal
-  # density—and consequently automatic eps—has no defined finite value.
-  if (!is.finite(area) || area <= 0) {
-    cli::cli_abort(
-      c(
-        "Could not calculate an automatic neighbourhood distance from {.var data}.",
-        "i" = "The convex hull of the input point coordinates has zero area.",
-        "i" = "Supply {.arg eps} explicitly or plot {.var data} to check its point locations."
-      ),
-      call = call
-    )
-  }
-
-  # Rearranging density = count / circular area gives the required radius.
-  # Subtract one because DBSCAN includes the focal point in minPts.
-  eps <- sqrt(((min_pts - 1) * area) / (pi * n * density_adjust))
+  neighbour_distance <- dbscan::kNNdist(coordinates, k = min_pts - 1L)
+  base_eps <- stats::median(neighbour_distance)
+  eps <- base_eps / sqrt(density_adjust)
   if (!is.finite(eps) || eps <= 0) {
-    cli::cli_abort(
-      "Automatic selection did not produce a finite positive {.arg eps} value.",
+    cli::cli_abort(c(
+      "Could not calculate a finite positive automatic {.arg eps} value.",
+      "i" = "Supply {.arg eps} explicitly or plot {.var data} to check for coincident point locations."
+    ),
       call = call
     )
   }
@@ -474,8 +507,8 @@ set_dbscan_eps <- function(
     eps_report <- if (eps > 1000) round(eps) else signif(eps, 4)
     cli::cli_inform(
       c(
-        "Neighbourhood distance set automatically from mean point density.",
-        "i" = "{.arg eps} = {format(eps_report, big.mark = ',')} {unit}."
+        "Neighbourhood distance set automatically from nearest-neighbour distances.",
+        "i" = "{.arg eps} = {format(eps_report, big.mark = ',')} {unit}; {.arg density_adjust} = {density_adjust}."
       ),
       call = call
     )

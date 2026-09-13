@@ -7,7 +7,7 @@
 hotspot_dbscan(
   data,
   eps = NULL,
-  min_pts = 5,
+  min_pts = NULL,
   density_adjust = 2,
   hull = c("concave", "convex"),
   hull_ratio = 0.75,
@@ -21,18 +21,19 @@ hotspot_dbscan(
 
 \item{eps}{A single positive number specifying the DBSCAN neighbourhood
 radius in the units of the analysis co-ordinate reference system (CRS).
-If \code{NULL}, the radius is calculated automatically from the mean point
-density within the convex hull of \code{data}.}
+If \code{NULL}, the radius is calculated automatically from nearest-neighbour
+distances. See \strong{Automatic parameter selection}.}
 
 \item{min_pts}{A single integer specifying the minimum number of points in
 an \code{eps} neighbourhood, including the point itself, for a point to be a
-core point. The default is \code{5}.}
+core point. If \code{NULL}, the value is calculated automatically from the
+number of point coordinates in \code{data}. See \strong{Automatic parameter
+selection}.}
 
 \item{density_adjust}{A single positive number controlling automatic
 selection of \code{eps}. Ignored unless \code{eps = NULL}. A value of \code{1} (the
-background-density reference) identifies neighbourhoods with approximately
-at least the mean density within the convex hull of \code{data}; the default of
-\code{2} corresponds to approximately twice that density.}
+reference neighbourhood density) uses the median nearest-neighbour
+distance; the default of \code{2} requires approximately twice that density.}
 
 \item{hull}{The type of hull used to represent each cluster: \code{"convex"}
 or \code{"concave"} (the default).}
@@ -69,18 +70,6 @@ represent each cluster as a buffered convex or concave hull. Clusters are
 ranked by the number of points they contain.
 }
 \details{
-When \code{eps = NULL}, the neighbourhood radius is calculated as
-
-\code{sqrt(((min_pts - 1) * A) / (pi * n * density_adjust))},
-
-where \code{A} is the area of the convex hull of the input point coordinates and
-\code{n} is the number of coordinates. This means that the expected number of
-points in an \code{eps} neighbourhood is approximately \code{density_adjust} times the
-mean density of points within the convex hull. A value of
-\code{density_adjust = 1} identifies clusters with at least the mean density;
-the default of \code{2} requires approximately twice the mean density, and still
-larger values identify clusters with higher density.
-
 \code{MULTIPOINT} geometries are cast to individual points before analysis. The
 output \code{n} column counts all input point coordinates intersecting each final
 cluster polygon, not only points assigned to that DBSCAN cluster. DBSCAN
@@ -92,6 +81,39 @@ Each cluster geometry is the selected hull of all assigned points, buffered
 by \code{eps} and clipped to the convex hull of all input points. Different
 cluster polygons may overlap after hull construction and buffering.
 }
+\section{Automatic parameter selection}{
+
+When \code{min_pts = NULL}, it is calculated as
+
+\code{min(n, 50, max(5, ceiling(sqrt(n))))},
+
+where \code{n} is the number of point coordinates after empty geometries have
+been removed and \code{MULTIPOINT} geometries have been expanded. For datasets
+with two to four coordinates, all coordinates are required. At least two
+coordinates are needed for automatic selection. This rule increases the
+evidence required to identify a hotspot in larger datasets, while the upper
+limit prevents the required number of neighbours becoming excessively
+large.
+
+When \code{eps = NULL}, the function calculates the distance from every point to
+its \code{(min_pts - 1)}th nearest other point. The median of those distances is
+a typical local neighbourhood radius. The value used for clustering is
+
+\code{eps = median_neighbour_distance / sqrt(density_adjust)}.
+
+\code{min_pts - 1} other points are used because DBSCAN counts the focal point
+itself. Since circular area is proportional to the square of its radius,
+the default \code{density_adjust = 2} searches for the required number of points
+in approximately half the typical neighbourhood area, corresponding to
+approximately twice the typical local point density. Larger values identify
+denser concentrations; values below one allow less-dense concentrations.
+
+Automatic values provide a starting point for exploratory analysis. DBSCAN
+results can be sensitive to both parameters, so users should consider
+whether the resulting neighbourhood size and minimum density are meaningful
+for their application.
+}
+
 \examples{
 \donttest{
 hotspot_dbscan(memphis_robberies_jan)

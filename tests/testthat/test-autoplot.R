@@ -133,6 +133,46 @@ test_that("output has correct class", {
   expect_s3_class(autoplot(result_dual_kde), "ggplot")
 })
 
+test_that("base maps are opt-in and configured without downloading tiles", {
+  expect_error(autoplot(result_count, basemap_type = NA), "single string")
+  expect_length(autoplot(result_count)$layers, 1)
+
+  skip_if_not_installed("ggspatial")
+  plot <- autoplot(
+    result_count,
+    alpha = 0.2,
+    basemap_type = "osm",
+    basemap_zoom = 12
+  )
+
+  # Inspecting an unbuilt plot avoids any request to the tile provider.
+  expect_s3_class(plot$layers[[1]]$geom, "GeomMapTile")
+  expect_equal(plot$layers[[1]]$data$type, "osm")
+  expect_equal(plot$layers[[1]]$data$zoom, 12)
+  expect_equal(plot$layers[[1]]$data$zoomin, 0)
+  expect_equal(plot$layers[[1]]$geom_params$progress, "none")
+  expect_equal(plot$layers[[length(plot$layers)]]$aes_params$alpha, 0.75)
+  expect_equal(plot$labels$caption, "\u00a9 OpenStreetMap contributors")
+
+  expect_error(
+    autoplot(result_count, basemap_type = "future_provider"),
+    "basemap_attribution"
+  )
+  custom <- autoplot(
+    result_count,
+    basemap_type = "future_provider",
+    basemap_attribution = "Map tiles \u00a9 Future Provider"
+  )
+  expect_equal(custom$labels$caption, "Map tiles \u00a9 Future Provider")
+})
+
+test_that("Gi* captions retain base-map attribution", {
+  skip_if_not_installed("ggspatial")
+  plot <- autoplot(result_gistar, basemap_type = "osm")
+  expect_match(plot$labels$caption, "more or fewer points")
+  expect_match(plot$labels$caption, "OpenStreetMap contributors")
+})
+
 test_that("weighted count outputs map weighted values", {
   weighted <- result_count
   weighted$sum <- result_count$n * 10 + 1

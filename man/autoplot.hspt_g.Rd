@@ -5,7 +5,15 @@
 \alias{autolayer.hspt_g}
 \title{Plot map of Getis-Ord Gi* results}
 \usage{
-\method{autoplot}{hspt_g}(object, critical_p = 0.05, sign = c("both", "hot", "cold"), ...)
+\method{autoplot}{hspt_g}(
+  object,
+  critical_p = 0.05,
+  sign = c("both", "hot", "cold"),
+  ...,
+  basemap_type = "none",
+  basemap_zoom = NULL,
+  basemap_attribution = NULL
+)
 
 \method{autolayer}{hspt_g}(object, critical_p = 0.05, sign = c("both", "hot", "cold"), ...)
 }
@@ -21,6 +29,20 @@ default), \code{"hot"} for positive Gi*/Gi values, or \code{"cold"} for negative
 values.}
 
 \item{...}{Further arguments passed to \code{\link[ggplot2:geom_sf]{ggplot2::geom_sf()}}, e.g. \code{alpha}.}
+
+\item{basemap_type}{A map type passed to the \code{type} argument of
+\code{\link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile()}}, or \code{"none"} (the default) for no base
+map. A base map requires the suggested \code{ggspatial} package and an internet
+connection unless the required tiles are cached. When a base map is used,
+the hotspot layer is drawn with \code{alpha = 0.75}, overriding any \code{alpha}
+value supplied in \code{...}.}
+
+\item{basemap_zoom}{The zoom level passed to
+\code{\link[ggspatial:annotation_map_tile]{ggspatial::annotation_map_tile()}}, or \code{NULL} to choose it automatically.}
+
+\item{basemap_attribution}{Attribution for the tile provider, or \code{NULL} to
+use the statement known for \code{basemap_type}. A non-empty string is required
+for a custom or otherwise unknown map type.}
 }
 \value{
 \code{autoplot()} returns a \link[ggplot2:ggplot]{ggplot2::ggplot} object. \code{autolayer()}

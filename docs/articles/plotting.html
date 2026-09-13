@@ -363,6 +363,16 @@ Removed 179 rows (5.0% of original rows) from `data`</code></pre>
 </section><section class="level2"><h2 id="customising-plots">Customising plots<a class="anchor" aria-label="anchor" href="#customising-plots"></a>
 </h2>
 <p><code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> returns an ordinary ggplot object, so scales, labels, themes, and other layers can be added or replaced with ggplot2. <code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code> is useful when the sfhotspot result is one component of a larger map. See the individual method help pages for the arguments accepted by each method.</p>
+<p>An optional map-tile background can provide geographic context. This requires the suggested ggspatial package and an internet connection unless the tiles are already cached. When a base map is requested, the hotspot layer is drawn with an alpha of 0.75 so that the background remains visible.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span></span>
+<span>  <span class="va">memphis_robberies_count</span>,</span>
+<span>  basemap_type <span class="op">=</span> <span class="st">"osm"</span>,</span>
+<span>  basemap_zoom <span class="op">=</span> <span class="fl">12</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>The default remains <code>basemap_type = "none"</code>, so ordinary plots never download tiles. Known map types receive an attribution caption automatically. For a custom or new map type, supply the provider’s required statement explicitly using <code>basemap_attribution</code>.</p>
 </section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
