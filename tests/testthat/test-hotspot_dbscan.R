@@ -15,20 +15,35 @@ make_dbscan_points <- function() {
 
 test_that("hotspot_dbscan returns ranked tidy polygon output", {
   result <- hotspot_dbscan(
-    make_dbscan_points(), eps = 1, min_pts = 3, quiet = TRUE
+    make_dbscan_points(),
+    eps = 1,
+    min_pts = 3,
+    hull = "convex",
+    quiet = TRUE
   )
 
   expect_s3_class(result, "hspt_s")
   expect_s3_class(result, "sf")
   expect_s3_class(result, "tbl_df")
-  expect_named(result, c("cluster", "rank", "n", "prop", "geometry"))
+  expect_named(
+    result,
+    c("cluster", "rank", "n", "prop", "prop_area", "geometry")
+  )
   expect_type(result$cluster, "integer")
   expect_type(result$rank, "integer")
   expect_type(result$n, "integer")
   expect_type(result$prop, "double")
+  expect_type(result$prop_area, "double")
   expect_identical(result$rank, 1:2)
   expect_identical(result$n, c(4L, 4L))
   expect_equal(result$prop, c(4 / 12, 4 / 12))
+  expect_equal(
+    result$prop_area,
+    as.numeric(sf::st_area(result)) /
+      as.numeric(sf::st_area(sf::st_convex_hull(sf::st_union(
+        make_dbscan_points()
+      ))))
+  )
   expect_identical(result$cluster, c(2L, 1L))
   expect_true(all(sf::st_is(result, c("POLYGON", "MULTIPOLYGON"))))
   expect_true(all(sf::st_is_valid(result)))
@@ -154,6 +169,19 @@ test_that("convex and concave hulls are supported", {
   expect_identical(attr(concave, "dbscan")$hull, "concave")
   expect_identical(attr(concave, "dbscan")$hull_ratio, 0.25)
   expect_true(all(sf::st_is_valid(concave)))
+
+  complete_hull <- sf::st_concave_hull(
+    sf::st_union(data), ratio = 0.25, allow_holes = FALSE
+  )
+  complete_geometry <- sf::st_intersection(
+    sf::st_buffer(complete_hull, 1),
+    sf::st_convex_hull(sf::st_union(data))
+  )
+  expect_equal(
+    concave$prop_area,
+    as.numeric(sf::st_area(concave)) /
+      as.numeric(sf::st_area(complete_geometry))
+  )
 })
 
 test_that("DBSCAN parameters are validated", {

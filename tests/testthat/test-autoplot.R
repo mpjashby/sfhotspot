@@ -164,6 +164,18 @@ test_that("base maps are opt-in and configured without downloading tiles", {
     basemap_attribution = "Map tiles \u00a9 Future Provider"
   )
   expect_equal(custom$labels$caption, "Map tiles \u00a9 Future Provider")
+
+  verbose <- autoplot(result_count, basemap_type = "osm", quiet = FALSE)
+  expect_equal(verbose$layers[[1]]$geom_params$progress, "text")
+  expect_error(autoplot(result_count, quiet = NA), "quiet")
+})
+
+test_that("all autoplot methods are quiet by default", {
+  methods <- c("n", "k", "c", "d", "dk", "g", "ib", "s")
+  for (class in methods) {
+    method <- getS3method("autoplot", paste0("hspt_", class))
+    expect_identical(formals(method)$quiet, TRUE)
+  }
 })
 
 test_that("Gi* captions retain base-map attribution", {

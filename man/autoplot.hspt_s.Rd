@@ -12,7 +12,8 @@
   ...,
   basemap_type = "none",
   basemap_zoom = NULL,
-  basemap_attribution = NULL
+  basemap_attribution = NULL,
+  quiet = TRUE
 )
 
 \method{autolayer}{hspt_s}(object, fill = c("n", "prop", "rank", "none"), label = "none", ...)
@@ -46,6 +47,9 @@ value supplied in \code{...}.}
 \item{basemap_attribution}{Attribution for the tile provider, or \code{NULL} to
 use the statement known for \code{basemap_type}. A non-empty string is required
 for a custom or otherwise unknown map type.}
+
+\item{quiet}{If \code{TRUE} (the default), suppress progress bars and other
+messages. If \code{FALSE}, show tile-download progress and other messages.}
 }
 \value{
 \code{autoplot()} returns a \link[ggplot2:ggplot]{ggplot2::ggplot} object. \code{autolayer()}

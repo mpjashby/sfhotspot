@@ -60,9 +60,12 @@ An \code{sf} tibble with class \code{hspt_s} and one row per non-noise
 cluster. It contains \code{cluster}, the original DBSCAN cluster identifier;
 \code{rank}, the priority rank; \code{n}, the number of input point coordinates
 intersecting the polygon; \code{prop}, \code{n} as a proportion of all input point
-coordinates; and \code{geometry}. Since cluster polygons may overlap, the sum
-of \code{prop} can exceed one. Ranking is by decreasing \code{n}, then increasing
-polygon area, then increasing cluster identifier.
+coordinates; \code{prop_area}, the polygon area as a proportion of the area
+covered by a hull of the complete dataset; and \code{geometry}. The
+complete-dataset hull uses the same \code{hull}, \code{hull_ratio}, buffering and
+clipping rules as the cluster hulls. Since cluster polygons may overlap,
+the sums of \code{prop} and \code{prop_area} can exceed one. Ranking is by decreasing
+\code{n}, then increasing polygon area, then increasing cluster identifier.
 }
 \description{
 Identify clusters of points using density-based spatial clustering and

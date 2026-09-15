@@ -1,10 +1,5 @@
 # sfhotspot 1.1.0
 
-* `hotspot_gistar()` and `hotspot_classify()` now use the default Holm method
-  when `p_adjust_method = NULL`. P-values are adjusted once using
-  `spdep::p.adjustSP()`; `hotspot_classify()` no longer applies a second
-  adjustment across time periods. Use `p_adjust_method = "none"` to retain
-  unadjusted p-values (#94).
 * New function `hotspot_dbscan()` to identify clusters using the DBSCAN
   algorithm, as implemented in the [dbscan](https://github.com/mhahsler/dbscan) 
   package. Its `min_pts` and `eps` parameters are selected automatically by
@@ -13,6 +8,11 @@
   methods.
 * New function `hotspot_isoband()` to generalise values in regular square hotspot
   grids into tidy SF isobands with appropriate visual representation (#81).
+* `hotspot_gistar()` and `hotspot_classify()` now use the default Holm method
+  when `p_adjust_method = NULL`. P-values are adjusted once using
+  `spdep::p.adjustSP()`; `hotspot_classify()` no longer applies a second
+  adjustment across time periods. Use `p_adjust_method = "none"` to retain
+  unadjusted p-values (#94).
 * Added `autoplot()` and `autolayer()` methods for `hotspot_gistar()` and
   `hotspot_dual_kde()` results, and completed the plotting support for
   `hotspot_classify()` results. Plot scales and legends now reflect the

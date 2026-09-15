@@ -114,10 +114,14 @@ build_autoplot <- function(
   layer_args = list(),
   basemap_type = "none",
   basemap_zoom = NULL,
-  basemap_attribution = NULL
+  basemap_attribution = NULL,
+  quiet = TRUE
 ) {
   if (!rlang::is_string(basemap_type)) {
     cli::cli_abort("{.arg basemap_type} must be a single string.")
+  }
+  if (!rlang::is_bool(quiet)) {
+    cli::cli_abort("{.arg quiet} must be {.val TRUE} or {.val FALSE}.")
   }
 
   plot <- ggplot2::ggplot()
@@ -130,7 +134,7 @@ build_autoplot <- function(
       type = basemap_type,
       zoom = basemap_zoom,
       zoomin = 0,
-      progress = "none"
+      progress = if (quiet) "none" else "text"
     )
     plot <- plot + do.call(ggspatial::annotation_map_tile, tile_args)
     layer_args$alpha <- 0.75
@@ -140,7 +144,10 @@ build_autoplot <- function(
       )
   }
 
-  plot + do.call(autolayer, c(list(object), layer_args))
+  add_layer <- function() {
+    plot + do.call(autolayer, c(list(object), layer_args))
+  }
+  if (quiet) suppressMessages(add_layer()) else add_layer()
 }
 
 #' Plot map of grid counts
@@ -162,6 +169,8 @@ build_autoplot <- function(
 #' @param basemap_attribution Attribution for the tile provider, or `NULL` to
 #'   use the statement known for `basemap_type`. A non-empty string is required
 #'   for a custom or otherwise unknown map type.
+#' @param quiet If `TRUE` (the default), suppress progress bars and other
+#'   messages. If `FALSE`, show tile-download progress and other messages.
 #' @param ... Further arguments passed to [ggplot2::geom_sf()], e.g. `alpha`.
 #' @return `autoplot()` returns a [ggplot2::ggplot] object. `autolayer()`
 #'   returns a layer that can be added to a [ggplot2::ggplot] object.
@@ -171,7 +180,8 @@ autoplot.hspt_n <- function(
   ...,
   basemap_type = "none",
   basemap_zoom = NULL,
-  basemap_attribution = NULL
+  basemap_attribution = NULL,
+  quiet = TRUE
 ) {
   weighted <- rlang::has_name(object, "sum")
   build_autoplot(
@@ -179,7 +189,8 @@ autoplot.hspt_n <- function(
     layer_args = list(...),
     basemap_type = basemap_type,
     basemap_zoom = basemap_zoom,
-    basemap_attribution = basemap_attribution
+    basemap_attribution = basemap_attribution,
+    quiet = quiet
   ) +
     ggplot2::scale_fill_distiller(
       type = "seq",
@@ -219,14 +230,16 @@ autoplot.hspt_k <- function(
   ...,
   basemap_type = "none",
   basemap_zoom = NULL,
-  basemap_attribution = NULL
+  basemap_attribution = NULL,
+  quiet = TRUE
 ) {
   build_autoplot(
     object,
     layer_args = list(...),
     basemap_type = basemap_type,
     basemap_zoom = basemap_zoom,
-    basemap_attribution = basemap_attribution
+    basemap_attribution = basemap_attribution,
+    quiet = quiet
   ) +
     ggplot2::scale_fill_distiller(
       type = "seq",
@@ -279,14 +292,16 @@ autoplot.hspt_c <- function(
   ...,
   basemap_type = "none",
   basemap_zoom = NULL,
-  basemap_attribution = NULL
+  basemap_attribution = NULL,
+  quiet = TRUE
 ) {
   build_autoplot(
     object,
     layer_args = list(...),
     basemap_type = basemap_type,
     basemap_zoom = basemap_zoom,
-    basemap_attribution = basemap_attribution
+    basemap_attribution = basemap_attribution,
+    quiet = quiet
   ) +
     ggplot2::scale_fill_manual(
       values = hotspot_category_colours,
@@ -347,7 +362,8 @@ autoplot.hspt_d <- function(
   ...,
   basemap_type = "none",
   basemap_zoom = NULL,
-  basemap_attribution = NULL
+  basemap_attribution = NULL,
+  quiet = TRUE
 ) {
   validate_plot_column(object, "change")
   build_autoplot(
@@ -355,7 +371,8 @@ autoplot.hspt_d <- function(
     layer_args = list(...),
     basemap_type = basemap_type,
     basemap_zoom = basemap_zoom,
-    basemap_attribution = basemap_attribution
+    basemap_attribution = basemap_attribution,
+    quiet = quiet
   ) +
     ggplot2::scale_fill_gradient2(
       midpoint = 0,
@@ -410,7 +427,8 @@ autoplot.hspt_dk <- function(
   ...,
   basemap_type = "none",
   basemap_zoom = NULL,
-  basemap_attribution = NULL
+  basemap_attribution = NULL,
+  quiet = TRUE
 ) {
   method <- validate_dual_kde(object)
   plot <- build_autoplot(
@@ -418,7 +436,8 @@ autoplot.hspt_dk <- function(
     layer_args = list(...),
     basemap_type = basemap_type,
     basemap_zoom = basemap_zoom,
-    basemap_attribution = basemap_attribution
+    basemap_attribution = basemap_attribution,
+    quiet = quiet
   )
   if (method == "ratio") {
     plot <- plot +
@@ -515,7 +534,8 @@ autoplot.hspt_g <- function(
   ...,
   basemap_type = "none",
   basemap_zoom = NULL,
-  basemap_attribution = NULL
+  basemap_attribution = NULL,
+  quiet = TRUE
 ) {
   sign <- rlang::arg_match(sign)
   validate_gistar_plot(object, critical_p, sign)
@@ -528,7 +548,8 @@ autoplot.hspt_g <- function(
     ),
     basemap_type = basemap_type,
     basemap_zoom = basemap_zoom,
-    basemap_attribution = basemap_attribution
+    basemap_attribution = basemap_attribution,
+    quiet = quiet
   )
   if (has_kde) {
     plot <- plot +
@@ -694,7 +715,8 @@ autoplot.hspt_ib <- function(
   ...,
   basemap_type = "none",
   basemap_zoom = NULL,
-  basemap_attribution = NULL
+  basemap_attribution = NULL,
+  quiet = TRUE
 ) {
   metadata <- validate_isoband_plot(object)
   colours <- isoband_colours(object, metadata)
@@ -705,7 +727,8 @@ autoplot.hspt_ib <- function(
     layer_args = list(...),
     basemap_type = basemap_type,
     basemap_zoom = basemap_zoom,
-    basemap_attribution = basemap_attribution
+    basemap_attribution = basemap_attribution,
+    quiet = quiet
   ) +
     ggplot2::scale_fill_manual(
       values = colours,
@@ -759,7 +782,8 @@ autoplot.hspt_s <- function(
   ...,
   basemap_type = "none",
   basemap_zoom = NULL,
-  basemap_attribution = NULL
+  basemap_attribution = NULL,
+  quiet = TRUE
 ) {
   fill <- rlang::arg_match(fill)
   label <- match_dbscan_labels(label)
@@ -768,7 +792,8 @@ autoplot.hspt_s <- function(
     layer_args = c(list(fill = fill, label = label), list(...)),
     basemap_type = basemap_type,
     basemap_zoom = basemap_zoom,
-    basemap_attribution = basemap_attribution
+    basemap_attribution = basemap_attribution,
+    quiet = quiet
   )
   scale_title <- switch(
     if (fill == "none" && label[[1]] == "none") {

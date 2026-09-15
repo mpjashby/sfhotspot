@@ -82,9 +82,12 @@
 #'   cluster. It contains `cluster`, the original DBSCAN cluster identifier;
 #'   `rank`, the priority rank; `n`, the number of input point coordinates
 #'   intersecting the polygon; `prop`, `n` as a proportion of all input point
-#'   coordinates; and `geometry`. Since cluster polygons may overlap, the sum
-#'   of `prop` can exceed one. Ranking is by decreasing `n`, then increasing
-#'   polygon area, then increasing cluster identifier.
+#'   coordinates; `prop_area`, the polygon area as a proportion of the area
+#'   covered by a hull of the complete dataset; and `geometry`. The
+#'   complete-dataset hull uses the same `hull`, `hull_ratio`, buffering and
+#'   clipping rules as the cluster hulls. Since cluster polygons may overlap,
+#'   the sums of `prop` and `prop_area` can exceed one. Ranking is by decreasing
+#'   `n`, then increasing polygon area, then increasing cluster identifier.
 #'
 #' @examples
 #' \donttest{
@@ -324,9 +327,34 @@ hotspot_dbscan <- function(
   # density and ranks first. The original cluster ID is a deterministic final
   # tie-breaker. The temporary area values are not part of the tidy output.
   polygon_area <- as.numeric(sf::st_area(result))
+
+  # Contextualise each cluster footprint against a footprint for the complete
+  # dataset. For convex hulls, buffering and clipping the complete-data hull
+  # returns the clipping boundary itself, so reuse its already-computed area.
+  # Concave hulls require one additional hull, buffer and intersection. Using
+  # the full cluster geometry pipeline makes numerator and denominator areas
+  # comparable, including for collinear data where the raw hull has no area.
+  overall_area <- if (hull == "convex") {
+    as.numeric(sf::st_area(clip_boundary))
+  } else {
+    overall_hull <- sf::st_concave_hull(
+      sf::st_union(analysis_data),
+      ratio = hull_ratio,
+      allow_holes = FALSE
+    )
+    overall_geometry <- sf::st_intersection(
+      sf::st_buffer(overall_hull, dist = eps),
+      clip_boundary
+    )
+    as.numeric(sf::st_area(sf::st_make_valid(overall_geometry)))
+  }
+  result$prop_area <- polygon_area / overall_area
+
   result <- result[order(-result$n, polygon_area, result$cluster), ]
   result$rank <- seq_len(nrow(result))
-  result <- result[, c("cluster", "rank", "n", "prop", "geometry")]
+  result <- result[, c(
+    "cluster", "rank", "n", "prop", "prop_area", "geometry"
+  )]
 
   # Area-based ranking must happen before this step. Back-transform only the
   # finished polygons and preserve the projected analysis CRS as provenance.
