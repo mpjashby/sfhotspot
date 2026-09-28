@@ -87,9 +87,12 @@ An `sf` tibble with class `hspt_s` and one row per non-noise cluster. It
 contains `cluster`, the original DBSCAN cluster identifier; `rank`, the
 priority rank; `n`, the number of input point coordinates intersecting
 the polygon; `prop`, `n` as a proportion of all input point coordinates;
-and `geometry`. Since cluster polygons may overlap, the sum of `prop`
-can exceed one. Ranking is by decreasing `n`, then increasing polygon
-area, then increasing cluster identifier.
+`prop_area`, the polygon area as a proportion of the area covered by a
+hull of the complete dataset; and `geometry`. The complete-dataset hull
+uses the same `hull`, `hull_ratio`, buffering and clipping rules as the
+cluster hulls. Since cluster polygons may overlap, the sums of `prop`
+and `prop_area` can exceed one. Ranking is by decreasing `n`, then
+increasing polygon area, then increasing cluster identifier.
 
 ## Details
 
@@ -151,17 +154,17 @@ hotspot_dbscan(memphis_robberies_jan)
 #> ℹ Unit of measurement: metre.
 #> Neighbourhood distance set automatically from nearest-neighbour distances.
 #> ℹ `eps` = 2,077 metres; `density_adjust` = 2.
-#> Simple feature collection with 3 features and 4 fields
+#> Simple feature collection with 3 features and 5 fields
 #> Geometry type: POLYGON
 #> Dimension:     XY
 #> Bounding box:  xmin: -90.06077 ymin: 35.02829 xmax: -89.88925 ymax: 35.2057
 #> Geodetic CRS:  WGS 84
-#> # A tibble: 3 × 5
-#>   cluster  rank     n  prop                                             geometry
-#> *   <int> <int> <int> <dbl>                                        <POLYGON [°]>
-#> 1       2     1    40 0.194 ((-90.05603 35.14974, -90.05569 35.15071, -90.05529…
-#> 2       1     2    31 0.150 ((-89.95894 35.05351, -89.95971 35.05425, -89.96043…
-#> 3       3     3    30 0.146 ((-89.96698 35.18006, -89.96726 35.181, -89.96749 3…
+#> # A tibble: 3 × 6
+#>   cluster  rank     n  prop prop_area                                   geometry
+#> *   <int> <int> <int> <dbl>     <dbl>                              <POLYGON [°]>
+#> 1       2     1    40 0.194    0.0897 ((-90.05603 35.14974, -90.05569 35.15071,…
+#> 2       1     2    31 0.150    0.0791 ((-89.95894 35.05351, -89.95971 35.05425,…
+#> 3       3     3    30 0.146    0.0836 ((-89.96698 35.18006, -89.96726 35.181, -…
 
 hotspot_dbscan(
   memphis_robberies_jan,
@@ -175,14 +178,14 @@ hotspot_dbscan(
 #> ℹ Unit of measurement: metre.
 #> Neighbourhood distance set automatically from nearest-neighbour distances.
 #> ℹ `eps` = 1,696 metres; `density_adjust` = 3.
-#> Simple feature collection with 1 feature and 4 fields
+#> Simple feature collection with 1 feature and 5 fields
 #> Geometry type: POLYGON
 #> Dimension:     XY
 #> Bounding box:  xmin: -89.9706 ymin: 35.14672 xmax: -89.8954 ymax: 35.20228
 #> Geodetic CRS:  WGS 84
-#> # A tibble: 1 × 5
-#>   cluster  rank     n  prop                                             geometry
-#> *   <int> <int> <int> <dbl>                                        <POLYGON [°]>
-#> 1       1     1    26 0.126 ((-89.92806 35.14692, -89.92904 35.14681, -89.93002…
+#> # A tibble: 1 × 6
+#>   cluster  rank     n  prop prop_area                                   geometry
+#> *   <int> <int> <int> <dbl>     <dbl>                              <POLYGON [°]>
+#> 1       1     1    26 0.126    0.0546 ((-89.92806 35.14692, -89.92904 35.14681,…
 # }
 ```

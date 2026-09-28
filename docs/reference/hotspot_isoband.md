@@ -4,7 +4,7 @@ Generalise values in a regular square grid into polygon bands. The
 result is an [sf::sf](https://r-spatial.github.io/sf/reference/sf.html)
 object with one row for each non-empty band and can be plotted with
 [`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html) or
-[`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html).
+[`hotspot_layer()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_layer.md).
 
 ## Usage
 

@@ -33,6 +33,20 @@ attr(result_dual_kde, "method") <- "ratio"
 layer_data <- function(layer) layer[[1]]$data
 
 
+test_that("hotspot_layer delegates to the autolayer methods", {
+  wrapped <- hotspot_layer(result_count, alpha = 0.5)
+  direct <- ggplot2::autolayer(result_count, alpha = 0.5)
+
+  expect_equal(layer_data(wrapped), layer_data(direct))
+  expect_identical(wrapped$aes_params$alpha, direct$aes_params$alpha)
+
+  expect_equal(
+    layer_data(hotspot_layer(result_gistar, sign = "hot")),
+    layer_data(ggplot2::autolayer(result_gistar, sign = "hot"))
+  )
+})
+
+
 
 # TEST INPUTS ------------------------------------------------------------------
 
@@ -183,6 +197,21 @@ test_that("Gi* captions retain base-map attribution", {
   plot <- autoplot(result_gistar, basemap_type = "osm")
   expect_match(plot$labels$caption, "more or fewer points")
   expect_match(plot$labels$caption, "OpenStreetMap contributors")
+
+  automatic <- hotspot_map(
+    result_gistar,
+    sign = "hot",
+    caption = "Analysis by A. Researcher"
+  )
+  expect_equal(
+    strsplit(automatic$labels$caption, "\n", fixed = TRUE)[[1]],
+    c(
+      "* in areas with more points than expected by chance",
+      "Analysis by A. Researcher",
+      "\u00a9 OpenStreetMap contributors"
+    )
+  )
+  expect_identical(automatic$theme$plot.caption$hjust, 0)
 })
 
 test_that("weighted count outputs map weighted values", {
@@ -225,8 +254,8 @@ test_that("change scales are centred on zero with symmetric limits", {
 
 test_that("dual-KDE methods use method-specific scales and labels", {
   specifications <- list(
-    ratio = list(title = "density ratio", limits = log10(c(0.25, 4))),
-    log = list(title = "log density ratio", limits = c(-4, 4)),
+    ratio = list(title = "density ratio", limits = NULL),
+    log = list(title = "log density ratio", limits = NULL),
     diff = list(title = "density difference", limits = c(-4, 4)),
     sum = list(title = "combined density", limits = c(0, NA))
   )
@@ -249,10 +278,62 @@ test_that("dual-KDE methods use method-specific scales and labels", {
 
     expect_equal(plot$labels$fill, specifications[[method]]$title)
     expect_equal(scale$limits, specifications[[method]]$limits)
+    expect_equal(scale$get_transformation()$name, "identity")
+  }
+})
+
+test_that("only difference maps use a diverging scale", {
+  for (method in c("ratio", "log", "sum")) {
+    object <- result_dual_kde
+    object$kde <- rep(c(0.25, 1, 4), length.out = nrow(object))
+    attr(object, "method") <- method
+    scale <- autoplot(object)$scales$get_scales("fill")
+
+    expect_s3_class(scale, "ScaleContinuous")
+    expect_null(scale$midpoint)
     expect_equal(
-      scale$get_transformation()$name,
-      if (method == "ratio") "log-10" else "identity"
+      scale$palette(c(0, 0.5, 1)),
+      c("#EFF3FF", "#6BAED6", "#084594")
     )
+  }
+
+  object <- result_dual_kde
+  object$kde <- rep(c(-4, 0, 2), length.out = nrow(object))
+  attr(object, "method") <- "diff"
+  scale <- autoplot(object)$scales$get_scales("fill")
+  expect_equal(scale$palette(0.5), "#FFFFFF")
+})
+
+test_that("numeric map legends use SI suffixes", {
+  scale <- autoplot(result_count)$scales$get_scales("fill")
+  expect_equal(scale$get_labels(c(1, 1e3, 1e6)), c("1", "1k", "1M"))
+  expect_equal(label_iso(c(12, 999)), c("12", "999"))
+  expect_equal(label_iso(1e33), "1,000Q")
+})
+
+test_that("density legends reliably label both endpoints", {
+  density_plots <- list(
+    autoplot(result_kde),
+    autoplot(result_gistar, sign = "hot")
+  )
+  for (method in c("ratio", "log", "diff", "sum")) {
+    object <- result_dual_kde
+    object$kde <- rep(
+      switch(method, ratio = c(0.25, 1, 4), c(-4, 0, 2)),
+      length.out = nrow(object)
+    )
+    if (method == "sum") object$kde <- abs(object$kde)
+    attr(object, "method") <- method
+    density_plots[[length(density_plots) + 1L]] <- autoplot(object)
+  }
+
+  for (plot in density_plots) {
+    built_scale <- ggplot2::ggplot_build(plot)$plot$scales$get_scales(
+      "fill"
+    )
+    expect_equal(built_scale$get_labels(), c("low", "high"))
+    expect_length(built_scale$get_breaks(), 2)
+    expect_lt(built_scale$get_breaks()[[1]], built_scale$get_breaks()[[2]])
   }
 })
 
@@ -273,7 +354,7 @@ test_that("Gi* KDE layers apply p-value and sign conditions", {
 
   expect_equal(
     layer_data(autolayer(object))$.plot_value,
-    c(1, NA_real_, 3, NA_real_)
+    c(-1, NA_real_, 3, NA_real_)
   )
   expect_equal(
     layer_data(autolayer(object, sign = "hot"))$.plot_value,
@@ -285,13 +366,28 @@ test_that("Gi* KDE layers apply p-value and sign conditions", {
   )
   expect_equal(
     layer_data(autolayer(object, critical_p = 0.2))$.plot_value,
-    object$kde
+    c(-1, -2, 3, 4)
   )
   expect_equal(autoplot(object)$scales$get_scales("fill")$na.value,
                "transparent")
 
   object$pvalue <- 1
   expect_no_warning(ggplot2::ggplot_build(autoplot(object)))
+})
+
+test_that("Gi* KDE plots use sign-appropriate continuous scales", {
+  both <- autoplot(result_gistar, sign = "both")$scales$get_scales("fill")
+  expect_equal(both$palette(c(0, 0.5, 1)), c("#2166AC", "#F7F7F7", "#B2182B"))
+  expect_equal(both$get_labels(both$limits), c("cold", "hot"))
+  expect_equal(both$limits, symmetric_limits(
+    gistar_density_values(result_gistar, 0.05, "both")
+  ))
+
+  for (sign in c("cold", "hot")) {
+    scale <- autoplot(result_gistar, sign = sign)$scales$get_scales("fill")
+    expect_equal(scale$palette(c(0, 1)), c("#6BAED6", "#084594"))
+    expect_equal(scale$get_labels(c(1, 2)), c("low", "high"))
+  }
 })
 
 test_that("Gi* plots use audience-appropriate, sign-specific labels", {

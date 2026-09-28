@@ -28,12 +28,15 @@ reference:
   - st_transform_auto
 - title: "Plotting results"
   desc: >
-    These methods for the `autoplot()` function automatically produce charts
-    that are tailored to displaying the results produced by one of the
-    `hotspot_*()` family of functions. `hotspot_isoband()` generalises the 
-    polygons produced by the hotspot-analysis functions into polygons, which can
-    sometimes be preferable for plotting.
+    `hotspot_map()` creates complete maps, while `hotspot_layer()` creates
+    layers that can be combined with other ggplot2 layers. The `autoplot()`
+    methods automatically produce charts tailored to the results from the
+    `hotspot_*()` family of functions. `hotspot_isoband()` generalises the
+    polygons produced by the hotspot-analysis functions into polygons, which
+    can sometimes be preferable for plotting.
 - contents:
+  - hotspot_map
+  - hotspot_layer
   - hotspot_isoband
   - starts_with("autoplot")
 - title: "Sample data"

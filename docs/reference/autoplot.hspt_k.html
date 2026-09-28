@@ -33,7 +33,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Plot map of kernel-density values</h1>
-      <small class="dont-index">Source: <a href="https://github.com/mpjashby/sfhotspot/blob/HEAD/R/autoplot.R" class="external-link"><code>R/autoplot.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/mpjashby/sfhotspot/blob/HEAD/R/autoplot.R" class="external-link"><code>R/autoplot.R</code></a>, <a href="https://github.com/mpjashby/sfhotspot/blob/HEAD/R/hotspot_map.R" class="external-link"><code>R/hotspot_map.R</code></a></small>
       <div class="d-none name"><code>autoplot.hspt_k.Rd</code></div>
     </div>
 
@@ -49,11 +49,24 @@
 <span>  <span class="va">...</span>,</span>
 <span>  basemap_type <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  basemap_zoom <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  basemap_attribution <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  basemap_attribution <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'hspt_k'</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'hspt_k'</span></span>
+<span><span class="fu"><a href="hotspot_map.html">hotspot_map</a></span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  basemap_type <span class="op">=</span> <span class="st">"osm"</span>,</span>
+<span>  basemap_zoom <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  basemap_attribution <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  caption <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -71,11 +84,11 @@
 
 <dt id="arg-basemap-type">basemap_type<a class="anchor" aria-label="anchor" href="#arg-basemap-type"></a></dt>
 <dd><p>A map type passed to the <code>type</code> argument of
-<code><a href="https://paleolimbot.github.io/ggspatial/reference/annotation_map_tile.html" class="external-link">ggspatial::annotation_map_tile()</a></code>, or <code>"none"</code> (the default) for no base
-map. A base map requires the suggested <code>ggspatial</code> package and an internet
-connection unless the required tiles are cached. When a base map is used,
-the hotspot layer is drawn with <code>alpha = 0.75</code>, overriding any <code>alpha</code>
-value supplied in <code>...</code>.</p></dd>
+<code><a href="https://paleolimbot.github.io/ggspatial/reference/annotation_map_tile.html" class="external-link">ggspatial::annotation_map_tile()</a></code>, or <code>"none"</code> for no base map.
+<code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> defaults to <code>"none"</code> and <code><a href="hotspot_map.html">hotspot_map()</a></code> defaults to <code>"osm"</code>.
+A base map requires an internet connection unless the required tiles are
+cached. When a base map is used, the hotspot layer is drawn with
+<code>alpha = 0.75</code>, overriding any <code>alpha</code> value supplied in <code>...</code>.</p></dd>
 
 
 <dt id="arg-basemap-zoom">basemap_zoom<a class="anchor" aria-label="anchor" href="#arg-basemap-zoom"></a></dt>
@@ -88,16 +101,35 @@ value supplied in <code>...</code>.</p></dd>
 use the statement known for <code>basemap_type</code>. A non-empty string is required
 for a custom or otherwise unknown map type.</p></dd>
 
+
+<dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
+<dd><p>If <code>TRUE</code> (the default), suppress progress bars and other
+messages. If <code>FALSE</code>, show tile-download progress and other messages.</p></dd>
+
+
+<dt id="arg-mapping">mapping<a class="anchor" aria-label="anchor" href="#arg-mapping"></a></dt>
+<dd><p>For <code><a href="hotspot_map.html">hotspot_map()</a></code>, this must be <code>NULL</code>. Hotspot-result
+objects determine their own aesthetic mappings.</p></dd>
+
+
+<dt id="arg-caption">caption<a class="anchor" aria-label="anchor" href="#arg-caption"></a></dt>
+<dd><p>For <code><a href="hotspot_map.html">hotspot_map()</a></code>, additional text to display in the map
+caption, or <code>NULL</code> for no additional text. Base-map attribution and any
+explanatory caption generated by the plotting method are retained, with
+explanatory text above this caption and attribution below it.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p><code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> returns a <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> object. <code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code>
-returns a layer that can be added to a <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> object.</p>
+    <p><code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> and <code><a href="hotspot_map.html">hotspot_map()</a></code> return <a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> objects.
+<code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code> returns a layer that can be added to a
+<a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot</a> object.</p>
     </div>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
 
 <ul><li><p><code>autolayer(hspt_k)</code>: Create a ggplot layer of kernel-density values.</p></li>
+<li><p><code>hotspot_map(hspt_k)</code>: Create an automatic map of kernel-density values.</p></li>
 </ul></div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

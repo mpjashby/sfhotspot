@@ -285,9 +285,9 @@ test_that("DBSCAN results have configurable plot fills and labels", {
 
   expect_s3_class(autoplot(result), "ggplot")
   expect_equal(autolayer(result)[[1]]$data$.plot_value, result$n)
-  expect_equal(autolayer(result, fill = "prop")[[1]]$data$.plot_value,
+  expect_equal(autolayer(result, col_fill = "prop")[[1]]$data$.plot_value,
                result$prop)
-  expect_equal(autolayer(result, fill = "rank")[[1]]$data$.plot_value,
+  expect_equal(autolayer(result, col_fill = "rank")[[1]]$data$.plot_value,
                result$rank)
   expect_equal(
     autoplot(result)$scales$get_scales("fill")$palette(c(0, 1)),
@@ -295,39 +295,74 @@ test_that("DBSCAN results have configurable plot fills and labels", {
   )
 
   expect_length(autoplot(result)$layers, 1)
-  expect_equal(autolayer(result, label = "n")[[2]]$data$.plot_label,
+  expect_equal(autolayer(result, col_label = "n")[[2]]$data$.plot_label,
                as.character(result$n))
-  expect_equal(autolayer(result, label = "prop")[[2]]$data$.plot_label,
-               c("33.3%", "33.3%"))
-  expect_equal(autolayer(result, label = "rank")[[2]]$data$.plot_label,
+  expect_equal(autolayer(result, col_label = "prop")[[2]]$data$.plot_label,
+               c("33%", "33%"))
+  expect_equal(autolayer(result, col_label = "rank")[[2]]$data$.plot_label,
                c("1st", "2nd"))
   expect_equal(
-    autolayer(result, label = c("n", "prop"))[[2]]$data$.plot_label,
-    c("n = 4\n33.3%", "n = 4\n33.3%")
+    autolayer(result, col_label = c("n", "prop"))[[2]]$data$.plot_label,
+    c("n = 4\n33%", "n = 4\n33%")
   )
   expect_equal(
-    autolayer(result, label = c("rank", "n"))[[2]]$data$.plot_label,
+    autolayer(result, col_label = c("rank", "n"))[[2]]$data$.plot_label,
     c("1st\nn = 4", "2nd\nn = 4")
   )
-  expect_length(autoplot(result, label = "rank")$layers, 2)
-  expect_no_condition(ggplot2::ggplot_build(autoplot(result, label = "prop")))
+  expect_equal(
+    format_dbscan_labels(c(0.1514, 0.1171, 0.07349, 0.03697), "prop"),
+    c("15%", "12%", "7.3%", "3.7%")
+  )
+  light_label <- autolayer(result, col_label = "prop")[[2]]
+  expect_s3_class(light_label$geom, "GeomLabel")
+  expect_equal(light_label$aes_params$fill, "#FFFFFFBF")
+  expect_equal(light_label$aes_params$colour, "black")
+  expect_equal(light_label$aes_params$linewidth, 0)
 
-  outline <- autolayer(result, fill = "none")
-  expect_equal(outline[[1]]$data$.plot_value, result$n)
+  dark_plot <- autoplot(
+    result,
+    col_label = "prop",
+    basemap_type = "cartodark"
+  )
+  dark_label <- dark_plot$layers[[length(dark_plot$layers)]]
+  expect_s3_class(dark_label$geom, "GeomLabel")
+  expect_equal(dark_label$aes_params$fill, "#333333BF")
+  expect_equal(dark_label$aes_params$colour, "white")
+  expect_length(autoplot(result, col_label = "rank")$layers, 2)
+  expect_no_condition(
+    ggplot2::ggplot_build(autoplot(result, col_label = "prop"))
+  )
+
+  outline <- autolayer(result, col_fill = "none")
+  expect_false(".plot_value" %in% names(outline[[1]]$data))
   expect_true(is.na(outline[[1]]$aes_params$fill))
   expect_equal(outline[[1]]$aes_params$linewidth, 0.8)
-  expect_true("colour" %in% names(outline[[1]]$mapping))
-  outline_plot <- autoplot(result, fill = "none", label = c("rank", "n"))
+  expect_false("colour" %in% names(outline[[1]]$mapping))
+  expect_null(outline[[1]]$aes_params$colour)
+  custom_outline <- autolayer(result, col_fill = "none", colour = "red")
+  expect_equal(custom_outline[[1]]$aes_params$colour, "red")
+  static_fill <- autolayer(result, fill = "red")
+  expect_equal(static_fill[[1]]$aes_params$fill, "red")
+  outline_plot <- autoplot(
+    result,
+    col_fill = "none",
+    col_label = c("rank", "n")
+  )
   expect_null(outline_plot$scales$get_scales("fill"))
-  expect_equal(outline_plot$labels$colour, "rank")
+  expect_null(outline_plot$scales$get_scales("colour"))
+  expect_null(outline_plot$labels$colour)
+  proportion_plot <- autoplot(result, col_fill = "prop")
+  expect_equal(proportion_plot$labels$fill, "proportion")
   expect_equal(
-    outline_plot$scales$get_scales("colour")$palette(c(0, 1)),
-    c("#EFF3FF", "#084594")
+    proportion_plot$scales$get_scales("fill")$labels(
+      c(0.03, 0.06, 0.09, 0.12, 0.15)
+    ),
+    c("3%", "6%", "9%", "12%", "15%")
   )
 
   geographic <- sf::st_transform(result, 4326)
   expect_no_warning(
-    ggplot2::ggplot_build(autoplot(geographic, label = "n"))
+    ggplot2::ggplot_build(autoplot(geographic, col_label = "n"))
   )
 })
 
@@ -336,10 +371,13 @@ test_that("DBSCAN plotting arguments and columns are validated", {
     make_dbscan_points(), eps = 1, min_pts = 3, quiet = TRUE
   )
 
-  expect_error(autoplot(result, fill = "density"), "fill")
-  expect_error(autolayer(result, label = "cluster"), "label")
-  expect_error(autolayer(result, label = c("none", "n")), "cannot be combined")
-  expect_error(autolayer(result, label = c("n", "n")), "duplicated")
+  expect_error(autoplot(result, col_fill = "density"), "col_fill")
+  expect_error(autolayer(result, col_label = "cluster"), "col_label")
+  expect_error(
+    autolayer(result, col_label = c("none", "n")),
+    "cannot be combined"
+  )
+  expect_error(autolayer(result, col_label = c("n", "n")), "duplicated")
   expect_error(autolayer(result[, "geometry"]), "n")
   result$n <- as.character(result$n)
   expect_error(autoplot(result), "must be numeric")

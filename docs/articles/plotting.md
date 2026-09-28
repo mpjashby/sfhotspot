@@ -57,11 +57,21 @@ memphis_grid <- hotspot_grid(memphis_precincts_proj, cell_size = 500)
 
 > **Grid size**
 >
-> The 500-metre grid cells used in these examples are probably too
-> coarse for actual analysis, but are used here because of constraints
-> on rendering time for R package vignettes. In practice, the cell size
+> The 500-metre grid cells used in these examples may be too coarse for
+> many analytical purposes, but are used here because of constraints on
+> rendering time for R package vignettes. In practice, the cell size
 > should be chosen to suit the spatial scale of the data and the
 > research question.
+
+In each case the
+[`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
+method loads a map with no base map by default. For each of the above
+functions a corresponding
+[`hotspot_map()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_map.md)
+method exists that by-default also includes a base map with suitable
+attribution, etc.
+[`hotspot_map()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_map.md)
+can also be used for mapping ordinary `sf` objects.
 
 ## `hotspot_count()`
 
@@ -87,17 +97,18 @@ If
 is given weights, its result also contains a `sum` column. The plotting
 methods detect that column and map the weighted count instead.
 
-[`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html)
+[`hotspot_layer()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_layer.md)
 applies the same variable mapping as
 [`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html),
 but returns a layer so that it can be combined with other ggplot2
-layers. For example, a count layer can be drawn with precinct
-boundaries.
+layers. It is a student-friendly wrapper around
+[`ggplot2::autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html).
+For example, a count layer can be drawn with precinct boundaries.
 
 ``` r
 
 ggplot() +
-  autolayer(memphis_robberies_count) +
+  hotspot_layer(memphis_robberies_count) +
   geom_sf(data = memphis_precincts_proj, fill = NA, colour = "grey70") +
   scale_fill_distiller(palette = "Blues", direction = 1) +
   labs(fill = "Robbery\ncount") +
@@ -106,9 +117,9 @@ ggplot() +
 
 ![Map of Memphis robbery counts drawn with outlines of police precincts.
 Areas of greater robbery counts are darker
-blue.](plotting_files/figure-html/plot-count-autolayer-1.png)
+blue.](plotting_files/figure-html/plot-count-hotspot-layer-1.png)
 
-[`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html)
+[`hotspot_layer()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_layer.md)
 is particularly useful because it allows control of where the layer
 derived from the result produced by a `hotspot_*()` function appears in
 a stack of other spatial layers, so that (for example) it can be placed
@@ -147,21 +158,27 @@ higher density of robberies.](plotting_files/figure-html/plot-kde-1.png)
 ## `hotspot_dual_kde()`
 
 [`hotspot_dual_kde()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_dual_kde.md)
-is capable of comparing the density of two spatial datasets using
-different methods. The method used is recorded in the `method` attribute
-of the resulting object, which is then used by
+can compare the density of two spatial datasets in four ways. The method
+is recorded in the `method` attribute of the result, which
 [`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
 and
-[`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html)
-to select the appropriate plotting method. For example, the default
-method compares the *ratio* of the two densities, which is analogous to
-plotting rates.
+[`hotspot_layer()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_layer.md)
+use to select the appropriate colour scale. The following examples use
+the same robbery and population data, bandwidth and grid so that the
+effect of changing only `method` is visible.
+
+The default, `method = "ratio"`, divides the density of the first
+dataset by the density of the second. This is analogous to mapping a
+rate. The map uses a sequential scale applied directly to the ratio
+values, without treating one as a change point or transforming the
+scale.
 
 ``` r
 
 hotspot_dual_kde(
   memphis_robberies_proj, 
   memphis_population_proj, 
+  method = "ratio",
   bandwidth_adjust = 0.25,
   grid = memphis_grid
 ) |>
@@ -176,10 +193,87 @@ Memphis. Darker blue areas have a higher density of robberies relative
 to the
 population.](plotting_files/figure-html/plot-dual-kde-ratio-1.png)
 
-Ratios use a logarithmic diverging scale centred on one, so reciprocal
-values such as 0.5 and 2 receive equal visual emphasis. Logged ratios
-and differences use diverging scales centred on zero. Sums are
-non-negative and therefore use a sequential scale.
+`method = "log"` calculates the natural logarithm of the density ratio.
+Zero then represents equal densities, negative values indicate a lower
+robbery density relative to population density, and positive values
+indicate a higher relative robbery density. Although zero denotes
+equality, it is not treated as a colour-scale boundary: a continuous
+sequential scale represents progression from lower to higher logged
+ratios.
+
+``` r
+
+hotspot_dual_kde(
+  memphis_robberies_proj,
+  memphis_population_proj,
+  method = "log",
+  bandwidth_adjust = 0.25,
+  grid = memphis_grid
+) |>
+  autoplot()
+```
+
+    Bandwidth set automatically based on rule of thumb.
+    ℹ Adjusted bandwidth for `x` and `y` = 1,397 metres (0.25 * 5,588 metres).
+
+![Sequential map of the logged ratio of robbery density to population
+density in Memphis. Lighter and darker areas have lower and higher
+logged density
+ratios.](plotting_files/figure-html/plot-dual-kde-log-1.png)
+
+`method = "diff"` subtracts the density of the second dataset from that
+of the first. This is the only method for which
+[`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
+uses a diverging scale: negative and positive differences are shown on
+opposite sides of zero.
+
+``` r
+
+hotspot_dual_kde(
+  memphis_robberies_proj,
+  memphis_population_proj,
+  method = "diff",
+  bandwidth_adjust = 0.25,
+  grid = memphis_grid
+) |>
+  autoplot()
+```
+
+    Bandwidth set automatically based on rule of thumb.
+    ℹ Adjusted bandwidth for `x` and `y` = 1,397 metres (0.25 * 5,588 metres).
+
+![Diverging map of robbery density minus population density in Memphis.
+Negative and positive density differences appear on opposite sides of
+the colour
+scale.](plotting_files/figure-html/plot-dual-kde-difference-1.png)
+
+Finally, `method = "sum"` adds the two density surfaces. Since sums are
+non-negative, they are shown with a sequential scale: darker cells have
+a higher combined density.
+
+``` r
+
+hotspot_dual_kde(
+  memphis_robberies_proj,
+  memphis_population_proj,
+  method = "sum",
+  bandwidth_adjust = 0.25,
+  grid = memphis_grid
+) |>
+  autoplot()
+```
+
+    Bandwidth set automatically based on rule of thumb.
+    ℹ Adjusted bandwidth for `x` and `y` = 1,397 metres (0.25 * 5,588 metres).
+
+![Sequential map of the combined robbery and population density in
+Memphis. Darker blue cells have a higher combined
+density.](plotting_files/figure-html/plot-dual-kde-sum-1.png)
+
+Each legend uses `low` at its lower end and `high` at its upper end.
+These labels describe position within the values produced by the
+selected method; they do not imply that the four methods produce
+directly comparable numeric values.
 
 ## `hotspot_change()`
 
@@ -233,11 +327,15 @@ returns density estimates and p-values for each cell alongside the
 Getis-Ord Gi\* statistic. The plotting methods use the p-values to
 select which cells are visible, then map the density of points in each
 visible cell. The `critical_p` and `sign` arguments to
-[`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)/[`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html)
+[`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)/[`hotspot_layer()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_layer.md)
 can control this behaviour. Cells with `pvalue >= critical_p` are
 transparent. The default is `critical_p = 0.05`. The `sign` argument can
 be used to restrict the visible cells to those with significant positive
-or negative Gi\*/Gi values.
+or negative Gi\*/Gi values. When both signs are shown, a diverging scale
+distinguishes cold spots from hot spots; cold-spot densities are negated
+only for plotting. When only hot spots or only cold spots are shown, a
+medium-to-dark blue scale ensures that every significant cell remains
+visible.
 
 ``` r
 
@@ -256,7 +354,7 @@ transparent.](plotting_files/figure-html/plot-gistar-both-1.png)
 If `kde = FALSE`, the result has no `kde` column. The plotting methods
 instead map the `gistar` column using a diverging scale centred on zero.
 In this case, the `critical_p` and `sign` arguments to
-[`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)/[`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html)
+[`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)/[`hotspot_layer()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_layer.md)
 are ignored.
 
 ``` r
@@ -276,12 +374,12 @@ colours.](plotting_files/figure-html/plot-gistar-without-kde-1.png)
 returns polygons covering clusters of points identified by the DBSCAN
 algorithm. By default, the `fill` aesthetic is mapped to the `n` column,
 which counts the number of points in each cluster. This can be changed
-using the `fill` argument to
+using the `col_fill` argument to
 [`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html) or
-[`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html).
-Polygons can also be labelled using the `label` argument to
+[`hotspot_layer()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_layer.md).
+Polygons can also be labelled using the `col_label` argument to
 [`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html) or
-[`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html).
+[`hotspot_layer()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_layer.md).
 The default colour scale is sequential, with darker blue indicating
 clusters with more points.
 
@@ -292,8 +390,10 @@ memphis_robberies_proj |>
   autoplot()
 ```
 
-    Neighbourhood distance set automatically from mean point density.
-    ℹ `eps` = 381.3 metres.
+    Minimum points set automatically from the number of point coordinates.
+    ℹ `min_pts` = 48.
+    Neighbourhood distance set automatically from nearest-neighbour distances.
+    ℹ `eps` = 863.2 metres; `density_adjust` = 3.
 
 ![Map of clusters of robberies in Memphis identified by the DBSCAN
 algorithm.](plotting_files/figure-html/plot-dbscan-1.png)
@@ -317,7 +417,7 @@ square grid.
 Isobands retain information about the original `hotspot_*()` result and
 can themselves be plotted using
 [`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html) or
-[`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html).
+[`hotspot_layer()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_layer.md).
 The default palette, legend and treatment of meaningful values such as
 zero therefore depend on the function that produced the original grid.
 For example, KDE isobands use a sequential scale:
@@ -342,7 +442,7 @@ density.](plotting_files/figure-html/plot-kde-isobands-1.png)
 [`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
 returns an ordinary ggplot object, so scales, labels, themes, and other
 layers can be added or replaced with ggplot2.
-[`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html)
+[`hotspot_layer()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_layer.md)
 is useful when the sfhotspot result is one component of a larger map.
 See the individual method help pages for the arguments accepted by each
 method.
@@ -365,4 +465,7 @@ autoplot(
 The default remains `basemap_type = "none"`, so ordinary plots never
 download tiles. Known map types receive an attribution caption
 automatically. For a custom or new map type, supply the provider’s
-required statement explicitly using `basemap_attribution`.
+required statement explicitly using `basemap_attribution`. Use `caption`
+to add contextual information such as the map author, date or notes.
+This text appears above any explanatory caption and base-map
+attribution, which are retained automatically.

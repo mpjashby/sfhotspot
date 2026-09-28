@@ -128,9 +128,12 @@ selected parameters and geometry preparation.</p></dd>
 cluster. It contains <code>cluster</code>, the original DBSCAN cluster identifier;
 <code>rank</code>, the priority rank; <code>n</code>, the number of input point coordinates
 intersecting the polygon; <code>prop</code>, <code>n</code> as a proportion of all input point
-coordinates; and <code>geometry</code>. Since cluster polygons may overlap, the sum
-of <code>prop</code> can exceed one. Ranking is by decreasing <code>n</code>, then increasing
-polygon area, then increasing cluster identifier.</p>
+coordinates; <code>prop_area</code>, the polygon area as a proportion of the area
+covered by a hull of the complete dataset; and <code>geometry</code>. The
+complete-dataset hull uses the same <code>hull</code>, <code>hull_ratio</code>, buffering and
+clipping rules as the cluster hulls. Since cluster polygons may overlap,
+the sums of <code>prop</code> and <code>prop_area</code> can exceed one. Ranking is by decreasing
+<code>n</code>, then increasing polygon area, then increasing cluster identifier.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -184,17 +187,17 @@ for their application.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Unit of measurement: metre.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Neighbourhood distance set automatically from nearest-neighbour distances.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> `eps` = 2,077 metres; `density_adjust` = 2.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 3 features and 4 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 3 features and 5 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: POLYGON</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -90.06077 ymin: 35.02829 xmax: -89.88925 ymax: 35.2057</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geodetic CRS:  WGS 84</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   cluster  rank     n  prop                                             geometry</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">*</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                                        <span style="color: #949494; font-style: italic;">&lt;POLYGON [°]&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>       2     1    40 0.194 ((-90.05603 35.14974, -90.05569 35.15071, -90.05529…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>       1     2    31 0.150 ((-89.95894 35.05351, -89.95971 35.05425, -89.96043…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>       3     3    30 0.146 ((-89.96698 35.18006, -89.96726 35.181, -89.96749 3…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   cluster  rank     n  prop prop_area                                   geometry</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">*</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                              <span style="color: #949494; font-style: italic;">&lt;POLYGON [°]&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>       2     1    40 0.194    0.089<span style="text-decoration: underline;">7</span> ((-90.05603 35.14974, -90.05569 35.15071,…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>       1     2    31 0.150    0.079<span style="text-decoration: underline;">1</span> ((-89.95894 35.05351, -89.95971 35.05425,…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>       3     3    30 0.146    0.083<span style="text-decoration: underline;">6</span> ((-89.96698 35.18006, -89.96726 35.181, -…</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">hotspot_dbscan</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">memphis_robberies_jan</span>,</span></span>
@@ -208,15 +211,15 @@ for their application.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Unit of measurement: metre.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Neighbourhood distance set automatically from nearest-neighbour distances.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> `eps` = 1,696 metres; `density_adjust` = 3.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 1 feature and 4 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 1 feature and 5 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: POLYGON</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -89.9706 ymin: 35.14672 xmax: -89.8954 ymax: 35.20228</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geodetic CRS:  WGS 84</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 5</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   cluster  rank     n  prop                                             geometry</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">*</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                                        <span style="color: #949494; font-style: italic;">&lt;POLYGON [°]&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>       1     1    26 0.126 ((-89.92806 35.14692, -89.92904 35.14681, -89.93002…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   cluster  rank     n  prop prop_area                                   geometry</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">*</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                              <span style="color: #949494; font-style: italic;">&lt;POLYGON [°]&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>       1     1    26 0.126    0.054<span style="text-decoration: underline;">6</span> ((-89.92806 35.14692, -89.92904 35.14681,…</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

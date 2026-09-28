@@ -42,10 +42,10 @@ The results produced by
 [`hotspot_classify()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_classify.md)
 and
 [`hotspot_dbscan()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_dbscan.md)
-can be easily plotted using included methods
-for[`autoplot()`](https://ggplot2.tidyverse.org/reference/autoplot.html)
-and
-[`autolayer()`](https://ggplot2.tidyverse.org/reference/autolayer.html).
+can be easily plotted using
+[`hotspot_map()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_map.md),
+or combined with other ggplot2 layers using
+[`hotspot_layer()`](https://pkgs.lesscrime.info/sfhotspot/reference/hotspot_layer.md).
 
 There are also included datasets:
 

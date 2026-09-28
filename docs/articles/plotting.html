@@ -159,9 +159,10 @@
 <div>
 <blockquote>
 <p><strong>Grid size</strong></p>
-<p>The 500-metre grid cells used in these examples are probably too coarse for actual analysis, but are used here because of constraints on rendering time for R package vignettes. In practice, the cell size should be chosen to suit the spatial scale of the data and the research question.</p>
+<p>The 500-metre grid cells used in these examples may be too coarse for many analytical purposes, but are used here because of constraints on rendering time for R package vignettes. In practice, the cell size should be chosen to suit the spatial scale of the data and the research question.</p>
 </blockquote>
 </div>
+<p>In each case the <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> method loads a map with no base map by default. For each of the above functions a corresponding <code><a href="../reference/hotspot_map.html">hotspot_map()</a></code> method exists that by-default also includes a base map with suitable attribution, etc. <code><a href="../reference/hotspot_map.html">hotspot_map()</a></code> can also be used for mapping ordinary <code>sf</code> objects.</p>
 <section class="level2"><h2 id="hotspot_count">
 <code>hotspot_count()</code><a class="anchor" aria-label="anchor" href="#hotspot_count"></a>
 </h2>
@@ -182,23 +183,23 @@
 </div>
 </div>
 <p>If <code><a href="../reference/hotspot_count.html">hotspot_count()</a></code> is given weights, its result also contains a <code>sum</code> column. The plotting methods detect that column and map the weighted count instead.</p>
-<p><code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code> applies the same variable mapping as <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code>, but returns a layer so that it can be combined with other ggplot2 layers. For example, a count layer can be drawn with precinct boundaries.</p>
+<p><code><a href="../reference/hotspot_layer.html">hotspot_layer()</a></code> applies the same variable mapping as <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code>, but returns a layer so that it can be combined with other ggplot2 layers. It is a student-friendly wrapper around <code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">ggplot2::autolayer()</a></code>. For example, a count layer can be drawn with precinct boundaries.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer</a></span><span class="op">(</span><span class="va">memphis_robberies_count</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/hotspot_layer.html">hotspot_layer</a></span><span class="op">(</span><span class="va">memphis_robberies_count</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">memphis_precincts_proj</span>, fill <span class="op">=</span> <span class="cn">NA</span>, colour <span class="op">=</span> <span class="st">"grey70"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Blues"</span>, direction <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"Robbery\ncount"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
-<figure><p><img src="plotting_files/figure-html/plot-count-autolayer-1.png" alt="Map of Memphis robbery counts drawn with outlines of police precincts. Areas of greater robbery counts are darker blue." width="672"></p>
+<figure><p><img src="plotting_files/figure-html/plot-count-hotspot-layer-1.png" alt="Map of Memphis robbery counts drawn with outlines of police precincts. Areas of greater robbery counts are darker blue." width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p><code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code> is particularly useful because it allows control of where the layer derived from the result produced by a <code>hotspot_*()</code> function appears in a stack of other spatial layers, so that (for example) it can be placed on top of a base map.</p>
+<p><code><a href="../reference/hotspot_layer.html">hotspot_layer()</a></code> is particularly useful because it allows control of where the layer derived from the result produced by a <code>hotspot_*()</code> function appears in a stack of other spatial layers, so that (for example) it can be placed on top of a base map.</p>
 </section><section class="level2"><h2 id="hotspot_kde">
 <code>hotspot_kde()</code><a class="anchor" aria-label="anchor" href="#hotspot_kde"></a>
 </h2>
@@ -224,12 +225,14 @@ Removed 179 rows (5.0% of original rows) from `data`</code></pre>
 </section><section class="level2"><h2 id="hotspot_dual_kde">
 <code>hotspot_dual_kde()</code><a class="anchor" aria-label="anchor" href="#hotspot_dual_kde"></a>
 </h2>
-<p><code><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde()</a></code> is capable of comparing the density of two spatial datasets using different methods. The method used is recorded in the <code>method</code> attribute of the resulting object, which is then used by <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> and <code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code> to select the appropriate plotting method. For example, the default method compares the <em>ratio</em> of the two densities, which is analogous to plotting rates.</p>
+<p><code><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde()</a></code> can compare the density of two spatial datasets in four ways. The method is recorded in the <code>method</code> attribute of the result, which <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> and <code><a href="../reference/hotspot_layer.html">hotspot_layer()</a></code> use to select the appropriate colour scale. The following examples use the same robbery and population data, bandwidth and grid so that the effect of changing only <code>method</code> is visible.</p>
+<p>The default, <code>method = "ratio"</code>, divides the density of the first dataset by the density of the second. This is analogous to mapping a rate. The map uses a sequential scale applied directly to the ratio values, without treating one as a change point or transforming the scale.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde</a></span><span class="op">(</span></span>
 <span>  <span class="va">memphis_robberies_proj</span>, </span>
 <span>  <span class="va">memphis_population_proj</span>, </span>
+<span>  method <span class="op">=</span> <span class="st">"ratio"</span>,</span>
 <span>  bandwidth_adjust <span class="op">=</span> <span class="fl">0.25</span>,</span>
 <span>  grid <span class="op">=</span> <span class="va">memphis_grid</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -245,13 +248,79 @@ Removed 179 rows (5.0% of original rows) from `data`</code></pre>
 </div>
 </div>
 </div>
-<p>Ratios use a logarithmic diverging scale centred on one, so reciprocal values such as 0.5 and 2 receive equal visual emphasis. Logged ratios and differences use diverging scales centred on zero. Sums are non-negative and therefore use a sequential scale.</p>
+<p><code>method = "log"</code> calculates the natural logarithm of the density ratio. Zero then represents equal densities, negative values indicate a lower robbery density relative to population density, and positive values indicate a higher relative robbery density. Although zero denotes equality, it is not treated as a colour-scale boundary: a continuous sequential scale represents progression from lower to higher logged ratios.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde</a></span><span class="op">(</span></span>
+<span>  <span class="va">memphis_robberies_proj</span>,</span>
+<span>  <span class="va">memphis_population_proj</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"log"</span>,</span>
+<span>  bandwidth_adjust <span class="op">=</span> <span class="fl">0.25</span>,</span>
+<span>  grid <span class="op">=</span> <span class="va">memphis_grid</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Bandwidth set automatically based on rule of thumb.
+ℹ Adjusted bandwidth for `x` and `y` = 1,397 metres (0.25 * 5,588 metres).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="plotting_files/figure-html/plot-dual-kde-log-1.png" alt="Sequential map of the logged ratio of robbery density to population density in Memphis. Lighter and darker areas have lower and higher logged density ratios." width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><code>method = "diff"</code> subtracts the density of the second dataset from that of the first. This is the only method for which <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> uses a diverging scale: negative and positive differences are shown on opposite sides of zero.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde</a></span><span class="op">(</span></span>
+<span>  <span class="va">memphis_robberies_proj</span>,</span>
+<span>  <span class="va">memphis_population_proj</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"diff"</span>,</span>
+<span>  bandwidth_adjust <span class="op">=</span> <span class="fl">0.25</span>,</span>
+<span>  grid <span class="op">=</span> <span class="va">memphis_grid</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Bandwidth set automatically based on rule of thumb.
+ℹ Adjusted bandwidth for `x` and `y` = 1,397 metres (0.25 * 5,588 metres).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="plotting_files/figure-html/plot-dual-kde-difference-1.png" alt="Diverging map of robbery density minus population density in Memphis. Negative and positive density differences appear on opposite sides of the colour scale." width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Finally, <code>method = "sum"</code> adds the two density surfaces. Since sums are non-negative, they are shown with a sequential scale: darker cells have a higher combined density.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde</a></span><span class="op">(</span></span>
+<span>  <span class="va">memphis_robberies_proj</span>,</span>
+<span>  <span class="va">memphis_population_proj</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"sum"</span>,</span>
+<span>  bandwidth_adjust <span class="op">=</span> <span class="fl">0.25</span>,</span>
+<span>  grid <span class="op">=</span> <span class="va">memphis_grid</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Bandwidth set automatically based on rule of thumb.
+ℹ Adjusted bandwidth for `x` and `y` = 1,397 metres (0.25 * 5,588 metres).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="plotting_files/figure-html/plot-dual-kde-sum-1.png" alt="Sequential map of the combined robbery and population density in Memphis. Darker blue cells have a higher combined density." width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Each legend uses <code>low</code> at its lower end and <code>high</code> at its upper end. These labels describe position within the values produced by the selected method; they do not imply that the four methods produce directly comparable numeric values.</p>
 </section><section class="level2"><h2 id="hotspot_change">
 <code>hotspot_change()</code><a class="anchor" aria-label="anchor" href="#hotspot_change"></a>
 </h2>
 <p><code><a href="../reference/hotspot_change.html">hotspot_change()</a></code> returns the differences between the number of points in each area in two time periods. Its scale is symmetric around zero so increases and decreases of the same size receive equal visual emphasis.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">memphis_robberies_proj</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/hotspot_change.html">hotspot_change</a></span><span class="op">(</span></span>
 <span>    boundary <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2019-07-01"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span>,</span>
@@ -270,7 +339,7 @@ Removed 179 rows (5.0% of original rows) from `data`</code></pre>
 </h2>
 <p><code><a href="../reference/hotspot_classify.html">hotspot_classify()</a></code> categorises grid cells based on their hotspot and coldspot status over time. The default palette uses warm hues for hotspot categories, cool hues for coldspot categories, purple for mixed results, and grey for no pattern.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">memphis_robberies_proj</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/hotspot_classify.html">hotspot_classify</a></span><span class="op">(</span>period <span class="op">=</span> <span class="st">"1 month"</span>, grid <span class="op">=</span> <span class="va">memphis_grid</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -289,9 +358,9 @@ Removed 179 rows (5.0% of original rows) from `data`</code></pre>
 </section><section class="level2"><h2 id="hotspot_gistar">
 <code>hotspot_gistar()</code><a class="anchor" aria-label="anchor" href="#hotspot_gistar"></a>
 </h2>
-<p>By default, <code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> returns density estimates and p-values for each cell alongside the Getis-Ord Gi* statistic. The plotting methods use the p-values to select which cells are visible, then map the density of points in each visible cell. The <code>critical_p</code> and <code>sign</code> arguments to <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code>/<code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code> can control this behaviour. Cells with <code>pvalue &gt;= critical_p</code> are transparent. The default is <code>critical_p = 0.05</code>. The <code>sign</code> argument can be used to restrict the visible cells to those with significant positive or negative Gi*/Gi values.</p>
+<p>By default, <code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> returns density estimates and p-values for each cell alongside the Getis-Ord Gi* statistic. The plotting methods use the p-values to select which cells are visible, then map the density of points in each visible cell. The <code>critical_p</code> and <code>sign</code> arguments to <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code>/<code><a href="../reference/hotspot_layer.html">hotspot_layer()</a></code> can control this behaviour. Cells with <code>pvalue &gt;= critical_p</code> are transparent. The default is <code>critical_p = 0.05</code>. The <code>sign</code> argument can be used to restrict the visible cells to those with significant positive or negative Gi*/Gi values. When both signs are shown, a diverging scale distinguishes cold spots from hot spots; cold-spot densities are negated only for plotting. When only hot spots or only cold spots are shown, a medium-to-dark blue scale ensures that every significant cell remains visible.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">memphis_robberies_proj</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/hotspot_gistar.html">hotspot_gistar</a></span><span class="op">(</span>grid <span class="op">=</span> <span class="va">memphis_grid</span>, bandwidth_adjust <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -306,9 +375,9 @@ Removed 179 rows (5.0% of original rows) from `data`</code></pre>
 </div>
 </div>
 </div>
-<p>If <code>kde = FALSE</code>, the result has no <code>kde</code> column. The plotting methods instead map the <code>gistar</code> column using a diverging scale centred on zero. In this case, the <code>critical_p</code> and <code>sign</code> arguments to <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code>/<code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code> are ignored.</p>
+<p>If <code>kde = FALSE</code>, the result has no <code>kde</code> column. The plotting methods instead map the <code>gistar</code> column using a diverging scale centred on zero. In this case, the <code>critical_p</code> and <code>sign</code> arguments to <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code>/<code><a href="../reference/hotspot_layer.html">hotspot_layer()</a></code> are ignored.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">memphis_robberies_proj</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/hotspot_gistar.html">hotspot_gistar</a></span><span class="op">(</span>grid <span class="op">=</span> <span class="va">memphis_grid</span>, bandwidth_adjust <span class="op">=</span> <span class="fl">0.25</span>, kde <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -322,15 +391,17 @@ Removed 179 rows (5.0% of original rows) from `data`</code></pre>
 </section><section class="level2"><h2 id="hotspot_dbscan">
 <code>hotspot_dbscan()</code><a class="anchor" aria-label="anchor" href="#hotspot_dbscan"></a>
 </h2>
-<p><code><a href="../reference/hotspot_dbscan.html">hotspot_dbscan()</a></code> returns polygons covering clusters of points identified by the DBSCAN algorithm. By default, the <code>fill</code> aesthetic is mapped to the <code>n</code> column, which counts the number of points in each cluster. This can be changed using the <code>fill</code> argument to <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> or <code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code>. Polygons can also be labelled using the <code>label</code> argument to <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> or <code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code>. The default colour scale is sequential, with darker blue indicating clusters with more points.</p>
+<p><code><a href="../reference/hotspot_dbscan.html">hotspot_dbscan()</a></code> returns polygons covering clusters of points identified by the DBSCAN algorithm. By default, the <code>fill</code> aesthetic is mapped to the <code>n</code> column, which counts the number of points in each cluster. This can be changed using the <code>col_fill</code> argument to <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> or <code><a href="../reference/hotspot_layer.html">hotspot_layer()</a></code>. Polygons can also be labelled using the <code>col_label</code> argument to <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> or <code><a href="../reference/hotspot_layer.html">hotspot_layer()</a></code>. The default colour scale is sequential, with darker blue indicating clusters with more points.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">memphis_robberies_proj</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/hotspot_dbscan.html">hotspot_dbscan</a></span><span class="op">(</span>density_adjust <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Neighbourhood distance set automatically from mean point density.
-ℹ `eps` = 381.3 metres.</code></pre>
+<pre><code>Minimum points set automatically from the number of point coordinates.
+ℹ `min_pts` = 48.
+Neighbourhood distance set automatically from nearest-neighbour distances.
+ℹ `eps` = 863.2 metres; `density_adjust` = 3.</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
@@ -342,9 +413,9 @@ Removed 179 rows (5.0% of original rows) from `data`</code></pre>
 </section><section class="level2"><h2 id="isobands">Isobands<a class="anchor" aria-label="anchor" href="#isobands"></a>
 </h2>
 <p>The numeric grid outputs from <code><a href="../reference/hotspot_count.html">hotspot_count()</a></code>, <code><a href="../reference/hotspot_kde.html">hotspot_kde()</a></code>, <code><a href="../reference/hotspot_dual_kde.html">hotspot_dual_kde()</a></code>, <code><a href="../reference/hotspot_change.html">hotspot_change()</a></code> and <code><a href="../reference/hotspot_gistar.html">hotspot_gistar()</a></code> can be generalised into isobands using <code><a href="../reference/hotspot_isoband.html">hotspot_isoband()</a></code>. The categorical output from <code><a href="../reference/hotspot_classify.html">hotspot_classify()</a></code> cannot be converted because isobands require numeric values on a regular square grid.</p>
-<p>Isobands retain information about the original <code>hotspot_*()</code> result and can themselves be plotted using <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> or <code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code>. The default palette, legend and treatment of meaningful values such as zero therefore depend on the function that produced the original grid. For example, KDE isobands use a sequential scale:</p>
+<p>Isobands retain information about the original <code>hotspot_*()</code> result and can themselves be plotted using <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> or <code><a href="../reference/hotspot_layer.html">hotspot_layer()</a></code>. The default palette, legend and treatment of meaningful values such as zero therefore depend on the function that produced the original grid. For example, KDE isobands use a sequential scale:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">memphis_robberies_proj</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/hotspot_kde.html">hotspot_kde</a></span><span class="op">(</span>bandwidth_adjust <span class="op">=</span> <span class="fl">0.25</span>, grid <span class="op">=</span> <span class="va">memphis_grid</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/hotspot_isoband.html">hotspot_isoband</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -362,17 +433,17 @@ Removed 179 rows (5.0% of original rows) from `data`</code></pre>
 </div>
 </section><section class="level2"><h2 id="customising-plots">Customising plots<a class="anchor" aria-label="anchor" href="#customising-plots"></a>
 </h2>
-<p><code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> returns an ordinary ggplot object, so scales, labels, themes, and other layers can be added or replaced with ggplot2. <code><a href="https://ggplot2.tidyverse.org/reference/autolayer.html" class="external-link">autolayer()</a></code> is useful when the sfhotspot result is one component of a larger map. See the individual method help pages for the arguments accepted by each method.</p>
+<p><code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> returns an ordinary ggplot object, so scales, labels, themes, and other layers can be added or replaced with ggplot2. <code><a href="../reference/hotspot_layer.html">hotspot_layer()</a></code> is useful when the sfhotspot result is one component of a larger map. See the individual method help pages for the arguments accepted by each method.</p>
 <p>An optional map-tile background can provide geographic context. This requires the suggested ggspatial package and an internet connection unless the tiles are already cached. When a base map is requested, the hotspot layer is drawn with an alpha of 0.75 so that the background remains visible.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span></span>
 <span>  <span class="va">memphis_robberies_count</span>,</span>
 <span>  basemap_type <span class="op">=</span> <span class="st">"osm"</span>,</span>
 <span>  basemap_zoom <span class="op">=</span> <span class="fl">12</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
-<p>The default remains <code>basemap_type = "none"</code>, so ordinary plots never download tiles. Known map types receive an attribution caption automatically. For a custom or new map type, supply the provider’s required statement explicitly using <code>basemap_attribution</code>.</p>
+<p>The default remains <code>basemap_type = "none"</code>, so ordinary plots never download tiles. Known map types receive an attribution caption automatically. For a custom or new map type, supply the provider’s required statement explicitly using <code>basemap_attribution</code>. Use <code>caption</code> to add contextual information such as the map author, date or notes. This text appears above any explanatory caption and base-map attribution, which are retained automatically.</p>
 </section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);

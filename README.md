@@ -51,7 +51,8 @@ arguments to each function.
 The results produced by `hotspot_count()`, `hotspot_change()`,
 `hotspot_kde()`, `hotspot_dual_kde()`, `hotspot_gistar()`,
 `hotspot_classify()` and `hotspot_dbscan()` can be easily plotted using
-included methods for`autoplot()` and `autolayer()`.
+`hotspot_map()`, or combined with other ggplot2 layers using
+`hotspot_layer()`.
 
 There are also included datasets:
 

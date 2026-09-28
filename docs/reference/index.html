@@ -133,7 +133,7 @@
       </dl></div><div class="section level2">
       <h2 id="plotting-results">Plotting results<a class="anchor" aria-label="anchor" href="#plotting-results"></a></h2>
 
-      <div class="section-desc"><p>These methods for the <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> function automatically produce charts that are tailored to displaying the results produced by one of the <code>hotspot_*()</code> family of functions. <code><a href="../reference/hotspot_isoband.html">hotspot_isoband()</a></code> generalises the polygons produced by the hotspot-analysis functions into polygons, which can sometimes be preferable for plotting.</p></div>
+      <div class="section-desc"><p><code><a href="../reference/hotspot_map.html">hotspot_map()</a></code> creates complete maps, while <code><a href="../reference/hotspot_layer.html">hotspot_layer()</a></code> creates layers that can be combined with other ggplot2 layers. The <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot()</a></code> methods automatically produce charts tailored to the results from the <code>hotspot_*()</code> family of functions. <code><a href="../reference/hotspot_isoband.html">hotspot_isoband()</a></code> generalises the polygons produced by the hotspot-analysis functions into polygons, which can sometimes be preferable for plotting.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -142,6 +142,20 @@
 
       <dl><dt>
 
+          <code><a href="hotspot_map.html">hotspot_map()</a></code>
+
+        </dt>
+        <dd>Create an automatic map</dd>
+
+        <dt>
+
+          <code><a href="hotspot_layer.html">hotspot_layer()</a></code>
+
+        </dt>
+        <dd>Create a ggplot layer from hotspot results</dd>
+
+        <dt>
+
           <code><a href="hotspot_isoband.html">hotspot_isoband()</a></code>
 
         </dt>
@@ -149,56 +163,56 @@
 
         <dt>
 
-          <code><a href="autoplot.hspt_c.html">autoplot(<i>&lt;hspt_c&gt;</i>)</a></code> <code><a href="autoplot.hspt_c.html">autolayer(<i>&lt;hspt_c&gt;</i>)</a></code>
+          <code><a href="autoplot.hspt_c.html">autoplot(<i>&lt;hspt_c&gt;</i>)</a></code> <code><a href="autoplot.hspt_c.html">autolayer(<i>&lt;hspt_c&gt;</i>)</a></code> <code><a href="autoplot.hspt_c.html">hotspot_map(<i>&lt;hspt_c&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot map of hotspot classifications</dd>
 
         <dt>
 
-          <code><a href="autoplot.hspt_d.html">autoplot(<i>&lt;hspt_d&gt;</i>)</a></code> <code><a href="autoplot.hspt_d.html">autolayer(<i>&lt;hspt_d&gt;</i>)</a></code>
+          <code><a href="autoplot.hspt_d.html">autoplot(<i>&lt;hspt_d&gt;</i>)</a></code> <code><a href="autoplot.hspt_d.html">autolayer(<i>&lt;hspt_d&gt;</i>)</a></code> <code><a href="autoplot.hspt_d.html">hotspot_map(<i>&lt;hspt_d&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot map of changes in grid counts</dd>
 
         <dt>
 
-          <code><a href="autoplot.hspt_dk.html">autoplot(<i>&lt;hspt_dk&gt;</i>)</a></code> <code><a href="autoplot.hspt_dk.html">autolayer(<i>&lt;hspt_dk&gt;</i>)</a></code>
+          <code><a href="autoplot.hspt_dk.html">autoplot(<i>&lt;hspt_dk&gt;</i>)</a></code> <code><a href="autoplot.hspt_dk.html">autolayer(<i>&lt;hspt_dk&gt;</i>)</a></code> <code><a href="autoplot.hspt_dk.html">hotspot_map(<i>&lt;hspt_dk&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot map of dual kernel-density values</dd>
 
         <dt>
 
-          <code><a href="autoplot.hspt_g.html">autoplot(<i>&lt;hspt_g&gt;</i>)</a></code> <code><a href="autoplot.hspt_g.html">autolayer(<i>&lt;hspt_g&gt;</i>)</a></code>
+          <code><a href="autoplot.hspt_g.html">autoplot(<i>&lt;hspt_g&gt;</i>)</a></code> <code><a href="autoplot.hspt_g.html">autolayer(<i>&lt;hspt_g&gt;</i>)</a></code> <code><a href="autoplot.hspt_g.html">hotspot_map(<i>&lt;hspt_g&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot map of Getis-Ord Gi* results</dd>
 
         <dt>
 
-          <code><a href="autoplot.hspt_ib.html">autoplot(<i>&lt;hspt_ib&gt;</i>)</a></code> <code><a href="autoplot.hspt_ib.html">autolayer(<i>&lt;hspt_ib&gt;</i>)</a></code>
+          <code><a href="autoplot.hspt_ib.html">autoplot(<i>&lt;hspt_ib&gt;</i>)</a></code> <code><a href="autoplot.hspt_ib.html">autolayer(<i>&lt;hspt_ib&gt;</i>)</a></code> <code><a href="autoplot.hspt_ib.html">hotspot_map(<i>&lt;hspt_ib&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot isobands</dd>
 
         <dt>
 
-          <code><a href="autoplot.hspt_k.html">autoplot(<i>&lt;hspt_k&gt;</i>)</a></code> <code><a href="autoplot.hspt_k.html">autolayer(<i>&lt;hspt_k&gt;</i>)</a></code>
+          <code><a href="autoplot.hspt_k.html">autoplot(<i>&lt;hspt_k&gt;</i>)</a></code> <code><a href="autoplot.hspt_k.html">autolayer(<i>&lt;hspt_k&gt;</i>)</a></code> <code><a href="autoplot.hspt_k.html">hotspot_map(<i>&lt;hspt_k&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot map of kernel-density values</dd>
 
         <dt>
 
-          <code><a href="autoplot.hspt_n.html">autoplot(<i>&lt;hspt_n&gt;</i>)</a></code> <code><a href="autoplot.hspt_n.html">autolayer(<i>&lt;hspt_n&gt;</i>)</a></code>
+          <code><a href="autoplot.hspt_n.html">autoplot(<i>&lt;hspt_n&gt;</i>)</a></code> <code><a href="autoplot.hspt_n.html">autolayer(<i>&lt;hspt_n&gt;</i>)</a></code> <code><a href="autoplot.hspt_n.html">hotspot_map(<i>&lt;hspt_n&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot map of grid counts</dd>
 
         <dt>
 
-          <code><a href="autoplot.hspt_s.html">autoplot(<i>&lt;hspt_s&gt;</i>)</a></code> <code><a href="autoplot.hspt_s.html">autolayer(<i>&lt;hspt_s&gt;</i>)</a></code>
+          <code><a href="autoplot.hspt_s.html">autoplot(<i>&lt;hspt_s&gt;</i>)</a></code> <code><a href="autoplot.hspt_s.html">autolayer(<i>&lt;hspt_s&gt;</i>)</a></code> <code><a href="autoplot.hspt_s.html">hotspot_map(<i>&lt;hspt_s&gt;</i>)</a></code>
 
         </dt>
         <dd>Plot DBSCAN hotspot clusters</dd>

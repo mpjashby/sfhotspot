@@ -2,7 +2,7 @@
 #'
 #' Generalise values in a regular square grid into polygon bands. The result is
 #' an [sf::sf] object with one row for each non-empty band and can be plotted
-#' with [autoplot()] or [autolayer()].
+#' with [autoplot()] or [hotspot_layer()].
 #'
 #' @param data An [sf::sf] object containing a regular square grid and at least
 #'   one numeric column, typically produced by a `hotspot_*()` function.
@@ -582,16 +582,10 @@ isoband_display_labels <- function(lower, upper) {
   boundaries <- sort(unique(c(lower, upper)))
   finite_boundaries <- boundaries[is.finite(boundaries)]
   non_zero <- abs(finite_boundaries[finite_boundaries != 0])
-  scientific <- any(non_zero < 1e-4 | non_zero >= 1e6)
+  use_si <- any(non_zero < 1e-4 | non_zero >= 1e3)
   for (digits in 2:17) {
-    if (scientific) {
-      decimal_places <- digits - 1L
-      scientific_values <- finite_boundaries
-      scientific_values[scientific_values == 0] <- 0
-      formatted <- sprintf(
-        paste0("%.", decimal_places, "e"),
-        scientific_values
-      )
+    if (use_si) {
+      formatted <- label_iso(finite_boundaries, digits = digits)
     } else {
       boundary_magnitudes <- floor(log10(non_zero))
       decimal_places <- max(0, digits - 1L - boundary_magnitudes)

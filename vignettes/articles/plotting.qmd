@@ -43,8 +43,11 @@ memphis_grid <- hotspot_grid(memphis_precincts_proj, cell_size = 500)
 
 
 ::: {.callout-note title="Grid size"}
-The 500-metre grid cells used in these examples are probably too coarse for actual analysis, but are used here because of constraints on rendering time for R package vignettes. In practice, the cell size should be chosen to suit the spatial scale of the data and the research question.
+The 500-metre grid cells used in these examples may be too coarse for many analytical purposes, but are used here because of constraints on rendering time for R package vignettes. In practice, the cell size should be chosen to suit the spatial scale of the data and the research question.
 :::
+
+
+In each case the `autoplot()` method loads a map with no base map by default. For each of the above functions a corresponding `hotspot_map()` method exists that by-default also includes a base map with suitable attribution, etc. `hotspot_map()` can also be used for mapping ordinary `sf` objects.
 
 
 ## `hotspot_count()`
@@ -66,23 +69,29 @@ autoplot(memphis_robberies_count)
 
 If `hotspot_count()` is given weights, its result also contains a `sum` column. The plotting methods detect that column and map the weighted count instead.
 
-`autolayer()` applies the same variable mapping as `autoplot()`, but returns a layer so that it can be combined with other ggplot2 layers. For example, a count layer can be drawn with precinct boundaries. 
+`hotspot_layer()` applies the same variable mapping as `autoplot()`, but returns
+a layer so that it can be combined with other ggplot2 layers. It is a
+student-friendly wrapper around `ggplot2::autolayer()`. For example, a count
+layer can be drawn with precinct boundaries.
 
 ```{r}
-#| label: plot-count-autolayer
+#| label: plot-count-hotspot-layer
 #| fig-alt: >
 #|   Map of Memphis robbery counts drawn with outlines of police precincts.
 #|   Areas of greater robbery counts are darker blue.
 
 ggplot() +
-  autolayer(memphis_robberies_count) +
+  hotspot_layer(memphis_robberies_count) +
   geom_sf(data = memphis_precincts_proj, fill = NA, colour = "grey70") +
   scale_fill_distiller(palette = "Blues", direction = 1) +
   labs(fill = "Robbery\ncount") +
   theme_void()
 ```
 
-`autolayer()` is particularly useful because it allows control of where the layer derived from the result produced by a `hotspot_*()` function appears in a stack of other spatial layers, so that (for example) it can be placed on top of a base map.
+`hotspot_layer()` is particularly useful because it allows control of where the
+layer derived from the result produced by a `hotspot_*()` function appears in a
+stack of other spatial layers, so that (for example) it can be placed on top of
+a base map.
 
 
 ## `hotspot_kde()`
@@ -104,7 +113,16 @@ memphis_robberies_proj |>
 
 ## `hotspot_dual_kde()`
 
-`hotspot_dual_kde()` is capable of comparing the density of two spatial datasets using different methods. The method used is recorded in the `method` attribute of the resulting object, which is then used by `autoplot()` and `autolayer()` to select the appropriate plotting method. For example, the default method compares the _ratio_ of the two densities, which is analogous to plotting rates.
+`hotspot_dual_kde()` can compare the density of two spatial datasets in four
+ways. The method is recorded in the `method` attribute of the result, which
+`autoplot()` and `hotspot_layer()` use to select the appropriate colour scale. The
+following examples use the same robbery and population data, bandwidth and grid
+so that the effect of changing only `method` is visible.
+
+The default, `method = "ratio"`, divides the density of the first dataset by
+the density of the second. This is analogous to mapping a rate. The map uses a
+sequential scale applied directly to the ratio values, without treating one as
+a change point or transforming the scale.
 
 ```{r}
 #| label: plot-dual-kde-ratio
@@ -117,16 +135,85 @@ memphis_robberies_proj |>
 hotspot_dual_kde(
   memphis_robberies_proj, 
   memphis_population_proj, 
+  method = "ratio",
   bandwidth_adjust = 0.25,
   grid = memphis_grid
 ) |>
   autoplot()
 ```
 
-Ratios use a logarithmic diverging scale centred on one, so reciprocal values
-such as 0.5 and 2 receive equal visual emphasis. Logged ratios and differences
-use diverging scales centred on zero. Sums are non-negative and therefore use a
-sequential scale.
+`method = "log"` calculates the natural logarithm of the density ratio. Zero
+then represents equal densities, negative values indicate a lower robbery
+density relative to population density, and positive values indicate a higher
+relative robbery density. Although zero denotes equality, it is not treated as
+a colour-scale boundary: a continuous sequential scale represents progression
+from lower to higher logged ratios.
+
+```{r}
+#| label: plot-dual-kde-log
+#| cache: true
+#| fig-alt: >
+#|   Sequential map of the logged ratio of robbery density to population
+#|   density in Memphis. Lighter and darker areas have lower and higher logged
+#|   density ratios.
+
+hotspot_dual_kde(
+  memphis_robberies_proj,
+  memphis_population_proj,
+  method = "log",
+  bandwidth_adjust = 0.25,
+  grid = memphis_grid
+) |>
+  autoplot()
+```
+
+`method = "diff"` subtracts the density of the second dataset from that of the
+first. This is the only method for which `autoplot()` uses a diverging scale:
+negative and positive differences are shown on opposite sides of zero.
+
+```{r}
+#| label: plot-dual-kde-difference
+#| cache: true
+#| fig-alt: >
+#|   Diverging map of robbery density minus population density in Memphis.
+#|   Negative and positive density differences appear on opposite sides of the
+#|   colour scale.
+
+hotspot_dual_kde(
+  memphis_robberies_proj,
+  memphis_population_proj,
+  method = "diff",
+  bandwidth_adjust = 0.25,
+  grid = memphis_grid
+) |>
+  autoplot()
+```
+
+Finally, `method = "sum"` adds the two density surfaces. Since sums are
+non-negative, they are shown with a sequential scale: darker cells have a
+higher combined density.
+
+```{r}
+#| label: plot-dual-kde-sum
+#| cache: true
+#| fig-alt: >
+#|   Sequential map of the combined robbery and population density in Memphis.
+#|   Darker blue cells have a higher combined density.
+
+hotspot_dual_kde(
+  memphis_robberies_proj,
+  memphis_population_proj,
+  method = "sum",
+  bandwidth_adjust = 0.25,
+  grid = memphis_grid
+) |>
+  autoplot()
+```
+
+Each legend uses `low` at its lower end and `high` at its upper end. These
+labels describe position within the values produced by the selected method;
+they do not imply that the four methods produce directly comparable numeric
+values.
 
 
 ## `hotspot_change()`
@@ -166,7 +253,7 @@ memphis_robberies_proj |>
 
 ## `hotspot_gistar()`
 
-By default, `hotspot_gistar()` returns density estimates and p-values for each cell alongside the Getis-Ord Gi* statistic. The plotting methods use the p-values to select which cells are visible, then map the density of points in each visible cell. The `critical_p` and `sign` arguments to `autoplot()`/`autolayer()` can control this behaviour. Cells with `pvalue >= critical_p` are transparent. The default is `critical_p = 0.05`. The `sign` argument can be used to restrict the visible cells to those with significant positive or negative Gi*/Gi values.
+By default, `hotspot_gistar()` returns density estimates and p-values for each cell alongside the Getis-Ord Gi* statistic. The plotting methods use the p-values to select which cells are visible, then map the density of points in each visible cell. The `critical_p` and `sign` arguments to `autoplot()`/`hotspot_layer()` can control this behaviour. Cells with `pvalue >= critical_p` are transparent. The default is `critical_p = 0.05`. The `sign` argument can be used to restrict the visible cells to those with significant positive or negative Gi*/Gi values. When both signs are shown, a diverging scale distinguishes cold spots from hot spots; cold-spot densities are negated only for plotting. When only hot spots or only cold spots are shown, a medium-to-dark blue scale ensures that every significant cell remains visible.
 
 ```{r}
 #| label: plot-gistar-both
@@ -179,7 +266,7 @@ memphis_robberies_proj |>
   autoplot()
 ```
 
-If `kde = FALSE`, the result has no `kde` column. The plotting methods instead map the `gistar` column using a diverging scale centred on zero. In this case, the `critical_p` and `sign` arguments to `autoplot()`/`autolayer()` are ignored.
+If `kde = FALSE`, the result has no `kde` column. The plotting methods instead map the `gistar` column using a diverging scale centred on zero. In this case, the `critical_p` and `sign` arguments to `autoplot()`/`hotspot_layer()` are ignored.
 
 ```{r}
 #| label: plot-gistar-without-kde
@@ -195,7 +282,7 @@ memphis_robberies_proj |>
 
 ## `hotspot_dbscan()`
 
-`hotspot_dbscan()` returns polygons covering clusters of points identified by the DBSCAN algorithm. By default, the `fill` aesthetic is mapped to the `n` column, which counts the number of points in each cluster. This can be changed using the `fill` argument to `autoplot()` or `autolayer()`. Polygons can also be labelled using the `label` argument to `autoplot()` or `autolayer()`. The default colour scale is sequential, with darker blue indicating clusters with more points.
+`hotspot_dbscan()` returns polygons covering clusters of points identified by the DBSCAN algorithm. By default, the `fill` aesthetic is mapped to the `n` column, which counts the number of points in each cluster. This can be changed using the `col_fill` argument to `autoplot()` or `hotspot_layer()`. Polygons can also be labelled using the `col_label` argument to `autoplot()` or `hotspot_layer()`. The default colour scale is sequential, with darker blue indicating clusters with more points.
 
 
 ```{r}
@@ -218,7 +305,7 @@ from `hotspot_classify()` cannot be converted because isobands require numeric
 values on a regular square grid.
 
 Isobands retain information about the original `hotspot_*()` result and can
-themselves be plotted using `autoplot()` or `autolayer()`. The default palette,
+themselves be plotted using `autoplot()` or `hotspot_layer()`. The default palette,
 legend and treatment of meaningful values such as zero therefore depend on the
 function that produced the original grid. For example, KDE isobands use a
 sequential scale:
@@ -239,8 +326,8 @@ memphis_robberies_proj |>
 ## Customising plots
 
 `autoplot()` returns an ordinary ggplot object, so scales, labels, themes, and
-other layers can be added or replaced with ggplot2. `autolayer()` is useful when
-the sfhotspot result is one component of a larger map. See the individual
+other layers can be added or replaced with ggplot2. `hotspot_layer()` is useful
+when the sfhotspot result is one component of a larger map. See the individual
 method help pages for the arguments accepted by each method.
 
 An optional map-tile background can provide geographic context. This requires
@@ -262,4 +349,6 @@ The default remains `basemap_type = "none"`, so ordinary plots never download
 tiles.
 Known map types receive an attribution caption automatically. For a custom or
 new map type, supply the provider's required statement explicitly using
-`basemap_attribution`.
+`basemap_attribution`. Use `caption` to add contextual information such as the
+map author, date or notes. This text appears above any explanatory caption and
+base-map attribution, which are retained automatically.

@@ -272,7 +272,8 @@ validate_sf <- function(
     cli::cli_abort(
       c(
         "Co-ordinate reference system for {.var {label}} is missing.",
-        "i" = "Check or set the CRS using {.fn st_crs}."
+        "i" = "Check the CRS using {.fn sf::st_crs}.",
+        "i" = "If the co-ordinate system is known, set it using {.fn sf::st_set_crs}."
       ),
       call = call
     )

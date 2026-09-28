@@ -111,11 +111,15 @@ test_that("display labels use the minimum unambiguous precision", {
   )
   expect_identical(
     isoband_display_labels(c(-Inf, -0.000012), c(-0.000012, Inf)),
-    c("< \u22121.2e-05", "\u2265 \u22121.2e-05")
+    c("< \u221212\u00b5", "\u2265 \u221212\u00b5")
   )
   expect_identical(
     isoband_display_labels(c(2.6087, 11.9521), c(11.9521, 21.2955)),
     c("2.6\u201312.0", "12.0\u201321.3")
+  )
+  expect_identical(
+    isoband_display_labels(c(1000, 12500), c(12500, 1e6)),
+    c("1.0k\u201312k", "12k\u20131.0M")
   )
 })
 

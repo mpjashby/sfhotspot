@@ -48,7 +48,7 @@ interval notation and \code{label} contains ranges formatted for display.
 \description{
 Generalise values in a regular square grid into polygon bands. The result is
 an \link[sf:sf]{sf::sf} object with one row for each non-empty band and can be plotted
-with \code{\link[=autoplot]{autoplot()}} or \code{\link[=autolayer]{autolayer()}}.
+with \code{\link[=autoplot]{autoplot()}} or \code{\link[=hotspot_layer]{hotspot_layer()}}.
 }
 \details{
 The default \code{style = "equal"} divides the observed range into equal-width

@@ -6,8 +6,15 @@
   default from the number of points and nearest-neighbour distances,
   respectively. Also added corresponding `autoplot()` and `autolayer()`
   methods.
-* New function `hotspot_isoband()` to generalise values in regular square hotspot
-  grids into tidy SF isobands with appropriate visual representation (#81).
+* New function `hotspot_isoband()` to generalise values in regular square 
+  hotspot grids into tidy SF isobands with appropriate visual representation 
+  (#81).
+* New function `hotspot_map()` to produce quick maps of the objects produced by
+  functions in the `hotspot_*()` family, as well as of generic sf objects. By
+  default, maps produced by `hotspot_map()` include a base map while those
+  produced using `autoplot()` methods do not.
+* New function `hotspot_layer()` provides a student-friendly wrapper around
+  `ggplot2::autolayer()` for adding sfhotspot results to custom ggplot2 maps.
 * `hotspot_gistar()` and `hotspot_classify()` now use the default Holm method
   when `p_adjust_method = NULL`. P-values are adjusted once using
   `spdep::p.adjustSP()`; `hotspot_classify()` no longer applies a second
@@ -17,9 +24,8 @@
   `hotspot_dual_kde()` results, and completed the plotting support for
   `hotspot_classify()` results. Plot scales and legends now reflect the
   semantics of each result, including the comparison method used for dual KDE
-  and significance/sign filtering for Gi* results. Legend titles consistently
-  use lower-case terminology. A new website plotting article demonstrates each
-  distinct behaviour (#85).
+  and significance/sign filtering for Gi* results. A new website plotting
+  article demonstrates each distinct behaviour (#85).
 * `hotspot_clip()` can now clip any type of geometry, not just point data (#65,
   #78) and produces warnings if clipping changes the geometry type of any 
   features in a way that might create downstream problems.
@@ -44,7 +50,7 @@
   data while using a common automatically selected bandwidth for both layers,
   and checks that both point layers overlap the analysis grid (#67).
 * `hotspot_gistar()` now uses weighted counts to calculate Gi* statistics and
-  p-values when weights are supplied, and `autoplot()`/`autolayer()` plot
+  p-values when weights are supplied, and `autoplot()`/`autolayer()` plot use
   weighted counts when they are present (#86).
 * Automatic CRS transformation using `st_transform_auto()` in KDE-related 
   functions now correctly restores the original geographic CRS rather than 
