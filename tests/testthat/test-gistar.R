@@ -1,7 +1,14 @@
-data_sf <- head(memphis_robberies, 1000)
+# Gi* runtime grows rapidly with the number of grid cells. This deliberately
+# small fixture retains non-zero and zero-count cells, so it exercises the same
+# statistical branches without turning a correctness test into a scale test.
+data_sf <- head(memphis_robberies, 100)
+cell_size <- 0.02
 counts <- count_points_in_polygons(
   points = data_sf,
-  polygons = sf::st_set_geometry(create_grid(data_sf), "random_geom_column")
+  polygons = sf::st_set_geometry(
+    create_grid(data_sf, cell_size = cell_size),
+    "random_geom_column"
+  )
 )
 
 # To speed up the checking process, run the function with arguments that should
@@ -86,6 +93,8 @@ test_that("column values are within the specified range", {
 })
 
 test_that("NULL uses the default p-value adjustment method (#94)", {
+  # Leave cell size implicit in both calls so the test compares only the default
+  # adjustment method while retaining coverage of automatic grid inference.
   holm_result <- gistar(counts, p_adjust_method = "holm")
 
   expect_equal(result$pvalue, holm_result$pvalue)
@@ -95,9 +104,12 @@ test_that("weighted counts are used when present (#86)", {
   weighted_counts <- counts
   weighted_counts$sum <- seq_len(nrow(weighted_counts))^2
 
-  weighted_result <- gistar(weighted_counts)
+  # These calls test weighting, not cell-size inference, so use the known toy
+  # cell size to keep both calculations focused and fast.
+  weighted_result <- gistar(weighted_counts, cell_size = cell_size)
   unweighted_result <- gistar(
-    weighted_counts[, setdiff(names(weighted_counts), "sum")]
+    weighted_counts[, setdiff(names(weighted_counts), "sum")],
+    cell_size = cell_size
   )
 
   expect_false(isTRUE(all.equal(

@@ -1,19 +1,44 @@
-set.seed(123)
+# Plot methods need representative columns, classes and geometry, not repeated
+# executions of the analysis algorithms. A 4-by-3 toy lattice supplies enough
+# rows for every classification category while keeping plotting tests focused.
+toy_extent <- sf::st_as_sfc(sf::st_bbox(
+  c(xmin = 0, ymin = 0, xmax = 4000, ymax = 3000),
+  crs = sf::st_crs(3857)
+))
+toy_geometry <- sf::st_make_grid(toy_extent, n = c(4, 3))
+toy_n <- as.double(seq_along(toy_geometry) - 1L)
 
-data_sf <- memphis_robberies
-data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
-result_count <- hotspot_count(data_sf, cell_size = 0.01, quiet = TRUE)
-result_kde <- hotspot_kde(
-  sf::st_transform(data_sf, 32616),
-  cell_size = 1000,
-  quiet = TRUE
+result_count <- new_hotspot_results(
+  sf::st_as_sf(tibble::tibble(n = toy_n, geometry = toy_geometry)),
+  class = "hspt_n"
 )
-result_classify <- hotspot_classify(
-  memphis_robberies,
-  cell_size = 0.01,
-  quiet = TRUE
+result_kde <- new_hotspot_results(
+  sf::st_as_sf(tibble::tibble(
+    n = toy_n,
+    kde = as.double(seq_along(toy_geometry)) / 100,
+    geometry = toy_geometry
+  )),
+  class = "hspt_k"
 )
-result_change <- hotspot_change(data_sf, quiet = TRUE)
+result_classify <- new_hotspot_results(
+  sf::st_as_sf(tibble::tibble(
+    hotspot_category = rep(
+      names(hotspot_category_colours),
+      length.out = length(toy_geometry)
+    ),
+    geometry = toy_geometry
+  )),
+  class = "hspt_c"
+)
+result_change <- new_hotspot_results(
+  sf::st_as_sf(tibble::tibble(
+    n_before = toy_n,
+    n_after = rev(toy_n),
+    change = toy_n - rev(toy_n),
+    geometry = toy_geometry
+  )),
+  class = "hspt_d"
+)
 
 result_gistar <- result_kde
 result_gistar$gistar <- rep(c(-2, -1, 1, 2), length.out = nrow(result_gistar))

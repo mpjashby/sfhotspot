@@ -1,10 +1,32 @@
 data_sf <- memphis_robberies_jan
 boundary_sf <- memphis_precincts[1, ]
 result <- hotspot_clip(data_sf, boundary_sf, quiet = TRUE)
-polygon_data_sf <- hotspot_count(data_sf, quiet = TRUE)
+
+# Class preservation depends only on the SF columns and attributes. Use four toy
+# polygons here rather than generating and repeatedly clipping a full analysis
+# grid for every sfhotspot result class.
+toy_extent <- sf::st_as_sfc(sf::st_bbox(
+  c(xmin = 0, ymin = 0, xmax = 2, ymax = 2),
+  crs = sf::st_crs(3857)
+))
+toy_geometry <- sf::st_make_grid(toy_extent, n = c(2, 2))
+polygon_data_sf <- new_hotspot_results(
+  sf::st_as_sf(tibble::tibble(
+    n = as.double(seq_along(toy_geometry)),
+    geometry = toy_geometry
+  )),
+  class = "hspt_n"
+)
+toy_boundary <- sf::st_as_sf(sf::st_as_sfc(sf::st_bbox(
+  c(xmin = 0, ymin = 0, xmax = 0.9, ymax = 2),
+  crs = sf::st_crs(3857)
+)))
+# Metadata regressions do not require geometric clipping. A full toy boundary
+# mirrors the original test while avoiding interactions with dimension changes.
+toy_full_boundary <- sf::st_as_sf(toy_extent)
 polygon_result <- hotspot_clip(
   polygon_data_sf,
-  memphis_precincts,
+  toy_boundary,
   quiet = TRUE
 )
 
@@ -105,7 +127,7 @@ test_that("package-specific result classes are preserved (#71)", {
     )
     classed_result <- hotspot_clip(
       classed_data,
-      memphis_precincts,
+      toy_full_boundary,
       quiet = TRUE
     )
     expect_s3_class(classed_result, result_class)
@@ -122,7 +144,7 @@ test_that("dual-KDE class and method survive clipping (#83)", {
   )
   clipped_dual_kde <- hotspot_clip(
     dual_kde_data,
-    memphis_precincts,
+    toy_full_boundary,
     quiet = TRUE
   )
 
@@ -137,7 +159,7 @@ test_that("unrelated classes are not preserved (#71)", {
   )
   unclassed_result <- hotspot_clip(
     unclassed_data,
-    memphis_precincts,
+    toy_full_boundary,
     quiet = TRUE
   )
 

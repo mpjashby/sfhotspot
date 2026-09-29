@@ -1,6 +1,14 @@
-data_sf <- head(memphis_robberies, 1000)
+# The classification tests need several time periods and occupied cells, but not
+# the full example dataset. Evenly spaced rows retain the complete date range in
+# a 200-point fixture rather than taking 200 records from only the earliest dates.
+data_sf <- memphis_robberies[unique(round(seq(
+  1,
+  nrow(memphis_robberies),
+  length.out = 200
+))), ]
+cell_size <- 0.03
 
-result <- hotspot_classify(data_sf)
+result <- hotspot_classify(data_sf, cell_size = cell_size, quiet = TRUE)
 
 # CHECK INPUTS -----------------------------------------------------------------
 
@@ -71,6 +79,21 @@ test_that("columns in output have the required types", {
   expect_true(sf::st_is(result$geometry[[1]], "POLYGON"))
 })
 
+test_that("automatic period and cell size are reported", {
+  # Automatic cell-size selection is tested directly elsewhere. Mock its value
+  # here so this orchestration branch remains covered without recreating the
+  # fine grid that made the original classification tests slow.
+  local_mocked_bindings(
+    set_cell_size = function(...) cell_size,
+    .package = "sfhotspot"
+  )
+
+  messages <- capture_messages(automatic <- hotspot_classify(data_sf))
+
+  expect_true(any(grepl("period.*set to.*automatically", messages)))
+  expect_s3_class(automatic, "hspt_c")
+})
+
 test_that("p-values are not adjusted again across periods (#94)", {
   testthat::local_mocked_bindings(
     gistar = function(counts, ...) {
@@ -84,6 +107,7 @@ test_that("p-values are not adjusted again across periods (#94)", {
   classified <- hotspot_classify(
     data_sf,
     period = "1 month",
+    cell_size = cell_size,
     quiet = TRUE
   )
 
@@ -92,7 +116,9 @@ test_that("p-values are not adjusted again across periods (#94)", {
 
 test_that("cell size is extracted silently from a supplied grid (#87)", {
   data_projected <- sf::st_transform(data_sf, 2843)
-  grid <- hotspot_grid(data_projected, cell_size = 2000, quiet = TRUE)
+  # The regression is about extracting a supplied cell size, so use a coarse
+  # grid that keeps the repeated classifications small.
+  grid <- hotspot_grid(data_projected, cell_size = 5000, quiet = TRUE)
 
   # Regression test for https://github.com/mpjashby/sfhotspot/issues/87
   messages <- testthat::capture_messages(

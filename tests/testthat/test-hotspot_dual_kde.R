@@ -1,24 +1,27 @@
 # KDE can only be calculated for projected co-ordinates, so first convert data
-# to use local state plane CRS
-data_sf <- sf::st_transform(head(memphis_robberies, 100), 2843)
+# to use local state plane CRS. The small, coarse fixture covers comparison,
+# weighting and transformation behaviour without repeatedly building large KDEs.
+set.seed(123)
+data_sf <- sf::st_transform(head(memphis_robberies, 30), 2843)
 data_sf$wt <- runif(nrow(data_sf), max = 1000)
 data_lonlat <- sf::st_transform(data_sf, 4326)
 data_lonlat_y <- data_lonlat[seq(1, nrow(data_lonlat), by = 2), ]
-grid_lonlat <- hotspot_grid(data_lonlat, cell_size = 0.03, quiet = TRUE)
+cell_size <- 5000
+grid_lonlat <- hotspot_grid(data_lonlat, cell_size = 0.05, quiet = TRUE)
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
 result <- hotspot_dual_kde(
   x = data_sf,
   y = data_sf,
-  cell_size = 1000,
+  cell_size = cell_size,
   bandwidth = 10000,
   quiet = TRUE
 )
 result_wt <- hotspot_dual_kde(
   x = data_sf,
   y = data_sf,
-  cell_size = 1000,
+  cell_size = cell_size,
   bandwidth = 10000,
   weights = c(wt, wt),
   quiet = TRUE
@@ -26,14 +29,14 @@ result_wt <- hotspot_dual_kde(
 result_dual_bdwth <- hotspot_dual_kde(
   x = data_sf,
   y = data_sf,
-  cell_size = 1000,
+  cell_size = cell_size,
   bandwidth = list(9000, 10000),
   quiet = TRUE
 )
 result_dual_adj <- hotspot_dual_kde(
   x = data_sf,
   y = data_sf,
-  cell_size = 1000,
+  cell_size = cell_size,
   bandwidth_adjust = list(0.5, 1),
   quiet = TRUE
 )
@@ -128,13 +131,17 @@ test_that("output is an SF tibble with dual-KDE and KDE classes (#83)", {
 
 test_that("every comparison method is recorded in dual-KDE metadata (#83)", {
   for (comparison_method in c("ratio", "log", "diff", "sum")) {
-    method_result <- hotspot_dual_kde(
-      data_sf,
-      data_sf,
-      cell_size = 1000,
-      bandwidth = 10000,
-      method = comparison_method,
-      quiet = TRUE
+    # Each public comparison method is run once on the shared toy surface. This
+    # combines the former metadata and no-condition tests without duplicate KDEs.
+    expect_no_condition(
+      method_result <- hotspot_dual_kde(
+        data_sf,
+        data_sf,
+        cell_size = cell_size,
+        bandwidth = 10000,
+        method = comparison_method,
+        quiet = TRUE
+      )
     )
 
     expect_identical(class(method_result)[1:2], c("hspt_dk", "hspt_k"))
@@ -214,7 +221,9 @@ test_that("lon/lat data use valid projected bandwidths and retain their CRS", {
 })
 
 test_that("cell size is extracted silently from a supplied grid", {
-  grid <- hotspot_grid(data_sf, cell_size = 1000, quiet = TRUE)
+  # The coarse grid keeps this argument-precedence regression test independent
+  # of KDE resolution.
+  grid <- hotspot_grid(data_sf, cell_size = cell_size, quiet = TRUE)
 
   expect_no_message(
     grid_result <- hotspot_dual_kde(
@@ -229,44 +238,13 @@ test_that("cell size is extracted silently from a supplied grid", {
     hotspot_dual_kde(
       data_sf,
       data_sf,
-      cell_size = 500,
+      cell_size = cell_size / 2,
       bandwidth = 10000,
       grid = grid,
       quiet = TRUE
     )
   )
 })
-
-test_that("no issues with different methods", {
-  expect_no_condition(
-    hotspot_dual_kde(
-      data_sf,
-      data_sf,
-      cell_size = 1000,
-      bandwidth = 10000,
-      method = "log"
-    )
-  )
-  expect_no_condition(
-    hotspot_dual_kde(
-      data_sf,
-      data_sf,
-      cell_size = 1000,
-      bandwidth = 10000,
-      method = "diff"
-    )
-  )
-  expect_no_condition(
-    hotspot_dual_kde(
-      data_sf,
-      data_sf,
-      cell_size = 1000,
-      bandwidth = 10000,
-      method = "sum"
-    )
-  )
-})
-
 
 ## Messages ----
 
@@ -279,14 +257,14 @@ test_that("message when cell size set automatically", {
 
 test_that("message when bandwidth set automatically", {
   expect_message(
-    hotspot_dual_kde(data_sf, data_sf, cell_size = 1000),
+    hotspot_dual_kde(data_sf, data_sf, cell_size = cell_size),
     "Bandwidth set automatically based on rule of thumb"
   )
   expect_message(
     hotspot_dual_kde(
       data_sf,
       data_sf,
-      cell_size = 1000,
+      cell_size = cell_size,
       bandwidth = list(NULL, 10000)
     ),
     "Bandwidth set automatically based on rule of thumb"
@@ -298,7 +276,7 @@ test_that("message when data were transformed", {
     hotspot_dual_kde(
       x = data_lonlat,
       y = data_lonlat,
-      cell_size = 0.005,
+      cell_size = 0.02,
       bandwidth = 10000
     ),
     "Data transformed to "
@@ -307,7 +285,7 @@ test_that("message when data were transformed", {
     hotspot_dual_kde(
       x = data_lonlat,
       y = data_lonlat,
-      cell_size = 0.005,
+      cell_size = 0.02,
       bandwidth = 10000,
       quiet = TRUE
     )

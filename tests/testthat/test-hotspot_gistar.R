@@ -1,14 +1,20 @@
-data_sf <- sf::st_transform(head(memphis_robberies, 1000), 2843)
+# A coarse toy grid is sufficient for testing the high-level Gi* orchestration.
+# The standalone `gistar()` tests cover the statistic itself in greater detail.
+data_sf <- sf::st_transform(head(memphis_robberies, 100), 2843)
 data_sf$wt <- seq_len(nrow(data_sf))
-data_lonlat <- sf::st_transform(head(data_sf, 100), 4326)
+cell_size <- 5000
+grid <- hotspot_grid(data_sf, cell_size = cell_size, quiet = TRUE)
+data_lonlat <- sf::st_transform(head(data_sf, 30), 4326)
+grid_lonlat <- sf::st_transform(grid, 4326)
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
-result <- hotspot_gistar(data_sf, quiet = TRUE)
-result_wt <- hotspot_gistar(data_sf, weights = wt, quiet = TRUE)
-result_no_kde <- hotspot_gistar(data_sf, kde = FALSE, quiet = TRUE)
+result <- hotspot_gistar(data_sf, grid = grid, quiet = TRUE)
+result_wt <- hotspot_gistar(data_sf, grid = grid, weights = wt, quiet = TRUE)
+result_no_kde <- hotspot_gistar(data_sf, grid = grid, kde = FALSE, quiet = TRUE)
 result_wt_no_kde <- hotspot_gistar(
   data_sf,
+  grid = grid,
   weights = wt,
   kde = FALSE,
   quiet = TRUE
@@ -37,22 +43,24 @@ test_that("error for lon/lat `data` if `transform = FALSE`", {
 
 test_that("message if `data` uses a geographic CRS and KDE not performed", {
   expect_message(
-    hotspot_gistar(data_lonlat, kde = FALSE)
+    hotspot_gistar(data_lonlat, grid = grid_lonlat, kde = FALSE)
   )
 })
 
 test_that("cell size is extracted silently from a supplied grid", {
-  grid <- hotspot_grid(data_sf, cell_size = 1000, quiet = TRUE)
+  # This test concerns supplied-grid precedence, so the shared coarse cell size
+  # avoids repeated fine-resolution Gi* calculations.
+  supplied_grid <- hotspot_grid(data_sf, cell_size = cell_size, quiet = TRUE)
 
   expect_no_message(
-    grid_result <- hotspot_gistar(data_sf, grid = grid, kde = FALSE)
+    grid_result <- hotspot_gistar(data_sf, grid = supplied_grid, kde = FALSE)
   )
   expect_equal(
     grid_result,
     hotspot_gistar(
       data_sf,
-      grid = grid,
-      cell_size = 500,
+      grid = supplied_grid,
+      cell_size = cell_size / 2,
       kde = FALSE,
       quiet = TRUE
     )
@@ -86,7 +94,13 @@ test_that("standard SF printing and subsetting are preserved (#82)", {
 })
 
 test_that("function calculates KDE values for lon/lat data", {
-  result_lonlat <- hotspot_gistar(data_lonlat, quiet = TRUE)
+  # One small geographic end-to-end case retains transformation and KDE
+  # coverage without generating an automatically fine grid.
+  result_lonlat <- hotspot_gistar(
+    data_lonlat,
+    grid = grid_lonlat,
+    quiet = TRUE
+  )
 
   expect_s3_class(result_lonlat, "sf")
   expect_type(result_lonlat$kde, "double")
@@ -130,12 +144,14 @@ test_that("column values are within the specified range", {
 test_that("NULL uses Holm adjustment once (#94)", {
   holm_result <- hotspot_gistar(
     data_sf,
+    grid = grid,
     kde = FALSE,
     p_adjust_method = "holm",
     quiet = TRUE
   )
   unadjusted_result <- hotspot_gistar(
     data_sf,
+    grid = grid,
     kde = FALSE,
     p_adjust_method = "none",
     quiet = TRUE

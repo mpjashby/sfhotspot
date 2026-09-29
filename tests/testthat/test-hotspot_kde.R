@@ -1,20 +1,23 @@
 # KDE can only be calculated for projected co-ordinates, so first convert data
-# to use local state plane CRS
-data_sf <- sf::st_transform(head(memphis_robberies, 100), 2843)
+# to use local state plane CRS. Thirty points and a coarse grid are sufficient
+# for interface and CRS tests; fine-resolution surfaces belong in benchmarks.
+set.seed(123)
+data_sf <- sf::st_transform(head(memphis_robberies, 30), 2843)
 data_sf$wt <- runif(nrow(data_sf), max = 1000)
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
+cell_size <- 5000
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
 result <- hotspot_kde(
   data = data_sf,
-  cell_size = 1000,
+  cell_size = cell_size,
   bandwidth = 10000,
   quiet = TRUE
 )
 result_wt <- hotspot_kde(
   data_sf,
-  cell_size = 1000,
+  cell_size = cell_size,
   bandwidth = 10000,
   weights = wt,
   quiet = TRUE
@@ -59,7 +62,9 @@ test_that("columns in output have the required types", {
 })
 
 test_that("cell size is extracted silently from a supplied grid", {
-  grid <- hotspot_grid(data_sf, cell_size = 1000, quiet = TRUE)
+  # Reuse a coarse toy grid because this regression test concerns argument
+  # precedence, not the resolution of the KDE surface.
+  grid <- hotspot_grid(data_sf, cell_size = cell_size, quiet = TRUE)
 
   expect_no_message(
     grid_result <- hotspot_kde(data_sf, grid = grid, bandwidth = 10000)
@@ -69,7 +74,7 @@ test_that("cell size is extracted silently from a supplied grid", {
     hotspot_kde(
       data_sf,
       grid = grid,
-      cell_size = 500,
+      cell_size = cell_size / 2,
       bandwidth = 10000,
       quiet = TRUE
     )
@@ -83,7 +88,7 @@ test_that("no issues if cell size is set automatically", {
 test_that("automatic transformation supports non-WGS84 geographic data (#89)", {
   data_etrs89 <- sf::st_transform(data_sf, 4258)
   grid_etrs89 <- sf::st_transform(
-    hotspot_grid(data_sf, cell_size = 1000, quiet = TRUE),
+    hotspot_grid(data_sf, cell_size = cell_size, quiet = TRUE),
     4258
   )
 

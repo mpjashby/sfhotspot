@@ -107,6 +107,19 @@ test_that("no error if non-multipolygon geometry provided (#46)", {
 
 ## Messages ----
 
-test_that("produces warning if grid has 100,000+ cells", {
-  expect_message(create_grid(data_sf_m, cell_size = 40, quiet = FALSE))
+test_that("reports grids with more than 100,000 cells without building them", {
+  # The message is emitted before `st_make_grid()` is called. Mock only that
+  # allocation step so the real size calculation is tested without constructing
+  # more than 100,000 polygons during every package check.
+  local_mocked_bindings(
+    st_make_grid = function(x, ...) sf::st_as_sfc(sf::st_bbox(x)),
+    .package = "sf"
+  )
+
+  expect_message(
+    result <- create_grid(data_sf_m, cell_size = 40, quiet = FALSE),
+    "grid will contain a large number of cells"
+  )
+  expect_s3_class(result, "sf")
+  expect_equal(nrow(result), 1L)
 })

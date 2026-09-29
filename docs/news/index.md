@@ -1,5 +1,10 @@
 # Changelog
 
+## sfhotspot 1.1.1
+
+- Package tests now streamlined to reducing CRAN testing time
+  ([\#98](https://github.com/mpjashby/sfhotspot/issues/98)).
+
 ## sfhotspot 1.1.0
 
 - New function

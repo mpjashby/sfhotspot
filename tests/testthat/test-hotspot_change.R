@@ -1,5 +1,8 @@
-data_sf <- head(memphis_robberies, 1000)
+# Two hundred records retain multiple dates and comparison groups while avoiding
+# a fine grid over the full example dataset in every change test.
+data_sf <- head(memphis_robberies, 200)
 data_df <- as.data.frame(sf::st_drop_geometry(data_sf))
+cell_size <- 0.03
 data_sf$no_groups <- NA_real_
 data_sf$bad_groups <- data_sf$date < min(data_sf$date)
 data_sf$multi_groups <- cut(data_sf$date, breaks = 5)
@@ -7,7 +10,11 @@ data_sf$good_groups <- as.character(cut(data_sf$date, breaks = 2))
 
 # To speed up the checking process, run the function with arguments that should
 # not produce any errors or warnings
-result <- hotspot_change(data = data_sf, quiet = TRUE)
+result <- hotspot_change(
+  data = data_sf,
+  cell_size = cell_size,
+  quiet = TRUE
+)
 
 
 
@@ -97,7 +104,7 @@ test_that("columns in output have the required types", {
 })
 
 test_that("cell size is ignored silently when grid is provided", {
-  grid <- hotspot_grid(data_sf, cell_size = 0.01, quiet = TRUE)
+  grid <- hotspot_grid(data_sf, cell_size = cell_size, quiet = TRUE)
   boundary <- min(data_sf$date) + 30
 
   expect_no_message(
@@ -109,7 +116,7 @@ test_that("cell size is ignored silently when grid is provided", {
       data_sf,
       boundary = boundary,
       grid = grid,
-      cell_size = 0.001,
+      cell_size = cell_size / 2,
       quiet = TRUE
     )
   )
@@ -119,12 +126,15 @@ test_that("cell size is ignored silently when grid is provided", {
 ## Messages ----
 
 test_that("boundary point is reported if not specified", {
-  expect_message(hotspot_change(data_sf), "Boundary point set as")
+  expect_message(
+    hotspot_change(data_sf, cell_size = cell_size),
+    "Boundary point set as"
+  )
 })
 
 test_that("summary message if groups specified and not factor", {
   expect_message(
-    hotspot_change(data_sf, groups = good_groups),
+    hotspot_change(data_sf, groups = good_groups, cell_size = cell_size),
     "Comparing periods based on values"
   )
 })
