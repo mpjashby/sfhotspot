@@ -71,7 +71,7 @@ jobs:
         env:
           CHECK_ARGS: >-
             ${{ matrix.config.label == 'nosuggests'
-                && '--no-build-vignettes'
+                && '--ignore-vignettes'
                 || '' }}
           BUILD_ARGS: >-
             ${{ matrix.config.label == 'nosuggests'
