@@ -1,6 +1,10 @@
 # The classification tests need several time periods and occupied cells, but not
 # the full example dataset. Evenly spaced rows retain the complete date range in
 # a 200-point fixture rather than taking 200 records from only the earliest dates.
+# Temporarily skip these tests without lubridate; remove the dependency in #100:
+# https://github.com/mpjashby/sfhotspot/issues/100
+testthat::skip_if_not_installed("lubridate")
+
 data_sf <- memphis_robberies[unique(round(seq(
   1,
   nrow(memphis_robberies),
