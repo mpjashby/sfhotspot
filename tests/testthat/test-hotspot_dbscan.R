@@ -59,7 +59,14 @@ test_that("MULTIPOINT coordinates are counted individually", {
     )), crs = 3857)
   )
 
-  result <- hotspot_dbscan(multipoint, eps = 0.2, min_pts = 3, quiet = TRUE)
+  # Use convex hulls so this non-concave test also runs with GEOS < 3.11.
+  result <- hotspot_dbscan(
+    multipoint,
+    eps = 0.2,
+    min_pts = 3,
+    hull = "convex",
+    quiet = TRUE
+  )
   expect_identical(result$n, 5L)
   expect_identical(result$prop, 1)
 })
@@ -79,7 +86,10 @@ test_that("polygon counts include noise points inside the final hull", {
     crs = 3857
   )
 
-  result <- hotspot_dbscan(data, eps = 1, min_pts = 3, quiet = TRUE)
+  # Use convex hulls so this non-concave test also runs with GEOS < 3.11.
+  result <- hotspot_dbscan(
+    data, eps = 1, min_pts = 3, hull = "convex", quiet = TRUE
+  )
 
   expect_identical(result$n, 25L)
   expect_identical(result$prop, 1)
@@ -123,7 +133,10 @@ test_that("automatic eps uses adjusted median nearest-neighbour distance", {
 })
 
 test_that("automatic eps is recorded in metadata", {
-  result <- hotspot_dbscan(memphis_robberies_jan, quiet = TRUE)
+  # Use convex hulls so this non-concave test also runs with GEOS < 3.11.
+  result <- hotspot_dbscan(
+    memphis_robberies_jan, hull = "convex", quiet = TRUE
+  )
   metadata <- attr(result, "dbscan")
 
   expect_true(metadata$eps_auto)
@@ -131,13 +144,16 @@ test_that("automatic eps is recorded in metadata", {
   expect_identical(metadata$min_pts, 15L)
   expect_true(metadata$min_pts_auto)
   expect_identical(metadata$density_adjust, 2)
-  expect_identical(metadata$hull, "concave")
-  expect_identical(metadata$hull_ratio, 0.75)
+  expect_identical(metadata$hull, "convex")
+  expect_null(metadata$hull_ratio)
 })
 
 test_that("geographic data are transformed and restored", {
+  # Use convex hulls so this non-concave test also runs with GEOS < 3.11.
   expect_message(
-    result <- hotspot_dbscan(memphis_robberies_jan, quiet = FALSE),
+    result <- hotspot_dbscan(
+      memphis_robberies_jan, hull = "convex", quiet = FALSE
+    ),
     "Data transformed to"
   )
   expect_identical(sf::st_crs(result), sf::st_crs(memphis_robberies_jan))
@@ -147,17 +163,37 @@ test_that("geographic data are transformed and restored", {
   )
 })
 
-test_that("convex and concave hulls are supported", {
+test_that("convex hulls are supported", {
   data <- make_dbscan_points()
   convex <- hotspot_dbscan(
     data, eps = 1, min_pts = 3, hull = "convex", quiet = TRUE
   )
   expect_identical(attr(convex, "dbscan")$hull, "convex")
+})
 
+test_that("concave hulls require GEOS 3.11", {
+  skip_if(
+    utils::compareVersion(sf::sf_extSoftVersion()[["GEOS"]], "3.11.0") >= 0,
+    "installed GEOS supports concave hulls"
+  )
+  expect_error(
+    hotspot_dbscan(
+      make_dbscan_points(),
+      eps = 1,
+      min_pts = 3,
+      hull = "concave",
+      quiet = TRUE
+    ),
+    "Concave cluster hulls require GEOS 3.11.0 or later"
+  )
+})
+
+test_that("concave hulls are supported", {
   skip_if(
     utils::compareVersion(sf::sf_extSoftVersion()[["GEOS"]], "3.11.0") < 0,
     "concave hulls require GEOS 3.11"
   )
+  data <- make_dbscan_points()
   concave <- hotspot_dbscan(
     data,
     eps = 1,
@@ -203,11 +239,22 @@ test_that("DBSCAN parameters are validated", {
 
 test_that("reserved and supported dot arguments are handled", {
   data <- make_dbscan_points()
+  # Use convex hulls so this non-concave test also runs with GEOS < 3.11.
   expect_no_error(hotspot_dbscan(
-    data, eps = 1, min_pts = 3, search = "linear", quiet = TRUE
+    data,
+    eps = 1,
+    min_pts = 3,
+    hull = "convex",
+    search = "linear",
+    quiet = TRUE
   ))
   expect_no_error(hotspot_dbscan(
-    data, eps = 1, min_pts = 3, borderPoints = FALSE, quiet = TRUE
+    data,
+    eps = 1,
+    min_pts = 3,
+    hull = "convex",
+    borderPoints = FALSE,
+    quiet = TRUE
   ))
   expect_error(hotspot_dbscan(data, eps = 1, weights = 1), "not supported")
   expect_error(hotspot_dbscan(data, eps = 1, minPts = 3), "reserved")
@@ -229,8 +276,11 @@ test_that("reserved and supported dot arguments are handled", {
 
 test_that("all-noise and coincident automatic inputs give useful errors", {
   data <- make_dbscan_points()
+  # Use convex hulls so this non-concave test also runs with GEOS < 3.11.
   expect_error(
-    hotspot_dbscan(data, eps = 0.01, min_pts = 3, quiet = TRUE),
+    hotspot_dbscan(
+      data, eps = 0.01, min_pts = 3, hull = "convex", quiet = TRUE
+    ),
     "No DBSCAN hotspots"
   )
 
@@ -240,7 +290,7 @@ test_that("all-noise and coincident automatic inputs give useful errors", {
     crs = 3857
   )
   expect_error(
-    hotspot_dbscan(coincident, quiet = TRUE),
+    hotspot_dbscan(coincident, hull = "convex", quiet = TRUE),
     "finite positive automatic.*eps"
   )
 
@@ -248,14 +298,21 @@ test_that("all-noise and coincident automatic inputs give useful errors", {
     data.frame(x = 1:5, y = 1:5), coords = c("x", "y"), crs = 3857
   )
   expect_s3_class(
-    hotspot_dbscan(collinear, density_adjust = 0.25, quiet = TRUE),
+    hotspot_dbscan(
+      collinear, density_adjust = 0.25, hull = "convex", quiet = TRUE
+    ),
     "hspt_s"
   )
 })
 
 test_that("hspt_s class and metadata survive hotspot_clip", {
+  # Use convex hulls so this non-concave test also runs with GEOS < 3.11.
   result <- hotspot_dbscan(
-    make_dbscan_points(), eps = 1, min_pts = 3, quiet = TRUE
+    make_dbscan_points(),
+    eps = 1,
+    min_pts = 3,
+    hull = "convex",
+    quiet = TRUE
   )
   boundary <- sf::st_as_sf(sf::st_sfc(
     sf::st_polygon(list(matrix(
@@ -272,15 +329,25 @@ test_that("hspt_s class and metadata survive hotspot_clip", {
 })
 
 test_that("DBSCAN results cannot be converted to isobands", {
+  # Use convex hulls so this non-concave test also runs with GEOS < 3.11.
   result <- hotspot_dbscan(
-    make_dbscan_points(), eps = 1, min_pts = 3, quiet = TRUE
+    make_dbscan_points(),
+    eps = 1,
+    min_pts = 3,
+    hull = "convex",
+    quiet = TRUE
   )
   expect_error(hotspot_isoband(result, quiet = TRUE), "cannot be converted")
 })
 
 test_that("DBSCAN results have configurable plot fills and labels", {
+  # Use convex hulls so this non-concave test also runs with GEOS < 3.11.
   result <- hotspot_dbscan(
-    make_dbscan_points(), eps = 1, min_pts = 3, quiet = TRUE
+    make_dbscan_points(),
+    eps = 1,
+    min_pts = 3,
+    hull = "convex",
+    quiet = TRUE
   )
 
   expect_s3_class(autoplot(result), "ggplot")
@@ -367,8 +434,13 @@ test_that("DBSCAN results have configurable plot fills and labels", {
 })
 
 test_that("DBSCAN plotting arguments and columns are validated", {
+  # Use convex hulls so this non-concave test also runs with GEOS < 3.11.
   result <- hotspot_dbscan(
-    make_dbscan_points(), eps = 1, min_pts = 3, quiet = TRUE
+    make_dbscan_points(),
+    eps = 1,
+    min_pts = 3,
+    hull = "convex",
+    quiet = TRUE
   )
 
   expect_error(autoplot(result, col_fill = "density"), "col_fill")

@@ -179,7 +179,10 @@ for their application.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="fu">hotspot_dbscan</span><span class="op">(</span><span class="va">memphis_robberies_jan</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># The default concave hulls require GEOS 3.11 or later.</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/compareVersion.html" class="external-link">compareVersion</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/sf_extSoftVersion.html" class="external-link">sf_extSoftVersion</a></span><span class="op">(</span><span class="op">)</span><span class="op">[[</span><span class="st">"GEOS"</span><span class="op">]</span><span class="op">]</span>, <span class="st">"3.11.0"</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu">hotspot_dbscan</span><span class="op">(</span><span class="va">memphis_robberies_jan</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Minimum points set automatically from the number of point coordinates.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> `min_pts` = 15.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Data transformed to <span style="color: #0000BB;">"WGS 84 / UTM zone 16N"</span> co-ordinate system.</span>

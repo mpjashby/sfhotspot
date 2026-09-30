@@ -146,7 +146,10 @@ are meaningful for their application.
 
 ``` r
 # \donttest{
-hotspot_dbscan(memphis_robberies_jan)
+# The default concave hulls require GEOS 3.11 or later.
+if (utils::compareVersion(sf::sf_extSoftVersion()[["GEOS"]], "3.11.0") >= 0) {
+  hotspot_dbscan(memphis_robberies_jan)
+}
 #> Minimum points set automatically from the number of point coordinates.
 #> ℹ `min_pts` = 15.
 #> Data transformed to "WGS 84 / UTM zone 16N" co-ordinate system.

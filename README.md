@@ -10,6 +10,8 @@
 status](https://www.r-pkg.org/badges/version/sfhotspot.png)](https://CRAN.R-project.org/package=sfhotspot)
 [![CRAN
 checks](https://badges.cranchecks.info/worst/sfhotspot.svg)](https://cran.r-project.org/web/checks/check_results_sfhotspot.html)
+[![CRAN RStudio mirror
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/sfhotspot?color=blue.png)](https://r-pkg.org/pkg/sfhotspot)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![Codecov test

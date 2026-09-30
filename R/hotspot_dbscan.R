@@ -91,7 +91,10 @@
 #'
 #' @examples
 #' \donttest{
-#' hotspot_dbscan(memphis_robberies_jan)
+#' # The default concave hulls require GEOS 3.11 or later.
+#' if (utils::compareVersion(sf::sf_extSoftVersion()[["GEOS"]], "3.11.0") >= 0) {
+#'   hotspot_dbscan(memphis_robberies_jan)
+#' }
 #'
 #' hotspot_dbscan(
 #'   memphis_robberies_jan,
