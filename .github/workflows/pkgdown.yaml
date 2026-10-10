@@ -14,16 +14,31 @@ permissions:
 
 jobs:
   pkgdown:
-    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
     concurrency:
       group: pkgdown-deploy
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v6
 
+      - name: Check deployment credentials
+        shell: bash
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          missing=0
+          for secret_name in FTP_USERNAME FTP_PASSWORD; do
+            if [[ -z "${!secret_name}" ]]; then
+              echo "::error::${secret_name} is unavailable. Configure it in this repository's Settings > Secrets and variables > Actions. If it is an environment secret, set jobs.pkgdown.environment to that environment's name."
+              missing=1
+            fi
+          done
+          exit "$missing"
+
       - name: Deploy site via FTP
-        if: github.ref == 'refs/heads/main'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ftp.lesscrime.info
           port: 21
